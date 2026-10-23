@@ -1,4 +1,4 @@
-# Plano de la sala (3 salas + terrazas) calcado del original, en sus coordenadas (1204x596)
+# Plano de Natural Patraix (3 salas + terrazas) calcado del original, en sus coordenadas (1204x596)
 import sys
 P = lambda pts: " ".join(f"{x},{y}" for x, y in pts)
 
