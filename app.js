@@ -272,7 +272,7 @@ function renderMapa() {
       el("img", { src: photoUrl(S.mapPath), alt: "Plano de la sala" }),
       S.sectors.filter(s => s.x != null && s.y != null).map(s => el("button", { class: "pin" + (newBy[s.name] ? " fresh" : ""), style: `left:${s.x * 100}%;top:${s.y * 100}%`,
         "aria-label": `${s.name}: ${openBy[s.name] || 0} bloques`, onclick: e => { e.stopPropagation(); if (!S.placing) goSector(s.name); } },
-        el("span", { class: "pin-name", text: s.name }), el("span", { class: "pin-n", text: openBy[s.name] || 0 }))));
+        el("span", { class: "pin-name", text: s.name }), openBy[s.name] ? el("span", { class: "pin-n", text: openBy[s.name] }) : null)));
     if (placingSec) plan.addEventListener("click", async e => {
       const r = plan.getBoundingClientRect();
       const x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), y = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
@@ -282,7 +282,7 @@ function renderMapa() {
     });
     if (placingSec) kids.push(el("div", { class: "banner" }, `Toca el plano donde está «${placingSec.name}».`, el("button", { class: "linkbtn", onclick: () => { S.placing = null; render(); } }, "Cancelar")));
     kids.push(el("div", { class: "plan-scroll" }, plan));
-    kids.push(el("p", { class: "note", text: "Toca un sector para ver sus bloques. El número es cuántos hay abiertos; en verde, los que tienen novedades." }));
+    kids.push(el("p", { class: "note", text: "Toca un sector para ver sus bloques. La burbuja indica cuántos hay abiertos; en verde, los sectores con novedades. En el móvil, desliza el plano de lado." }));
   }
 
   if (names.length) {
@@ -298,7 +298,7 @@ function renderMapa() {
 
 function mapEditor() {
   const box = el("div", { class: "section editor" }, el("span", { class: "label", text: "Equipador · plano y sectores" }));
-  const file = el("input", { type: "file", accept: "image/*", id: "map-file", hidden: true, onchange: async () => {
+  const file = el("input", { type: "file", accept: "image/*,.svg", id: "map-file", hidden: true, onchange: async () => {
     const f = file.files[0]; if (!f) return;
     toast("Subiendo plano…");
     try {
@@ -599,7 +599,7 @@ function openDetail(id) {
 }
 
 /* ---------- fotos ---------- */
-async function resizeImage(file, max) {
+async function resizeImage(file, max, type = "image/jpeg") {
   let src;
   try { src = await createImageBitmap(file, { imageOrientation: "from-image" }); }
   catch (e) {
@@ -608,12 +608,15 @@ async function resizeImage(file, max) {
   const w = src.width, h = src.height, k = Math.min(1, max / Math.max(w, h));
   const c = document.createElement("canvas"); c.width = Math.round(w * k); c.height = Math.round(h * k);
   c.getContext("2d").drawImage(src, 0, 0, c.width, c.height);
-  return new Promise((res, rej) => c.toBlob(b => b ? res(b) : rej(new Error("toBlob")), "image/jpeg", 0.82));
+  return new Promise((res, rej) => c.toBlob(b => b ? res(b) : rej(new Error("toBlob")), type, 0.82));
 }
 async function uploadPhoto(file, folder, max = 1600) {
-  const blob = await resizeImage(file, max);
-  const path = `${folder}/${crypto.randomUUID()}.jpg`;
-  const { error } = await sb.storage.from("fotos").upload(path, blob, { contentType: "image/jpeg", cacheControl: "31536000" });
+  // Los planos en PNG o SVG suelen tener fondo transparente: se mantienen en PNG
+  const png = folder === "plano" && /png|svg/.test(file.type);
+  const type = png ? "image/png" : "image/jpeg";
+  const blob = await resizeImage(file, max, type);
+  const path = `${folder}/${crypto.randomUUID()}.${png ? "png" : "jpg"}`;
+  const { error } = await sb.storage.from("fotos").upload(path, blob, { contentType: type, cacheControl: "31536000" });
   if (error) throw error;
   return path;
 }

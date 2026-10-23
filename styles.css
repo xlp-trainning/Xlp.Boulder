@@ -235,3 +235,9 @@ td.num { text-align: right; font-family: var(--f-mono); font-size: 13px; font-va
 .card-top { flex-wrap: wrap; }
 .card-top h3 { overflow-wrap: break-word; flex: 1 1 auto; min-width: auto; }
 .tape .grade { letter-spacing: .02em; }
+
+/* Marcadores compactos: nombre del sector y burbuja con los bloques abiertos */
+.pin { padding: 3px 9px; font-size: 12px; gap: 5px; }
+.pin:has(.pin-n) { padding-right: 4px; }
+.pin-n { min-width: 16px; line-height: 16px; padding: 0 4px; font-size: 10.5px; }
+@media (max-width: 520px) { .plan { min-width: 780px; } }
