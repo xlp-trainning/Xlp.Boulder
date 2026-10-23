@@ -9,19 +9,15 @@
 <polygon points="120,40 772,40 772,80 120,80" fill="#CFE6DE"/>
 
 <!-- Zona alta -->
-<polygon points="-262,40 -40,40 -40,340 -262,340" fill="#F7F9F8" stroke="#2B3532" stroke-width="5" stroke-dasharray="14 8" stroke-linejoin="round"/>
-<polygon points="-236,40 -60,40 -60,314 -236,314" fill="#CFE6DE"/>
+<polygon points="-262,80 -40,80 -40,464 -262,464" fill="#F7F9F8" stroke="#2B3532" stroke-width="5" stroke-dasharray="14 8" stroke-linejoin="round"/>
+<polygon points="-238,84 -58,84 -58,450 -238,450" fill="#CFE6DE"/>
 <g>
-  <rect x="-254" y="44" width="20" height="50" fill="#FFFFFF" stroke="#2B3532" stroke-width="2.5"/>
-  <g fill="#2B3532"><circle cx="-249" cy="50" r="1.6"/><circle cx="-249" cy="56" r="1.6"/><circle cx="-249" cy="62" r="1.6"/><circle cx="-249" cy="68" r="1.6"/><circle cx="-249" cy="74" r="1.6"/><circle cx="-249" cy="80" r="1.6"/><circle cx="-249" cy="86" r="1.6"/><circle cx="-244" cy="50" r="1.6"/><circle cx="-244" cy="56" r="1.6"/><circle cx="-244" cy="62" r="1.6"/><circle cx="-244" cy="68" r="1.6"/><circle cx="-244" cy="74" r="1.6"/><circle cx="-244" cy="80" r="1.6"/><circle cx="-244" cy="86" r="1.6"/><circle cx="-239" cy="50" r="1.6"/><circle cx="-239" cy="56" r="1.6"/><circle cx="-239" cy="62" r="1.6"/><circle cx="-239" cy="68" r="1.6"/><circle cx="-239" cy="74" r="1.6"/><circle cx="-239" cy="80" r="1.6"/><circle cx="-239" cy="86" r="1.6"/></g>
-  <text x="-226" y="73" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#2B3532" letter-spacing="1.5">KILTER</text>
+  <rect x="-254" y="86" width="20" height="52" fill="#FFFFFF" stroke="#2B3532" stroke-width="2.5"/>
+  <g fill="#2B3532"><circle cx="-249" cy="92" r="1.6"/><circle cx="-249" cy="98" r="1.6"/><circle cx="-249" cy="104" r="1.6"/><circle cx="-249" cy="110" r="1.6"/><circle cx="-249" cy="116" r="1.6"/><circle cx="-249" cy="122" r="1.6"/><circle cx="-249" cy="128" r="1.6"/><circle cx="-249" cy="134" r="1.6"/><circle cx="-244" cy="92" r="1.6"/><circle cx="-244" cy="98" r="1.6"/><circle cx="-244" cy="104" r="1.6"/><circle cx="-244" cy="110" r="1.6"/><circle cx="-244" cy="116" r="1.6"/><circle cx="-244" cy="122" r="1.6"/><circle cx="-244" cy="128" r="1.6"/><circle cx="-244" cy="134" r="1.6"/><circle cx="-239" cy="92" r="1.6"/><circle cx="-239" cy="98" r="1.6"/><circle cx="-239" cy="104" r="1.6"/><circle cx="-239" cy="110" r="1.6"/><circle cx="-239" cy="116" r="1.6"/><circle cx="-239" cy="122" r="1.6"/><circle cx="-239" cy="128" r="1.6"/><circle cx="-239" cy="134" r="1.6"/></g>
+  <text x="-226" y="116" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#2B3532" letter-spacing="1.5">KILTER</text>
 </g>
-<text x="-151" y="26" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#8A9692" letter-spacing="3" text-anchor="middle">ZONA ALTA</text>
-<g font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#6B7773" text-anchor="middle" letter-spacing="1">
-  <text x="-151" y="364">AL FONDO DE LA U,</text>
-  <text x="-151" y="381">DE CARA A ELLA.</text>
-  <text x="-151" y="398">SE SUBE POR LA ESCALERA</text>
-</g>
+<text x="-151" y="52" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#8A9692" letter-spacing="3" text-anchor="middle">ZONA ALTA</text>
+<text x="-151" y="69" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#6B7773" text-anchor="middle" letter-spacing="1">PLANTA DE ARRIBA</text>
 
 <!-- Escalera: en la esquina de arriba, junto a la cara exterior del brazo de arriba -->
 <rect x="22" y="44" width="86" height="30" fill="#FFFFFF" stroke="#6E7A76" stroke-width="2"/>
@@ -29,7 +25,7 @@
 <path d="M98 59H32M40 53L30 59L40 65" fill="none" stroke="#2B3532" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
 
 <g fill="url(#hatch)" stroke="#1C2421" stroke-width="2" stroke-linejoin="round">
-  <polygon points="14,80 774,80 774,100 650,100 560,156 480,126 410,110 120,110 28,152 14,152"/><polygon points="14,150 28,150 28,342 14,342"/><polygon points="14,340 28,342 60,396 120,372 230,412 300,398 390,395 420,420 560,432 546,464 14,464"/><polygon points="-252,96 -238,96 -238,330 -252,330"/><polygon points="-252,316 -140,316 -140,330 -252,330"/>
+  <polygon points="14,80 774,80 774,100 650,100 560,156 480,126 410,110 120,110 28,152 14,152"/><polygon points="14,150 28,150 28,342 14,342"/><polygon points="14,340 28,342 60,396 120,372 230,412 300,398 390,395 420,420 560,432 546,464 14,464"/><polygon points="-252,140 -238,140 -226,168 -206,206 -184,250 -176,268 -196,300 -214,336 -230,380 -238,410 -238,450 -252,450"/><polygon points="-252,450 -140,450 -140,464 -252,464"/><polygon points="-238,450 -238,420 -206,450"/>
 </g>
 <polygon points="12,36 776,36 776,466 12,466" fill="none" stroke="#2B3532" stroke-width="5" stroke-linejoin="round"/>
 </svg>

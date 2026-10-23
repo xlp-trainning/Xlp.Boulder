@@ -16,11 +16,12 @@ walls = {
   "fondo": [(14,150),(28,150),(28,342),(14,342)],
   "abajo": [(14,340),(28,342),(60,396),(120,372),(230,412),(300,398),(390,395),(420,420),(560,432),(546,464),(14,464)],
   # Zona alta: pared larga, tramo corto en esquina
-  "alta-larga": [(-252,96),(-238,96),(-238,330),(-252,330)],
-  "alta-corta": [(-252,316),(-140,316),(-140,330),(-252,330)],
+  "alta-larga": [(-252,140),(-238,140),(-226,168),(-206,206),(-184,250),(-176,268),(-196,300),(-214,336),(-230,380),(-238,410),(-238,450),(-252,450)],
+  "alta-corta": [(-252,450),(-140,450),(-140,464),(-252,464)],
+  "alta-esquina": [(-238,450),(-238,420),(-206,450)],
 }
-up = [(-262,40),(-40,40),(-40,340),(-262,340)]
-up_mat = [(-236,40),(-60,40),(-60,314),(-236,314)]
+up = [(-262,80),(-40,80),(-40,464),(-262,464)]
+up_mat = [(-238,84),(-58,84),(-58,450),(-238,450)]
 
 svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="-275 0 1065 478" width="2663" height="1195">
 <defs>
@@ -36,16 +37,12 @@ svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="-275 0 1065 478" widt
 <polygon points="{P(up)}" fill="#F7F9F8" stroke="#2B3532" stroke-width="5" stroke-dasharray="14 8" stroke-linejoin="round"/>
 <polygon points="{P(up_mat)}" fill="#CFE6DE"/>
 <g>
-  <rect x="-254" y="44" width="20" height="50" fill="#FFFFFF" stroke="#2B3532" stroke-width="2.5"/>
-  <g fill="#2B3532">{"".join(f'<circle cx="{x}" cy="{y}" r="1.6"/>' for x in (-249,-244,-239) for y in range(50, 92, 6))}</g>
-  <text x="-226" y="73" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#2B3532" letter-spacing="1.5">KILTER</text>
+  <rect x="-254" y="86" width="20" height="52" fill="#FFFFFF" stroke="#2B3532" stroke-width="2.5"/>
+  <g fill="#2B3532">{"".join(f'<circle cx="{x}" cy="{y}" r="1.6"/>' for x in (-249,-244,-239) for y in range(92, 136, 6))}</g>
+  <text x="-226" y="116" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#2B3532" letter-spacing="1.5">KILTER</text>
 </g>
-<text x="-151" y="26" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#8A9692" letter-spacing="3" text-anchor="middle">ZONA ALTA</text>
-<g font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#6B7773" text-anchor="middle" letter-spacing="1">
-  <text x="-151" y="364">AL FONDO DE LA U,</text>
-  <text x="-151" y="381">DE CARA A ELLA.</text>
-  <text x="-151" y="398">SE SUBE POR LA ESCALERA</text>
-</g>
+<text x="-151" y="52" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#8A9692" letter-spacing="3" text-anchor="middle">ZONA ALTA</text>
+<text x="-151" y="69" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#6B7773" text-anchor="middle" letter-spacing="1">PLANTA DE ARRIBA</text>
 
 <!-- Escalera: en la esquina de arriba, junto a la cara exterior del brazo de arriba -->
 <rect x="22" y="44" width="86" height="30" fill="#FFFFFF" stroke="#6E7A76" stroke-width="2"/>
