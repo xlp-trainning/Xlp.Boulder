@@ -241,3 +241,9 @@ td.num { text-align: right; font-family: var(--f-mono); font-size: 13px; font-va
 .pin:has(.pin-n) { padding-right: 4px; }
 .pin-n { min-width: 16px; line-height: 16px; padding: 0 4px; font-size: 10.5px; }
 @media (max-width: 520px) { .plan { min-width: 780px; } }
+
+/* Selector de rocódromo */
+.brand { display: flex; flex-direction: column; }
+.gympick { display: inline-flex; align-self: flex-start; margin-top: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; max-width: 100%; overflow-x: auto; }
+.gympick button { border: 0; background: none; border-radius: 999px; padding: 7px 16px; font-weight: 700; font-size: 15px; color: var(--muted); white-space: nowrap; }
+.gympick button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }

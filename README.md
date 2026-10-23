@@ -1,20 +1,21 @@
 # Libreta de Bloques
 
-Web pública con los bloques del rocódromo, por nivel (Azul → Verde → Naranja → Amarillo → Morado → Rojo → Negro → Compe) y estilo.
+Web pública con los bloques de **Natural Patraix** y **Natural Benimaclet**, con un selector arriba para cambiar de rocódromo. Los bloques van por nivel (Azul → Verde → Naranja → Amarillo → Morado → Rojo → Negro → Compe) y estilo.
 
 - **Cualquiera** la abre sin registrarse y puede:
   - ver los bloques con su foto y la beta;
   - puntuarlos, marcarlos como encadenados o como proyecto, y guardar favoritos (los votos se guardan por dispositivo);
   - contar su propia beta con un apodo, con enlace a vídeo opcional.
 - **Novedades**: los bloques montados en los últimos 7 días llevan la marca «Nuevo» y tienen su pestaña.
-- **Mapa**: un plano de la sala (cualquier imagen) con un marcador por sector y el número de bloques abiertos. Al tocar un sector se filtra la lista.
+- **Mapa**: el plano de cada rocódromo (vienen ya puestos los de `mapas/`; se pueden cambiar desde la app) con un marcador por sector y el número de bloques abiertos. Al tocar un sector se filtra la lista.
 - **Mi progreso**: encadenados por nivel ("Rojo 4/9"), el nivel más alto conseguido y los proyectos en curso.
 - **El equipador** entra con email y contraseña ("Acceso equipador", al pie de la página) y puede:
   - crear, editar, desmontar o borrar bloques, con foto;
   - gestionar el plano y los sectores;
   - borrar comentarios;
   - ver **Estadísticas**: bloques por nivel y estilo, los que más y menos gustan, los poco encadenados, los más proyectados y los más comentados.
-- Cada bloque tiene su enlace (`…/#b-<id>`) y un botón **Compartir**, útil para historias de Instagram.
+- Cada rocódromo tiene sus bloques, sectores, plano y estadísticas. La web recuerda el rocódromo elegido en cada móvil.
+- Enlaces directos: `…/#patraix` y `…/#benimaclet` abren cada rocódromo. Cada bloque tiene su enlace (`…/#b-<id>`) y un botón **Compartir**, útil para historias de Instagram; si el bloque es del otro rocódromo, la web cambia sola.
 - Se puede añadir a la pantalla de inicio del móvil como una app.
 
 Las fotos se reducen en el propio móvil antes de subirlas (máximo 1600 px). Cada persona puede publicar como mucho 10 comentarios por hora.
@@ -53,6 +54,15 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `index.html` | estructura de la página |
 | `styles.css` | diseño (claro y oscuro según el móvil) |
 | `app.js` | lógica: carga, filtros, votos, formulario del equipador |
-| `config.js` | dirección y clave pública de Supabase, nombre del rocódromo |
+| `config.js` | dirección y clave pública de Supabase |
 | `supabase/schema.sql` | tablas y reglas de acceso |
 | `manifest.webmanifest`, `icon*` | instalación en la pantalla de inicio |
+| `mapas/` | planos de Natural Patraix y Natural Benimaclet (PNG, SVG y el script que los genera) |
+
+## Añadir otro rocódromo
+
+En **SQL Editor**, cambia los datos y ejecuta:
+```sql
+insert into public.gyms (id, name, sort, map_path) values ('ruzafa', 'Natural Ruzafa', 3, '');
+```
+El `id` es el que va en el enlace (`…/#ruzafa`). El plano se sube luego desde la app.

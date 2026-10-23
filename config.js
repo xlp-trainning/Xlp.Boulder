@@ -3,6 +3,4 @@
 window.LIBRETA_CONFIG = {
   supabaseUrl: "https://TU-PROYECTO.supabase.co",
   supabaseKey: "TU_CLAVE_ANON_O_PUBLISHABLE",
-  // Nombre que se muestra arriba de la página
-  gymName: "Rocódromo",
 };

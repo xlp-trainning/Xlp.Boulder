@@ -37,10 +37,12 @@ const isNew = b => b.active && daysSince(b.set_date) < NEW_DAYS;
 const CFG = window.LIBRETA_CONFIG || {};
 const configured = CFG.supabaseUrl && !CFG.supabaseUrl.includes("TU-PROYECTO") && CFG.supabaseKey && !CFG.supabaseKey.startsWith("TU_");
 const sb = configured && window.supabase ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey) : null;
-const photoUrl = path => path ? sb.storage.from("fotos").getPublicUrl(path).data.publicUrl : "";
+// Los planos que vienen con la web (mapas/...) se sirven tal cual; el resto son fotos subidas a Supabase
+const isStatic = path => /^(mapas\/|https?:)/.test(path);
+const photoUrl = path => !path ? "" : isStatic(path) ? path : sb.storage.from("fotos").getPublicUrl(path).data.publicUrl;
 
 const S = {
-  blocks: [], stats: {}, mine: {}, favs: [], sectors: [], mapPath: "",
+  gyms: [], gym: null, blocks: [], stats: {}, mine: {}, favs: [], sectors: [], mapPath: "",
   comments: {}, drafts: {},
   session: null, isSetter: false,
   page: "bloques", view: "open", level: null, sector: null, styles: new Set(), colors: new Set(), q: "", sort: "new",
@@ -70,23 +72,36 @@ const store = {
 S.view = store.get("lb-view", "open");
 S.page = store.get("lb-page", "bloques");
 S.favs = store.get("lb-favs", []);
-if (CFG.gymName) $("gymName").textContent = CFG.gymName;
+S.gym = store.get("lb-gym", null);
+// Enlace directo a un rocódromo: …/#patraix, …/#benimaclet
+{ const h = location.hash.slice(1); if (/^[a-z0-9-]{2,30}$/.test(h) && !h.startsWith("b-")) S.gym = h; }
+const currentGym = () => S.gyms.find(g => g.id === S.gym);
+function setGym(id) {
+  if (id === S.gym) return;
+  S.gym = id; store.set("lb-gym", id);
+  S.level = null; S.sector = null; S.colors.clear(); S.placing = null; S.loaded = false;
+  if (/^#[a-z0-9-]{2,30}$/.test(location.hash) && !location.hash.startsWith("#b-")) history.replaceState(null, "", "#" + id);
+  render(); refresh();
+}
 
 /* ---------- datos ---------- */
 const toStats = rows => Object.fromEntries((rows || []).map(r => [r.block_id,
   { avg: Number(r.avg_stars) || 0, n: Number(r.votes), sends: Number(r.sends), projects: Number(r.projects) || 0 }]));
 async function loadAll() {
-  const [b, s, sec, set] = await Promise.all([
-    sb.from("blocks").select("*").order("created_at", { ascending: false }),
+  const g = await sb.from("gyms").select("*").order("sort");
+  if (g.error) throw g.error;
+  S.gyms = g.data || [];
+  if (!S.gyms.some(x => x.id === S.gym)) S.gym = S.gyms[0]?.id || null;
+  const [b, s, sec] = await Promise.all([
+    sb.from("blocks").select("*").eq("gym_id", S.gym).order("created_at", { ascending: false }),
     sb.rpc("block_stats"),
-    sb.from("sectors").select("*").order("name"),
-    sb.from("settings").select("map_path").eq("id", 1).maybeSingle(),
+    sb.from("sectors").select("*").eq("gym_id", S.gym).order("name"),
   ]);
   if (b.error) throw b.error;
   S.blocks = b.data;
   S.stats = toStats(s.data);
   S.sectors = sec.data || [];
-  S.mapPath = set.data?.map_path || "";
+  S.mapPath = currentGym()?.map_path || "";
 }
 async function loadMine() {
   S.mine = {};
@@ -304,9 +319,9 @@ function mapEditor() {
     try {
       const path = await uploadPhoto(f, "plano", 2000);
       const old = S.mapPath;
-      const { error } = await sb.from("settings").upsert({ id: 1, map_path: path });
+      const { error } = await sb.from("gyms").update({ map_path: path }).eq("id", S.gym);
       if (error) throw error;
-      S.mapPath = path; if (old) removePhoto(old);
+      S.mapPath = path; const g = currentGym(); if (g) g.map_path = path; if (old) removePhoto(old);
       render(); toast("Plano actualizado");
     } catch (e) { console.error(e); toast("No se pudo subir el plano"); }
   } });
@@ -318,7 +333,7 @@ function mapEditor() {
   box.append(el("form", { class: "row", onsubmit: async e => {
     e.preventDefault();
     const name = nameIn.value.trim(); if (!name) return;
-    const { data, error } = await sb.from("sectors").insert({ name }).select().single();
+    const { data, error } = await sb.from("sectors").insert({ gym_id: S.gym, name }).select().single();
     if (error) return toast(error.code === "23505" ? "Ya hay un sector con ese nombre" : "No se pudo añadir");
     S.sectors.push(data); nameIn.value = ""; render();
   } }, el("div", { class: "field grow" }, nameIn), el("button", { class: "btn", type: "submit" }, "Añadir sector")));
@@ -333,7 +348,7 @@ function mapEditor() {
           e.preventDefault(); const nn = inp.value.trim(); if (!nn || nn === s.name) { mode = "view"; return draw(); }
           const { error } = await sb.from("sectors").update({ name: nn }).eq("id", s.id);
           if (error) return toast(error.code === "23505" ? "Ya hay un sector con ese nombre" : "No se pudo renombrar");
-          await sb.from("blocks").update({ sector: nn }).eq("sector", s.name);
+          await sb.from("blocks").update({ sector: nn }).eq("gym_id", S.gym).eq("sector", s.name);
           S.blocks.forEach(b => { if (b.sector === s.name) b.sector = nn; });
           s.name = nn; render();
         } }, el("div", { class: "field grow" }, inp), el("button", { class: "btn primary", type: "submit" }, "Guardar"),
@@ -432,7 +447,7 @@ function renderStats() {
       kpi(S.blocks.filter(isNew).length, `montados en ${NEW_DAYS} días`),
       kpi(avgAll ? avgAll.toFixed(1) + " ★" : "—", "puntuación media"),
       kpi(sum(open, b => st(b.id).sends), "encadenados"),
-      kpi(allComments.length, "comentarios")),
+      kpi(allComments.filter(c => S.blocks.some(b => b.id === c.block_id)).length, "comentarios")),
     el("section", { class: "section" }, el("span", { class: "label", text: "Por nivel (abiertos)" }),
       table(["Nivel", "Bloques", "Media", "Encad."], byLevel)),
     el("section", { class: "section" }, el("span", { class: "label", text: "Estilos (abiertos)" }),
@@ -448,7 +463,19 @@ function renderStats() {
 
 /* ---------- navegación ---------- */
 function setPage(p) { S.page = p; store.set("lb-page", p); render(); }
+function renderGymPick() {
+  const g = currentGym();
+  $("gymName").textContent = g?.name || "Rocódromo";
+  const box = $("gymPick");
+  box.hidden = S.gyms.length < 2;
+  // "Natural Patraix" / "Natural Benimaclet" → "Patraix" / "Benimaclet" si todos comparten la primera palabra
+  const first = S.gyms[0]?.name.split(" ")[0];
+  const short = S.gyms.every(x => x.name.split(" ")[0] === first && x.name.includes(" "));
+  box.replaceChildren(...S.gyms.map(x => el("button", { "aria-pressed": x.id === S.gym ? "true" : "false", onclick: () => setGym(x.id) },
+    short ? x.name.slice(first.length + 1) : x.name)));
+}
 function render() {
+  renderGymPick();
   // Sin datos todavía, todas las secciones enseñan el estado de la lista (cargando, error, sin configurar)
   const page = !sb || !S.loaded || S.error ? "bloques" : S.page;
   document.querySelectorAll("[data-page]").forEach(b => b.setAttribute("aria-current", b.dataset.page === S.page ? "page" : "false"));
@@ -485,7 +512,7 @@ const head = (label, big) => el("div", { class: "sheet-head" },
 
 async function shareBlock(b) {
   const url = location.origin + location.pathname + "#b-" + b.id;
-  const text = `${title(b)} · ${lvName(b)}`;
+  const text = `${title(b)} · ${lvName(b)} · ${currentGym()?.name || ""}`;
   try {
     if (navigator.share) { await navigator.share({ title: text, url }); return; }
     await navigator.clipboard.writeText(url); toast("Enlace copiado");
@@ -620,7 +647,7 @@ async function uploadPhoto(file, folder, max = 1600) {
   if (error) throw error;
   return path;
 }
-function removePhoto(path) { if (path) sb.storage.from("fotos").remove([path]); }
+function removePhoto(path) { if (path && !isStatic(path)) sb.storage.from("fotos").remove([path]); }
 
 /* ---------- formulario del equipador ---------- */
 function openForm(b) {
@@ -677,7 +704,7 @@ function openForm(b) {
     try { if (d.file) photo_path = await uploadPhoto(d.file, "bloques"); }
     catch (err) { console.error(err); saveBtn.disabled = false; saveBtn.textContent = edit ? "Guardar cambios" : "Añadir bloque"; return fail("No se pudo subir la foto. Prueba con otra imagen."); }
     const sector = fSector.value.trim();
-    const body = { name: fName.value.trim(), level: d.level, hold_color: d.color, sector, styles: d.styles,
+    const body = { ...(edit ? {} : { gym_id: S.gym }), name: fName.value.trim(), level: d.level, hold_color: d.color, sector, styles: d.styles,
       set_date: fDate.value || today(), beta: fBeta.value.trim(), video, photo_path };
     const { data, error } = edit
       ? await sb.from("blocks").update(body).eq("id", b.id).select().single()
@@ -690,7 +717,7 @@ function openForm(b) {
     if (edit && b.photo_path && b.photo_path !== photo_path) removePhoto(b.photo_path);
     // Un sector nuevo escrito a mano pasa a la lista de sectores para poder colocarlo en el plano
     if (sector && !S.sectors.some(s => s.name === sector)) {
-      const r = await sb.from("sectors").insert({ name: sector }).select().single();
+      const r = await sb.from("sectors").insert({ gym_id: S.gym, name: sector }).select().single();
       if (!r.error) S.sectors.push(r.data);
     }
     S.blocks = edit ? S.blocks.map(x => x.id === data.id ? data : x) : [data, ...S.blocks];
@@ -800,7 +827,13 @@ document.addEventListener("visibilitychange", () => {
 });
 
 render();
-if (sb) refresh().then(() => {
+if (sb) refresh().then(async () => {
   const m = location.hash.match(/^#b-([0-9a-f-]{36})$/);
-  if (m) openDetail(m[1]);
+  if (!m) return;
+  // Un enlace a un bloque del otro rocódromo cambia de rocódromo antes de abrirlo
+  if (!S.blocks.some(b => b.id === m[1])) {
+    const r = await sb.from("blocks").select("gym_id").eq("id", m[1]).maybeSingle();
+    if (r.data && r.data.gym_id !== S.gym) { S.gym = r.data.gym_id; store.set("lb-gym", S.gym); await refresh(); }
+  }
+  openDetail(m[1]);
 });

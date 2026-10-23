@@ -17,9 +17,30 @@ as $$
   select exists (select 1 from public.setters where user_id = auth.uid());
 $$;
 
+-- Rocódromos: cada uno con su plano. map_path puede ser un archivo de la web (mapas/...) o una foto subida.
+create table if not exists public.gyms (
+  id       text primary key check (id ~ '^[a-z0-9-]{2,30}$'),
+  name     text not null check (char_length(name) between 1 and 60),
+  sort     smallint not null default 0,
+  map_path text not null default '' check (char_length(map_path) <= 200)
+);
+alter table public.gyms enable row level security;
+drop policy if exists "todos leen los rocódromos" on public.gyms;
+create policy "todos leen los rocódromos" on public.gyms for select to anon, authenticated using (true);
+drop policy if exists "el equipador cambia los rocódromos" on public.gyms;
+create policy "el equipador cambia los rocódromos" on public.gyms for update to authenticated
+  using (public.is_setter()) with check (public.is_setter());
+grant select on public.gyms to anon, authenticated;
+grant update on public.gyms to authenticated;
+insert into public.gyms (id, name, sort, map_path) values
+  ('patraix', 'Natural Patraix', 1, 'mapas/natural-patraix.png'),
+  ('benimaclet', 'Natural Benimaclet', 2, 'mapas/natural-benimaclet.png')
+on conflict (id) do nothing;
+
 -- Bloques
 create table if not exists public.blocks (
   id           uuid primary key default gen_random_uuid(),
+  gym_id       text not null references public.gyms (id),
   name         text not null default '' check (char_length(name) <= 60),
   level        text not null check (level in ('azul','verde','naranja','amarillo','morado','rojo','negro','compe')),
   hold_color   text not null default '' check (char_length(hold_color) <= 20),
@@ -33,6 +54,7 @@ create table if not exists public.blocks (
   active       boolean not null default true,
   created_at   timestamptz not null default now()
 );
+create index if not exists blocks_gym_idx on public.blocks (gym_id);
 alter table public.blocks enable row level security;
 
 drop policy if exists "todos leen los bloques" on public.blocks;
@@ -101,13 +123,15 @@ as $$
   group by r.block_id;
 $$;
 
--- Sectores de la sala, con su posición en el plano (fracciones 0-1 de la imagen)
+-- Sectores de cada rocódromo, con su posición en el plano (fracciones 0-1 de la imagen)
 create table if not exists public.sectors (
   id         uuid primary key default gen_random_uuid(),
-  name       text not null unique check (char_length(name) between 1 and 40),
+  gym_id     text not null references public.gyms (id),
+  name       text not null check (char_length(name) between 1 and 40),
   x          real check (x between 0 and 1),
   y          real check (y between 0 and 1),
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  unique (gym_id, name)
 );
 alter table public.sectors enable row level security;
 drop policy if exists "todos leen los sectores" on public.sectors;
@@ -117,21 +141,6 @@ create policy "el equipador gestiona sectores" on public.sectors for all to auth
   using (public.is_setter()) with check (public.is_setter());
 grant select on public.sectors to anon, authenticated;
 grant insert, update, delete on public.sectors to authenticated;
-
--- Ajustes de la sala: una sola fila con la imagen del plano
-create table if not exists public.settings (
-  id       smallint primary key default 1 check (id = 1),
-  map_path text not null default '' check (char_length(map_path) <= 200)
-);
-alter table public.settings enable row level security;
-drop policy if exists "todos leen los ajustes" on public.settings;
-create policy "todos leen los ajustes" on public.settings for select to anon, authenticated using (true);
-drop policy if exists "el equipador cambia los ajustes" on public.settings;
-create policy "el equipador cambia los ajustes" on public.settings for all to authenticated
-  using (public.is_setter()) with check (public.is_setter());
-grant select on public.settings to anon, authenticated;
-grant insert, update on public.settings to authenticated;
-insert into public.settings (id) values (1) on conflict do nothing;
 
 -- Betas y comentarios de la gente. Cualquiera (también anónimo) publica con un apodo;
 -- cada uno borra los suyos y el equipador puede borrar cualquiera.
@@ -175,7 +184,7 @@ drop trigger if exists comments_guard on public.comments;
 create trigger comments_guard before insert on public.comments
   for each row execute function public.comments_guard();
 
--- Fotos de bloques y del plano: lectura pública, solo el equipador sube y borra
+-- Fotos de bloques y planos subidos: lectura pública, solo el equipador sube y borra
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('fotos', 'fotos', true, 5242880, array['image/jpeg', 'image/png', 'image/webp'])
 on conflict (id) do update
