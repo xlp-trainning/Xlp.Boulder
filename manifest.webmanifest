@@ -1,0 +1,16 @@
+{
+  "name": "Libreta de Bloques",
+  "short_name": "Bloques",
+  "description": "Los bloques abiertos del rocódromo, por nivel y estilo, con la beta del equipador.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#E8ECEA",
+  "theme_color": "#0D6B5B",
+  "lang": "es",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

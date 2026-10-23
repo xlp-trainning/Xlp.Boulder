@@ -1,0 +1,46 @@
+# Libreta de Bloques
+
+Web pública con los bloques del rocódromo, por nivel (Azul → Verde → Naranja → Amarillo → Morado → Rojo → Negro → Compe) y estilo.
+
+- **Cualquiera** la abre sin registrarse: ve los bloques y la beta, puntúa, marca encadenados y guarda favoritos. Los votos se guardan por dispositivo.
+- **El equipador** entra con email y contraseña ("Acceso equipador", al pie de la página) y crea, edita, desmonta o borra bloques.
+- Cada bloque tiene su enlace (`…/#b-<id>`) y un botón **Compartir**, útil para historias de Instagram.
+- Se puede añadir a la pantalla de inicio del móvil como una app.
+
+Es HTML, CSS y JavaScript sin compilar. Los datos viven en Supabase y la web se sirve con GitHub Pages.
+
+## Puesta en marcha
+
+### 1. Supabase
+
+1. Entra en tu proyecto → **SQL Editor** → **New query**, pega todo `supabase/schema.sql` y pulsa **Run**.
+2. **Authentication → Sign In / Providers** → activa **Allow anonymous sign-ins** (así votan los visitantes sin registrarse).
+3. **Authentication → Users → Add user → Create new user**: tu email y una contraseña, con **Auto Confirm User** marcado.
+4. Vuelve al **SQL Editor** y ejecuta, con tu email:
+   ```sql
+   insert into public.setters (user_id)
+     select id from auth.users where email = 'TU_EMAIL@ejemplo.com'
+     on conflict do nothing;
+   ```
+5. **Project Settings → API** (o el botón **Connect**): copia la **Project URL** y la clave **anon** / **publishable** a `config.js`.
+   La clave anon es pública por diseño; la seguridad la ponen las reglas del esquema. No uses nunca la `service_role` / `secret`.
+
+### 2. GitHub Pages
+
+En el repositorio: **Settings → Pages → Build and deployment → Source: Deploy from a branch**, rama `main`, carpeta `/ (root)`, **Save**.
+En un par de minutos la web queda en `https://<tu-usuario>.github.io/<repositorio>/`. Ese es el enlace para la bio de Instagram.
+
+## Añadir otro equipador
+
+Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
+
+## Archivos
+
+| archivo | qué es |
+| --- | --- |
+| `index.html` | estructura de la página |
+| `styles.css` | diseño (claro y oscuro según el móvil) |
+| `app.js` | lógica: carga, filtros, votos, formulario del equipador |
+| `config.js` | dirección y clave pública de Supabase, nombre del rocódromo |
+| `supabase/schema.sql` | tablas y reglas de acceso |
+| `manifest.webmanifest`, `icon*` | instalación en la pantalla de inicio |

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Libreta de Bloques</title>
+<meta name="description" content="Los bloques abiertos del rocódromo, por nivel y estilo, con la beta del equipador.">
+<meta name="theme-color" content="#0D6B5B">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bloques">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="label" id="gymName">Rocódromo</div>
+      <h1>Libreta de Bloques</h1>
+      <p>Todos los problemas abiertos en la sala, por nivel y estilo. Puntúalos, guarda tus favoritos y mira la beta.</p>
+    </div>
+    <div class="row">
+      <span class="status" id="who"></span>
+      <button class="btn primary" id="addBtn" hidden>+ Nuevo bloque</button>
+    </div>
+  </header>
+
+  <section class="dist" aria-label="Bloques por nivel">
+    <div class="dist-head">
+      <div class="total"><span id="totalN">0</span><small id="totalLbl">bloques abiertos</small></div>
+      <span class="note">De fácil a difícil · toca un nivel para filtrar</span>
+    </div>
+    <div class="bars-scroll"><div class="bars" id="bars"></div></div>
+  </section>
+
+  <section class="filters" aria-label="Filtros">
+    <div class="row">
+      <div class="tabs" role="group" aria-label="Vista">
+        <button id="tab-open" aria-pressed="true">Abiertos</button>
+        <button id="tab-fav" aria-pressed="false">♥ Favoritos</button>
+        <button id="tab-old" aria-pressed="false">Desmontados</button>
+      </div>
+      <input class="search" id="q" type="search" placeholder="Buscar por nombre, sector o beta…" aria-label="Buscar">
+      <select class="sort" id="sort" aria-label="Ordenar">
+        <option value="new">Más recientes</option>
+        <option value="gradeAsc">Más fáciles primero</option>
+        <option value="gradeDesc">Más difíciles primero</option>
+        <option value="rating">Mejor puntuados</option>
+      </select>
+    </div>
+    <div class="row" id="styleChips"></div>
+    <div class="row" id="colorChips"></div>
+  </section>
+
+  <main id="list"></main>
+
+  <footer class="foot">
+    <button class="linkbtn" id="loginBtn">Acceso equipador</button>
+  </footer>
+</div>
+
+<div id="sheetRoot"></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
