@@ -257,12 +257,3 @@ td.num { text-align: right; font-family: var(--f-mono); font-size: 13px; font-va
 /* Que el nivel Negro se distinga también en modo oscuro */
 .tape { box-shadow: inset 0 0 0 1px rgba(127,127,127,.28); }
 .bar .col { box-shadow: inset 0 0 0 1px var(--line); }
-
-/* Logo Natural Climb Valencia y firma Xlp.Boulder */
-.wordmark { flex-direction: column; align-items: flex-start; gap: 2px; }
-.wm-main { font-size: inherit; line-height: .9; }
-.wm-city { font-size: .42em; letter-spacing: .32em; color: var(--accent); line-height: 1; padding-left: .08em; }
-.byline { display: inline-flex; align-items: center; gap: 7px; margin-top: 8px; font-size: 13px; color: var(--muted); }
-.byline strong { color: var(--ink); font-weight: 800; }
-.byline .wm-dot { color: var(--accent); }
-.mark-sm { width: 20px; height: 20px; border-radius: 5px; flex: none; }

@@ -1,6 +1,6 @@
-# Natural Climb Valencia · Xlp.Boulder
+# Xlp.Boulder
 
-Web de **Natural Climb Valencia**, hecha por **Xlp.Boulder**, con los bloques de **Natural Patraix** y **Natural Benimaclet**, con un selector arriba para cambiar de rocódromo. Los bloques van por nivel (Azul → Verde → Naranja → Amarillo → Morado → Rojo → Negro → Compe) y estilo.
+**Xlp.Boulder** es la web pública con los bloques de **Natural Patraix** y **Natural Benimaclet**, con un selector arriba para cambiar de rocódromo. Los bloques van por nivel (Azul → Verde → Naranja → Amarillo → Morado → Rojo → Negro → Compe) y estilo.
 
 - **Cualquiera** la abre sin registrarse y puede:
   - ver los bloques con su foto y la beta;
@@ -58,7 +58,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `app.js` | lógica: carga, filtros, votos, formulario del equipador |
 | `config.js` | dirección y clave pública de Supabase |
 | `supabase/schema.sql` | tablas y reglas de acceso |
-| `manifest.webmanifest`, `icon*` | instalación en la pantalla de inicio, con el logo de Xlp.Boulder; en el móvil se llama «NC Valencia» |
+| `manifest.webmanifest`, `icon*` | instalación en la pantalla de inicio, con el logo de Xlp.Boulder |
 | `og.png` | imagen de vista previa al compartir el enlace |
 | `mapas/` | planos de Natural Patraix y Natural Benimaclet (PNG, SVG y el script que los genera) |
 

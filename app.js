@@ -464,6 +464,8 @@ function renderStats() {
 /* ---------- navegación ---------- */
 function setPage(p) { S.page = p; store.set("lb-page", p); render(); }
 function renderGymPick() {
+  const g = currentGym();
+  $("gymName").textContent = g?.name || "Rocódromo";
   const box = $("gymPick");
   box.hidden = S.gyms.length < 2;
   // "Natural Patraix" / "Natural Benimaclet" → "Patraix" / "Benimaclet" si todos comparten la primera palabra
