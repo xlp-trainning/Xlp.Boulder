@@ -30,34 +30,51 @@
     </div>
   </header>
 
-  <section class="dist" aria-label="Bloques por nivel">
-    <div class="dist-head">
-      <div class="total"><span id="totalN">0</span><small id="totalLbl">bloques abiertos</small></div>
-      <span class="note">De fácil a difícil · toca un nivel para filtrar</span>
-    </div>
-    <div class="bars-scroll"><div class="bars" id="bars"></div></div>
-  </section>
+  <nav class="mainnav" aria-label="Secciones">
+    <button data-page="bloques" aria-current="page">Bloques</button>
+    <button data-page="mapa">Mapa</button>
+    <button data-page="progreso">Mi progreso</button>
+    <button data-page="stats" hidden>Estadísticas</button>
+  </nav>
 
-  <section class="filters" aria-label="Filtros">
-    <div class="row">
-      <div class="tabs" role="group" aria-label="Vista">
-        <button id="tab-open" aria-pressed="true">Abiertos</button>
-        <button id="tab-fav" aria-pressed="false">♥ Favoritos</button>
-        <button id="tab-old" aria-pressed="false">Desmontados</button>
+  <div id="page-bloques" class="page">
+    <section class="dist" aria-label="Bloques por nivel">
+      <div class="dist-head">
+        <div class="total"><span id="totalN">0</span><small id="totalLbl">bloques abiertos</small></div>
+        <span class="note">De fácil a difícil · toca un nivel para filtrar</span>
       </div>
-      <input class="search" id="q" type="search" placeholder="Buscar por nombre, sector o beta…" aria-label="Buscar">
-      <select class="sort" id="sort" aria-label="Ordenar">
-        <option value="new">Más recientes</option>
-        <option value="gradeAsc">Más fáciles primero</option>
-        <option value="gradeDesc">Más difíciles primero</option>
-        <option value="rating">Mejor puntuados</option>
-      </select>
-    </div>
-    <div class="row" id="styleChips"></div>
-    <div class="row" id="colorChips"></div>
-  </section>
+      <div class="bars-scroll"><div class="bars" id="bars"></div></div>
+    </section>
 
-  <main id="list"></main>
+    <section class="filters" aria-label="Filtros">
+      <div class="tabs-scroll">
+        <div class="tabs" role="group" aria-label="Vista">
+          <button data-view="open" aria-pressed="true">Abiertos</button>
+          <button data-view="new" aria-pressed="false">Novedades</button>
+          <button data-view="fav" aria-pressed="false">♥ Favoritos</button>
+          <button data-view="proj" aria-pressed="false">Proyectos</button>
+          <button data-view="old" aria-pressed="false">Desmontados</button>
+        </div>
+      </div>
+      <div class="row">
+        <input class="search" id="q" type="search" placeholder="Buscar por nombre, sector o beta…" aria-label="Buscar">
+        <select class="sort" id="sort" aria-label="Ordenar">
+          <option value="new">Más recientes</option>
+          <option value="gradeAsc">Más fáciles primero</option>
+          <option value="gradeDesc">Más difíciles primero</option>
+          <option value="rating">Mejor puntuados</option>
+        </select>
+      </div>
+      <div class="row" id="styleChips"></div>
+      <div class="row" id="colorChips"></div>
+    </section>
+
+    <main id="list"></main>
+  </div>
+
+  <div id="page-mapa" class="page" hidden></div>
+  <div id="page-progreso" class="page" hidden></div>
+  <div id="page-stats" class="page" hidden></div>
 
   <footer class="foot">
     <button class="linkbtn" id="loginBtn">Acceso equipador</button>

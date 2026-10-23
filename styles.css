@@ -147,3 +147,91 @@ form.f { display: flex; flex-direction: column; gap: 14px; }
   .bar .g .full { display: none; }
   .bar .g .short { display: inline; }
 }
+
+/* ---------- navegación principal ---------- */
+.mainnav { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; margin-bottom: -8px; }
+.mainnav button { border: 0; background: none; padding: 10px 12px; font-weight: 700; font-size: 15px; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.mainnav button[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+.page { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.tabs-scroll { overflow-x: auto; scrollbar-width: none; margin-inline: -2px; padding-inline: 2px; }
+.tabs-scroll .tabs button { white-space: nowrap; }
+
+/* ---------- fichas: novedad, proyecto, miniatura ---------- */
+.new-badge { flex: none; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; background: var(--accent); color: var(--accent-ink); padding: 2px 6px; border-radius: 4px; line-height: 1.4; }
+.card-top h3 { flex: 1; }
+.proj-badge { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--star); }
+.card.has-photo { grid-template-columns: 78px 1fr 76px; }
+.thumb { width: 100%; height: 100%; object-fit: cover; display: block; min-height: 100%; }
+.photo { width: 100%; max-height: 60vh; object-fit: cover; border-radius: 12px; display: block; background: var(--line); }
+.photo-link { display: block; border-radius: 12px; }
+.photo-edit { display: flex; flex-direction: column; gap: 8px; }
+.photo-edit .photo { max-height: 220px; }
+.linkbtn.strong { color: var(--ink); text-decoration: none; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 0; text-align: left; }
+.linkbtn.danger { color: var(--danger); }
+.meta .linkbtn { padding: 0; font-size: 13px; color: var(--accent); }
+
+/* ---------- mapa ---------- */
+.plan-scroll { overflow-x: auto; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); }
+.plan { position: relative; min-width: 520px; }
+.plan img { display: block; width: 100%; height: auto; }
+.plan.placing { cursor: crosshair; outline: 3px dashed var(--accent); outline-offset: -3px; }
+.pin { position: absolute; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 6px; border: 2px solid var(--surface); background: var(--ink); color: var(--bg); border-radius: 999px; padding: 4px 6px 4px 10px; font-size: 12.5px; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,.3); white-space: nowrap; }
+.pin.fresh { background: var(--accent); color: var(--accent-ink); }
+.pin-n { background: var(--surface); color: var(--ink); border-radius: 999px; min-width: 20px; padding: 0 6px; text-align: center; font-family: var(--f-mono); font-size: 11.5px; line-height: 20px; }
+.plan.placing .pin { pointer-events: none; opacity: .6; }
+.banner { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; background: var(--accent-soft); border-radius: 10px; padding: 10px 14px; font-weight: 600; }
+.sector-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
+.sector-btn { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.sector-btn:hover { border-color: var(--muted); }
+.sector-name { font-weight: 700; font-size: 15.5px; overflow-wrap: anywhere; }
+.editor { background: var(--surface); border: 1px dashed var(--line); border-radius: 12px; padding: 16px; }
+.sector-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+.grow { flex: 1 1 160px; min-width: 0; }
+.btn.small { padding: 5px 10px; font-size: 13px; }
+.field.grow input { width: 100%; }
+
+/* ---------- mi progreso ---------- */
+.big-pct { font-size: 22px; font-weight: 500; color: var(--accent); }
+.levels { display: flex; flex-direction: column; gap: 6px; }
+.lvl-row { display: grid; grid-template-columns: 110px 1fr 56px; gap: 12px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; text-align: left; }
+.lvl-row:disabled { opacity: .5; cursor: default; }
+.lvl-name { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
+.lvl-track { height: 10px; background: var(--bg); border-radius: 999px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+.lvl-fill { display: block; height: 100%; border-radius: 999px; }
+.lvl-n { text-align: right; }
+
+/* ---------- estadísticas ---------- */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.kpi-n { font-family: var(--f-display); font-weight: 900; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }
+.table-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 8px 12px; border-bottom: 1px solid var(--line); }
+td { padding: 8px 12px; border-top: 1px solid var(--line); }
+tr:first-child td { border-top: 0; }
+td.num { text-align: right; font-family: var(--f-mono); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hbars { display: flex; flex-direction: column; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+.hbar { display: grid; grid-template-columns: 110px 1fr 32px; gap: 10px; align-items: center; font-size: 14px; }
+.hbar .mono { text-align: right; }
+.hbar-track { height: 10px; border-radius: 999px; background: var(--bg); overflow: hidden; }
+.hbar-fill { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+
+/* ---------- comentarios ---------- */
+.comments { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.comment { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; display: flex; flex-direction: column; gap: 4px; }
+.comment p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.comment-head { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.comment-head > span:last-child { margin-left: auto; }
+.comment-head .linkbtn { padding: 0 2px; }
+.comment-form textarea { min-height: 80px; }
+
+/* La hoja lateral hace scroll: que ningún bloque se encoja */
+.sheet > * { flex-shrink: 0; }
+@media (max-width: 520px) {
+  .mainnav { gap: 0; }
+  .mainnav button { padding: 10px 8px; font-size: 14px; }
+  th, td { padding: 8px 8px; }
+}
+.card-top { flex-wrap: wrap; }
+.card-top h3 { overflow-wrap: break-word; flex: 1 1 auto; min-width: auto; }
+.tape .grade { letter-spacing: .02em; }
