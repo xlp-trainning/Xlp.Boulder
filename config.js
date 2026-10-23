@@ -2,5 +2,5 @@
 // La clave "anon" / "publishable" es pública por diseño; nunca pongas aquí la "service_role" ni la "secret".
 window.LIBRETA_CONFIG = {
   supabaseUrl: "https://przbceryckqmmvocyele.supabase.co",
-  supabaseKey: "TU_CLAVE_ANON_O_PUBLISHABLE",
+  supabaseKey: "sb_publishable_KeTvZgZcJrouAkXfd9E1jw_uzpW1E-n",
 };
