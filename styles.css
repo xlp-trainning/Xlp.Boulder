@@ -247,3 +247,13 @@ td.num { text-align: right; font-family: var(--f-mono); font-size: 13px; font-va
 .gympick { display: inline-flex; align-self: flex-start; margin-top: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; max-width: 100%; overflow-x: auto; }
 .gympick button { border: 0; background: none; border-radius: 999px; padding: 7px 16px; font-weight: 700; font-size: 15px; color: var(--muted); white-space: nowrap; }
 .gympick button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+
+/* Marca Xlp.Boulder */
+.wordmark { display: flex; align-items: center; gap: 12px; }
+.wordmark .mark { width: clamp(44px, 9vw, 64px); height: auto; flex: none; border-radius: 22%; }
+.wordmark .wm-dot { color: var(--accent); }
+.foot { flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.foot-brand { font-size: 12.5px; color: var(--muted); font-weight: 600; letter-spacing: .02em; }
+/* Que el nivel Negro se distinga también en modo oscuro */
+.tape { box-shadow: inset 0 0 0 1px rgba(127,127,127,.28); }
+.bar .col { box-shadow: inset 0 0 0 1px var(--line); }

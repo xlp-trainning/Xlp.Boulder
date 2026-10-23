@@ -1,12 +1,12 @@
 {
-  "name": "Libreta de Bloques",
-  "short_name": "Bloques",
-  "description": "Los bloques abiertos del rocódromo, por nivel y estilo, con la beta del equipador.",
+  "name": "Xlp.Boulder",
+  "short_name": "Xlp.Boulder",
+  "description": "Los bloques abiertos de Natural Patraix y Natural Benimaclet, por nivel y estilo, con la beta del equipador.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#E8ECEA",
-  "theme_color": "#0D6B5B",
+  "theme_color": "#18201E",
   "lang": "es",
   "icons": [
     { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" },

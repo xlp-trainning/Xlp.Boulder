@@ -512,7 +512,7 @@ const head = (label, big) => el("div", { class: "sheet-head" },
 
 async function shareBlock(b) {
   const url = location.origin + location.pathname + "#b-" + b.id;
-  const text = `${title(b)} · ${lvName(b)} · ${currentGym()?.name || ""}`;
+  const text = `${title(b)} (${lvName(b)}) · ${currentGym()?.name || ""} · Xlp.Boulder`;
   try {
     if (navigator.share) { await navigator.share({ title: text, url }); return; }
     await navigator.clipboard.writeText(url); toast("Enlace copiado");

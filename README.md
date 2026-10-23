@@ -1,6 +1,6 @@
-# Libreta de Bloques
+# Xlp.Boulder
 
-Web pública con los bloques de **Natural Patraix** y **Natural Benimaclet**, con un selector arriba para cambiar de rocódromo. Los bloques van por nivel (Azul → Verde → Naranja → Amarillo → Morado → Rojo → Negro → Compe) y estilo.
+**Xlp.Boulder** es la web pública con los bloques de **Natural Patraix** y **Natural Benimaclet**, con un selector arriba para cambiar de rocódromo. Los bloques van por nivel (Azul → Verde → Naranja → Amarillo → Morado → Rojo → Negro → Compe) y estilo.
 
 - **Cualquiera** la abre sin registrarse y puede:
   - ver los bloques con su foto y la beta;
@@ -41,7 +41,9 @@ Es HTML, CSS y JavaScript sin compilar. Los datos viven en Supabase y la web se 
 ### 2. GitHub Pages
 
 En el repositorio: **Settings → Pages → Build and deployment → Source: Deploy from a branch**, rama `main`, carpeta `/ (root)`, **Save**.
-En un par de minutos la web queda en `https://<tu-usuario>.github.io/<repositorio>/`. Ese es el enlace para la bio de Instagram.
+En un par de minutos la web queda en `https://xlp-trainning.github.io/xlp-boulder/` (si el repositorio se llama `xlp-boulder`). Ese es el enlace para la bio de Instagram.
+
+Si el repositorio o el dominio son otros, cambia la dirección de `og:image` en `index.html`: es la imagen (`og.png`) que sale al compartir el enlace en Instagram o WhatsApp.
 
 ## Añadir otro equipador
 
@@ -56,7 +58,8 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `app.js` | lógica: carga, filtros, votos, formulario del equipador |
 | `config.js` | dirección y clave pública de Supabase |
 | `supabase/schema.sql` | tablas y reglas de acceso |
-| `manifest.webmanifest`, `icon*` | instalación en la pantalla de inicio |
+| `manifest.webmanifest`, `icon*` | instalación en la pantalla de inicio, con el logo de Xlp.Boulder |
+| `og.png` | imagen de vista previa al compartir el enlace |
 | `mapas/` | planos de Natural Patraix y Natural Benimaclet (PNG, SVG y el script que los genera) |
 
 ## Añadir otro rocódromo

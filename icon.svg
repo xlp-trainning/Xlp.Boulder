@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#0D6B5B"/>
-  <g transform="translate(96 88)">
-    <rect x="0"   y="0"   width="320" height="56" rx="10" fill="#1E63D6"/>
-    <rect x="0"   y="76"  width="260" height="56" rx="10" fill="#2E9D45"/>
-    <rect x="0"   y="152" width="200" height="56" rx="10" fill="#F07A1A"/>
-    <rect x="0"   y="228" width="140" height="56" rx="10" fill="#F5CE1B"/>
-    <rect x="0"   y="304" width="80"  height="32" rx="8"  fill="#E8ECEA"/>
+  <rect width="512" height="512" rx="112" fill="#18201E"/>
+  <!-- X de dos tiras de cinta de salida, y el punto de Xlp.Boulder -->
+  <g transform="translate(236 236)">
+    <rect x="-170" y="-46" width="340" height="92" rx="14" fill="#F5CE1B" transform="rotate(45)"/>
+    <rect x="-170" y="-46" width="340" height="92" rx="14" fill="#4CC3A8" transform="rotate(-45)"/>
+    <path d="M-150 -10h300M-150 10h300" stroke="#18201E" stroke-opacity=".18" stroke-width="6" transform="rotate(-45)"/>
   </g>
+  <circle cx="420" cy="420" r="44" fill="#F8FAF9"/>
 </svg>
