@@ -11,12 +11,13 @@ mat = [(26,150),(120,108),(410,108),(480,125),(560,155),(650,100),(772,100),(772
 # Colchoneta delante de la cara exterior del brazo de arriba
 mat_ext = [(120,40),(772,40),(772,80),(120,80)]
 walls = {
-  # Zona alta, abierta hacia la U (a la derecha). Fondo: pared de los triángulos
-  "alta-fondo": [(-252,80),(-238,80),(-238,464),(-252,464)],
-  # Pared de las presas amarillas (a la izquierda según se entra)
-  "alta-amarilla": [(-252,450),(-62,450),(-62,464),(-252,464)],
-  # Pared grande con desplome (a la derecha según se entra): sale hacia la sala en proa
-  "alta-desplome": [(-252,80),(-100,80),(-100,96),(-106,140),(-122,178),(-150,168),(-186,138),(-216,110),(-238,98),(-252,98)],
+  # Zona alta (frente abierto hacia la U, a la derecha del recuadro).
+  # Pared del fondo: la grande con desplome, que sale hacia la sala en proa; la Kilter va en el hueco de arriba
+  "alta-fondo": [(-252,140),(-238,140),(-226,152),(-196,176),(-166,206),(-160,230),(-180,262),(-206,300),(-226,338),(-236,380),(-238,450),(-252,450)],
+  # Pared izquierda: triángulos y presas amarillas
+  "alta-izquierda": [(-252,450),(-48,450),(-48,464),(-252,464)],
+  # Volumen de la esquina entre las dos
+  "alta-esquina": [(-238,450),(-238,432),(-220,450)],
   # Brazo de arriba: se escala por dentro (con su desplome) y por fuera
   "arriba": [(14,80),(774,80),(774,100),(650,100),(560,156),(480,126),(410,110),(120,110),(28,152),(14,152)],
   "fondo": [(14,150),(28,150),(28,342),(14,342)],
@@ -40,9 +41,9 @@ svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="-275 0 1065 478" widt
 <polygon points="{P(up)}" fill="#F7F9F8" stroke="#2B3532" stroke-width="5" stroke-dasharray="14 8" stroke-linejoin="round"/>
 <polygon points="{P(up_mat)}" fill="#CFE6DE"/>
 <g>
-  <rect x="-96" y="82" width="48" height="18" fill="#FFFFFF" stroke="#2B3532" stroke-width="2.5"/>
-  <g fill="#2B3532">{"".join(f'<circle cx="{x}" cy="{y}" r="1.6"/>' for x in range(-90, -50, 6) for y in (87, 91, 95))}</g>
-  <text x="-72" y="116" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#2B3532" letter-spacing="1.5" text-anchor="middle">KILTER</text>
+  <rect x="-254" y="86" width="20" height="52" fill="#FFFFFF" stroke="#2B3532" stroke-width="2.5"/>
+  <g fill="#2B3532">{"".join(f'<circle cx="{x}" cy="{y}" r="1.6"/>' for x in (-249,-244,-239) for y in range(92, 136, 6))}</g>
+  <text x="-226" y="116" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#2B3532" letter-spacing="1.5">KILTER</text>
 </g>
 <text x="-151" y="52" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#8A9692" letter-spacing="3" text-anchor="middle">ZONA ALTA</text>
 <text x="-151" y="69" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#6B7773" text-anchor="middle" letter-spacing="1">PLANTA DE ARRIBA</text>
