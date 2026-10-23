@@ -41,7 +41,7 @@ Es HTML, CSS y JavaScript sin compilar. Los datos viven en Supabase y la web se 
 ### 2. GitHub Pages
 
 En el repositorio: **Settings → Pages → Build and deployment → Source: Deploy from a branch**, rama `main`, carpeta `/ (root)`, **Save**.
-En un par de minutos la web queda en `https://xlp-trainning.github.io/xlp-boulder/` (si el repositorio se llama `xlp-boulder`). Ese es el enlace para la bio de Instagram.
+En un par de minutos la web queda en `https://xlp-trainning.github.io/Xlp.Boulder/`. Ese es el enlace para la bio de Instagram.
 
 Si el repositorio o el dominio son otros, cambia la dirección de `og:image` en `index.html`: es la imagen (`og.png`) que sale al compartir el enlace en Instagram o WhatsApp.
 
