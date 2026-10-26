@@ -11,7 +11,7 @@
 - **Mi progreso**: encadenados por nivel ("Rojo 4/9"), el nivel más alto conseguido y los proyectos en curso.
 - **El equipador** entra con email y contraseña ("Acceso equipador", al pie de la página) y puede:
   - crear, editar, desmontar o borrar bloques, con foto;
-  - **resaltar presas** en la foto: eliges el color y la web deja en color solo las presas del bloque, oscurece el resto y te deja marcar la **salida** y el **top** tocando las presas (también añadir las que falten o quitar las que sobren);
+  - **resaltar presas** en la foto: eliges el color y la web deja en color solo las presas del bloque, oscurece el resto y te deja marcar la **salida** y el **top** tocando las presas (también añadir las que falten o quitar las que sobren). Si se cuelan cosas del techo o la colchoneta, **marcas el muro** rodeándolo con el dedo y solo se buscan presas dentro;
   - gestionar el plano y los sectores;
   - borrar comentarios;
   - ver **Estadísticas**: bloques por nivel y estilo, los que más y menos gustan, los poco encadenados, los más proyectados y los más comentados.

@@ -268,3 +268,4 @@ td.num { text-align: right; font-family: var(--f-mono); font-size: 13px; font-va
 .ed-canvas { display: block; width: 100%; height: auto; cursor: crosshair; touch-action: manipulation; }
 .ed-info { font-weight: 700; font-size: 14px; }
 .ed-help { margin: 0; }
+.ed-canvas.drawing { touch-action: none; cursor: crosshair; outline: 3px solid var(--accent); outline-offset: -3px; }

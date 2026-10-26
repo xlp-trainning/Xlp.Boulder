@@ -87,6 +87,9 @@ function openHoldEditor({ source, color }) {
     }
 
     let holds = [], lab = new Int32Array(W * H).fill(-1), disp = lab, ring = lab, chosen = color && HOLD_RANGES[color] ? color : "";
+    // Zona del muro: si está marcada, solo se buscan presas dentro (fuera quedan techo, colchoneta…)
+    let zone = null, zonePts = [], drawMode = false, drawing = false, livePts = [], skipClick = false;
+    const inZone = i => !zone || zone[i] === 1;
 
     function relabel() {
       disp = growLabels(lab, W, H, Math.max(2, Math.round(4 * sc)));
@@ -98,7 +101,7 @@ function openHoldEditor({ source, color }) {
     function detect() {
       const test = HOLD_RANGES[chosen];
       const N = W * H; let m = new Uint8Array(N);
-      for (let i = 0; i < N; i++) { const [h, s, v] = hsvAt(orig, i * 4); if (test(h, s, v)) m[i] = 1; }
+      for (let i = 0; i < N; i++) { if (!inZone(i)) continue; const [h, s, v] = hsvAt(orig, i * 4); if (test(h, s, v)) m[i] = 1; }
       m = box(box(m, W, H, 1, true), W, H, 1, false);                       // quitar puntitos sueltos
       const rc = Math.max(2, Math.round(4 * sc));
       m = box(box(m, W, H, rc, false), W, H, rc, true);                     // unir trozos de una misma presa
@@ -147,7 +150,7 @@ function openHoldEditor({ source, color }) {
         const p = st.pop(); px.push(p);
         const px_ = p % W, py = (p - px_) / W;
         for (const q of [px_ > 0 ? p - 1 : -1, px_ < W - 1 ? p + 1 : -1, py > 0 ? p - W : -1, py < H - 1 ? p + W : -1]) {
-          if (q < 0 || seen[q] || lab[q] >= 0) continue;
+          if (q < 0 || seen[q] || lab[q] >= 0 || !inZone(q)) continue;
           const qx = q % W, qy = (q - qx) / W;
           if (Math.abs(qx - x) > R || Math.abs(qy - y) > R) continue;
           const dr = orig[q * 4] - r0, dg = orig[q * 4 + 1] - g0, db = orig[q * 4 + 2] - b0;
@@ -187,7 +190,15 @@ function openHoldEditor({ source, color }) {
         ctx.fillStyle = mk.color; ctx.beginPath(); ctx.roundRect(px, py, tw + padX * 2, ph, ph / 2); ctx.fill();
         ctx.fillStyle = "#141A18"; ctx.textBaseline = "middle"; ctx.fillText(mk.text, px + padX, py + ph / 2 + 1);
       }
-      if (!forExport) updateInfo();
+      if (!forExport) {
+        const pts = drawing ? livePts : zonePts;
+        if (pts.length > 1) {
+          ctx.save(); ctx.lineWidth = 5 * sc * 1.2; ctx.setLineDash([16 * sc, 10 * sc]); ctx.strokeStyle = "rgba(255,255,255,.9)";
+          ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = 6 * sc;
+          ctx.beginPath(); pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); if (!drawing) ctx.closePath(); ctx.stroke(); ctx.restore();
+        }
+        updateInfo();
+      }
     }
 
     // ---------- interfaz ----------
@@ -200,7 +211,8 @@ function openHoldEditor({ source, color }) {
     function updateInfo() {
       const on = holds.filter(h => h.state !== "off");
       const n = s => holds.filter(h => h.state === s).length;
-      info.textContent = !chosen ? "Elige el color de las presas del bloque."
+      info.textContent = drawMode ? "Rodea con el dedo la zona del muro y suelta para cerrarla."
+        : !chosen ? "Elige el color de las presas del bloque."
         : `${on.length} ${on.length === 1 ? "presa" : "presas"} · ${n("start")} de salida · ${n("top")} de top`;
       useBtn.disabled = !chosen;
     }
@@ -216,10 +228,12 @@ function openHoldEditor({ source, color }) {
       }, 20));
     }
     canvas.addEventListener("click", e => {
+      if (drawMode || skipClick) { skipClick = false; return; }
       if (!chosen) return toast("Elige primero el color de las presas");
       const r = canvas.getBoundingClientRect();
       const x = Math.round((e.clientX - r.left) / r.width * W), y = Math.round((e.clientY - r.top) / r.height * H);
       if (x < 0 || y < 0 || x >= W || y >= H) return;
+      if (!inZone(y * W + x)) return toast("Ese punto está fuera del muro marcado");
       let id = disp[y * W + x];
       if (id < 0) id = ring[y * W + x];
       if (id < 0) {   // la presa más cercana, si el toque cae justo al lado
@@ -234,12 +248,48 @@ function openHoldEditor({ source, color }) {
       draw();
     });
 
+    const toImg = e => { const r = canvas.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; };
+    canvas.addEventListener("pointerdown", e => {
+      if (!drawMode) return;
+      e.preventDefault(); drawing = true; livePts = [toImg(e)]; canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener("pointermove", e => {
+      if (!drawing) return;
+      const p = toImg(e), q = livePts[livePts.length - 1];
+      if (Math.hypot(p[0] - q[0], p[1] - q[1]) > 6 * sc) { livePts.push(p); draw(); }
+    });
+    const endDraw = () => {
+      if (!drawing) return;
+      drawing = false; drawMode = false; skipClick = true; canvas.classList.remove("drawing");
+      if (livePts.length < 3) { livePts = []; drawZoneBtns(); return draw(); }
+      zonePts = livePts; livePts = [];
+      const oc = document.createElement("canvas"); oc.width = W; oc.height = H;
+      const o = oc.getContext("2d"); o.fillStyle = "#fff"; o.beginPath();
+      zonePts.forEach(([x, y], i) => i ? o.lineTo(x, y) : o.moveTo(x, y)); o.closePath(); o.fill();
+      const a = o.getImageData(0, 0, W, H).data; zone = new Uint8Array(W * H);
+      for (let i = 0; i < zone.length; i++) zone[i] = a[i * 4 + 3] > 0 ? 1 : 0;
+      drawZoneBtns();
+      if (chosen) run(); else draw();
+    };
+    canvas.addEventListener("pointerup", endDraw);
+    canvas.addEventListener("pointercancel", endDraw);
+    const zoneBtns = el("div", { class: "actions" });
+    function drawZoneBtns() {
+      zoneBtns.replaceChildren(...[
+        el("button", { type: "button", class: "btn" + (drawMode ? " primary" : ""), onclick: () => {
+          drawMode = !drawMode; canvas.classList.toggle("drawing", drawMode); drawZoneBtns(); updateInfo();
+        } }, drawMode ? "Cancelar trazo" : zone ? "✏️ Volver a marcar el muro" : "✏️ Marcar el muro"),
+        zone && !drawMode ? el("button", { type: "button", class: "btn", onclick: () => { zone = null; zonePts = []; drawZoneBtns(); if (chosen) run(); else draw(); } }, "Quitar zona") : null].filter(Boolean));
+    }
+    drawZoneBtns();
+
     const root = el("div", { class: "ed-scrim", role: "dialog", "aria-modal": "true", "aria-label": "Resaltar presas" },
       el("div", { class: "ed-panel" },
         el("div", { class: "sheet-head" }, el("h2", { class: "sheet-title", text: "Resaltar presas" }),
           el("button", { class: "x", type: "button", "aria-label": "Cancelar", onclick: () => { close(); resolve(null); } }, "×")),
         el("div", { class: "field" }, el("span", { class: "label", text: "Color de las presas" }), chips),
-        el("p", { class: "note ed-help", text: "Toca una presa para cambiarla: salida → top → quitar → normal. Si falta alguna, toca encima para añadirla." }),
+        el("p", { class: "note ed-help", text: "Toca una presa para cambiarla: salida → top → quitar → normal. Si falta alguna, toca encima para añadirla. Si se cuelan cosas del techo o la colchoneta, marca el muro." }),
+        zoneBtns,
         el("div", { class: "ed-stage" }, canvas),
         info,
         el("div", { class: "actions" }, useBtn,
