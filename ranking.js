@@ -71,8 +71,24 @@ function leagueBadge(l, big) {
     l.solid ? el("span", { class: "lg-badge-in", text: l.name }) : l.name);
 }
 
+// La primera vez que se entra al ranking, explicar cómo se asigna la liga
+function rankingIntro() {
+  store.set("lb-rank-intro", 1);
+  const lg = myLeague();
+  sheet(head("Así funciona el ranking", true),
+    el("div", { class: "intro" },
+      el("p", {}, "Tu liga es la del ", el("strong", { text: `primer color del que encadenes ${PROMOTE} bloques` }),
+        " en este rocódromo. Si ya tienes 10 de varios colores, cuenta el más difícil."),
+      el("p", { text: "No hace falta ir color a color: si tus primeros 10 de un color son negros, entras directo en la liga Negro. Y nunca se baja de liga." }),
+      el("p", { text: `Mientras no tengas ${PROMOTE} de ningún color, estás en la liga Azul.` }),
+      el("p", { text: "Dentro de tu liga compites por los puntos del mes (azul 1, verde 2… compe 8; el flash suma la mitad más). El día 1 todo vuelve a cero." }),
+      el("div", { class: "intro-now" }, el("span", { text: "Ahora mismo estás en la liga" }), leagueBadge(lg.l, true))),
+    el("div", { class: "actions" }, el("button", { class: "btn primary", onclick: closeSheet }, "¡Entendido!")));
+}
+
 function renderRanking() {
   const root = $("page-ranking");
+  if (!store.get("lb-rank-intro", 0) && !$("sheetRoot").firstChild) setTimeout(rankingIntro);
   if (RK.key !== `${S.gym}|${RK.month}`) loadRanking();
   const lg = myLeague();
   const shown = RK.month === "prev" ? monthStart(1) : monthStart(0);
@@ -131,6 +147,7 @@ function renderRanking() {
             el("span", { class: "rk-pts" }, el("strong", { text: String(r.points) }), el("span", { class: "note", text: "puntos" })),
             S.isSetter && !r.is_me ? el("button", { class: "linkbtn rk-kick", "aria-label": `Quitar a ${r.nick}`, onclick: () => kickClimber(r) }, "Quitar") : null)))
         : el("p", { class: "note", text: RK.month === "cur" ? `Nadie ha puntuado todavía en la liga ${view.name} este mes. ¡Estrénala!` : `Nadie puntuó en la liga ${view.name} ese mes.` })),
-    el("p", { class: "note", text: `Cómo funciona: todos empiezan en la liga Azul. Para subir a la liga de un color hay que encadenar ${PROMOTE} bloques de ese color en este rocódromo; nunca se baja. Dentro de cada liga gana quien más puntos sume en el mes (azul 1, verde 2… compe 8; el flash suma la mitad más). El ranking se reinicia el día 1.` }),
+    el("p", { class: "note" }, `Tu liga es el color más difícil del que hayas encadenado ${PROMOTE} bloques en este rocódromo (sin ir color a color, y nunca se baja). Dentro de cada liga gana quien más puntos sume en el mes. `,
+      el("button", { class: "linkbtn", onclick: rankingIntro }, "Más detalles")),
   ].filter(Boolean));
 }

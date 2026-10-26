@@ -17,7 +17,8 @@
   - **Tarjetas para historias de Instagram** (1080×1920): una por bloque encadenado y otra con el resumen del mes, para compartir o guardar.
   - Encadenados por nivel ("Rojo 4/9") y proyectos en curso.
 - **Ranking** mensual por **ligas de color**, en cada rocódromo:
-  - Todos empiezan en la liga Azul. Para subir a la liga de un color hay que encadenar **10 bloques de ese color**; nunca se baja.
+  - Tu liga es la del **primer color del que encadenes 10 bloques** (si tienes 10 de varios, el más difícil). No hace falta ir color a color y nunca se baja; mientras no tengas 10 de ninguno, estás en Azul.
+  - La primera vez que alguien entra en el ranking, una ventana le explica cómo se asigna la liga y en cuál está.
   - Dentro de cada liga gana quien más puntos sume en el mes. Se reinicia el día 1 y se puede ver el mes pasado.
   - Es voluntario: cada uno se apunta con un apodo (sin email). El equipador puede quitar a alguien del ranking.
   - La fecha de cada encadenado la pone el servidor, así que no se puede trampear con fechas, y no cuentan los bloques marcados después de desmontarse.

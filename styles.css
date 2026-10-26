@@ -340,3 +340,6 @@ a.btn.primary { color: var(--accent-ink); }
 .rk-pts { display: flex; flex-direction: column; align-items: flex-end; }
 .rk-pts strong { font-family: var(--f-display); font-weight: 900; font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums; }
 .rk-kick { font-size: 13px; color: var(--danger); padding: 0; }
+.intro { display: flex; flex-direction: column; gap: 10px; line-height: 1.5; }
+.intro p { margin: 0; }
+.intro-now { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-weight: 700; background: var(--accent-soft); border-radius: 10px; padding: 10px 14px; }
