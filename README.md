@@ -14,7 +14,8 @@
   - **Rachas**: semanas seguidas encadenando algo, con aviso si la racha está a punto de perderse.
   - **Medallas** (primer bloque de cada color, flashes, 10/50 encadenados, 100 puntos, recién montado, sector completo, 6 estilos, rachas de 4 y 12 semanas), con barra de avance.
   - **Tu siguiente reto**: tres bloques abiertos recomendados según tu nivel, los estilos que menos tocas, tus proyectos y los recién montados.
-  - **Tarjetas para historias de Instagram** (1080×1920): una por bloque encadenado y otra con el resumen del mes, para compartir o guardar.
+  - **Tarjeta para historias de Instagram** (1080×1920) de cada bloque encadenado, para compartir o guardar.
+  - **Tu mes**, un resumen tipo Spotify Wrapped: pantallas a pantalla completa que se pasan tocando (o solas cada 6 segundos), con los bloques del mes y la comparación con el anterior, la evolución semana a semana, los colores (y los estrenados), el bloque más difícil, el estilo del mes, datos curiosos (sector, día favorito, el mejor valorado) y el puesto en el ranking. Cada pantalla se comparte en historias. A principio de mes un aviso y un punto en «Mi progreso» anuncian que el resumen del mes pasado está listo.
   - Encadenados por nivel ("Rojo 4/9") y proyectos en curso.
 - **Ranking** mensual por **ligas de color**, en cada rocódromo:
   - Tu liga es la del **primer color del que encadenes 10 bloques** (si tienes 10 de varios, el más difícil). No hace falta ir color a color y nunca se baja; mientras no tengas 10 de ninguno, estás en Azul.
@@ -72,7 +73,8 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `app.js` | lógica: carga, filtros, votos, formulario del equipador |
 | `progreso.js` | Mi progreso: puntos, rachas, medallas y siguiente reto |
 | `ranking.js` | ranking mensual por ligas de color |
-| `historias.js` | tarjetas para historias de Instagram |
+| `historias.js` | tarjeta para historias de Instagram de un bloque |
+| `wrapped.js` | «Tu mes»: el resumen del mes tipo Wrapped |
 | `editor.js` | editor de la foto del bloque: resaltar presas por color, salida y top |
 | `config.js` | dirección y clave pública de Supabase |
 | `supabase/schema.sql` | tablas y reglas de acceso |

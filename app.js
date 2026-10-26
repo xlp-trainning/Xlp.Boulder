@@ -515,6 +515,7 @@ function render() {
   const page = !sb || !S.loaded || S.error ? "bloques" : S.page;
   document.querySelectorAll("[data-page]").forEach(b => b.setAttribute("aria-current", b.dataset.page === S.page ? "page" : "false"));
   document.querySelectorAll(".page").forEach(p => p.hidden = p.id !== "page-" + page);
+  markWrapped();
   if (page === "bloques") return renderBloques();
   if (S.page === "mapa") renderMapa();
   if (S.page === "ranking") renderRanking();

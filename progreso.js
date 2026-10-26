@@ -92,6 +92,18 @@ function recommendations(n = 3) {
   }).sort((a, b) => b.score - a.score).slice(0, n);
 }
 
+// «Tu mes»: el resumen del mes pasado (con aviso si aún no se ha visto) y el del mes en curso
+function wrappedSection() {
+  const prevN = wrappedData(1).sends.length, curN = wrappedData(0).sends.length;
+  const pending = wrappedPending(), prev = monthName(monthStart(1)), cur = monthName(monthStart(0));
+  return el("section", { class: "section" + (pending ? " wr-new" : "") }, el("span", { class: "label", text: "Tu mes" }),
+    pending ? el("p", { class: "wr-ready", text: `🎁 Tu resumen de ${prev} está listo` }) : null,
+    el("div", { class: "actions" },
+      prevN ? el("button", { class: "btn" + (pending ? " primary" : ""), onclick: () => openWrapped(1) }, `🎁 Resumen de ${prev}`) : null,
+      el("button", { class: "btn" + (pending ? "" : " primary"), disabled: !curN, onclick: () => openWrapped(0) }, `Tu ${cur} hasta ahora`)),
+    el("p", { class: "note", text: "Tus bloques, tu evolución semana a semana, colores, estilo, datos curiosos y tu puesto en el ranking. Cada pantalla se puede compartir en historias." }));
+}
+
 function renderProgreso() {
   const root = $("page-progreso");
   const c = progressCtx(), st = c.streak;
@@ -118,6 +130,7 @@ function renderProgreso() {
       kpi(c.sends.length, "encadenados", el("span", { class: "note", text: `⚡ ${c.flashes} al flash` })),
       kpi(c.top ? c.top.name : "—", "nivel más alto", c.top ? el("span", { class: "kpi-tape", style: `background:${c.top.bg}` }) : null)),
     st.cur > 0 && !st.thisWeek ? el("div", { class: "banner" }, `🔥 Encadena algo esta semana para no perder tu racha de ${st.cur} ${st.cur === 1 ? "semana" : "semanas"}.`) : null,
+    wrappedSection(),
 
     el("section", { class: "section" }, el("span", { class: "label", text: "Tu siguiente reto" }),
       recs.length ? el("div", { class: "grid" }, recs.map(r => el("div", { class: "rec" }, el("span", { class: "rec-why", text: r.why }), card(r.b))))
@@ -140,6 +153,5 @@ function renderProgreso() {
       projects.length ? el("div", { class: "grid" }, projects.map(card))
         : el("p", { class: "note", text: "Marca «Es mi proyecto» en los bloques que estés probando para tenerlos a mano aquí." })),
 
-    el("div", { class: "actions" }, el("button", { class: "btn primary", disabled: !c.monthSends.length, onclick: storyMonth }, "📸 Compartir mi mes en historias")),
     el("p", { class: "note", text: "Puntos por color: azul 1, verde 2, naranja 3, amarillo 4, morado 5, rojo 6, negro 7 y compe 8; el flash suma la mitad más. Tu progreso se guarda en este móvil, sin cuenta." })].filter(Boolean));
 }

@@ -1,4 +1,4 @@
-// Tarjetas para historias de Instagram (1080x1920): un bloque encadenado o el resumen del mes.
+// Tarjetas para historias de Instagram (1080x1920) de un bloque encadenado. El resumen del mes está en wrapped.js.
 // Usa el estado y las utilidades de app.js y progreso.js.
 
 const STORY = { w: 1080, h: 1920, bg: "#18201E", ink: "#F8FAF9", muted: "#AEBBB6", accent: "#4CC3A8", url: "xlp-trainning.github.io/Xlp.Boulder" };
@@ -78,37 +78,6 @@ async function storyBlock(b, mine) {
   x.fillText([b.sector, `+${pointsFor(b, mine.flash)} puntos`, fmtDate(mine.sent_at || new Date().toISOString())].filter(Boolean).join("  ·  "), 80, y);
   drawFooter(x);
   showStory(c, `${title(b)} · ${lvName(b)}`);
-}
-
-async function storyMonth() {
-  const [c, x] = await storyCanvas();
-  const p = progressCtx(), st = p.streak;
-  const month = new Date().toLocaleDateString("es-ES", { month: "long", year: "numeric" });
-  drawHeader(x, currentGym()?.name || "");
-  x.fillStyle = STORY.muted; x.font = `700 44px ${BODY}`; x.fillText("MI MES DE ESCALADA", 80, 420);
-  x.fillStyle = STORY.ink; fitText(x, month.toUpperCase(), 920, 130); x.fillText(month.toUpperCase(), 80, 550);
-  // Cifras del mes
-  const stats = [[p.monthPoints, "puntos"], [p.monthSends.length, "bloques"], [p.monthSends.filter(s => s.m.flash).length, "al flash"], [st.cur, st.cur === 1 ? "semana de racha" : "semanas de racha"]];
-  stats.forEach(([n, label], i) => {
-    const cx = 80 + (i % 2) * 470, cy = 650 + Math.floor(i / 2) * 290;
-    x.fillStyle = "#222B28"; x.beginPath(); x.roundRect(cx, cy, 450, 260, 32); x.fill();
-    x.fillStyle = i === 0 ? STORY.accent : STORY.ink; x.font = `900 150px ${DISPLAY}`; x.fillText(String(n), cx + 36, cy + 160);
-    x.fillStyle = STORY.muted; x.font = `600 38px ${BODY}`; x.fillText(label, cx + 40, cy + 220);
-  });
-  // Bloques del mes por color
-  const y0 = 1290; x.fillStyle = STORY.muted; x.font = `700 36px ${BODY}`; x.fillText("POR COLOR", 80, y0 - 30);
-  const counts = LEVELS.map(l => p.monthSends.filter(s => s.b.level === l.k).length), max = Math.max(1, ...counts);
-  LEVELS.forEach((l, i) => {
-    const bw = 920 / LEVELS.length - 14, bx = 80 + i * (920 / LEVELS.length), bh = counts[i] / max * 280;
-    x.fillStyle = l.solid ? "#F4F4F2" : l.bg; x.globalAlpha = counts[i] ? 1 : .25;
-    x.beginPath(); x.roundRect(bx, y0 + 340 - Math.max(bh, 10), bw, Math.max(bh, 10), 10); x.fill(); x.globalAlpha = 1;
-    x.fillStyle = STORY.ink; x.font = `900 44px ${DISPLAY}`; x.textAlign = "center";
-    if (counts[i]) x.fillText(String(counts[i]), bx + bw / 2, y0 + 320 - bh);
-    x.fillStyle = STORY.muted; x.font = `700 26px ${BODY}`; x.fillText(SHORT[l.k].toUpperCase(), bx + bw / 2, y0 + 385); x.textAlign = "left";
-  });
-  if (p.top) { x.fillStyle = STORY.ink; x.font = `700 40px ${BODY}`; x.fillText(`Nivel más alto: ${p.top.name}`, 80, 1760); }
-  drawFooter(x);
-  showStory(c, `Mi mes en ${currentGym()?.name || "el rocódromo"}`);
 }
 
 // Vista previa con «Compartir» (Instagram, WhatsApp…) y «Guardar imagen»

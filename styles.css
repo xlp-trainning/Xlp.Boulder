@@ -343,3 +343,24 @@ a.btn.primary { color: var(--accent-ink); }
 .intro { display: flex; flex-direction: column; gap: 10px; line-height: 1.5; }
 .intro p { margin: 0; }
 .intro-now { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-weight: 700; background: var(--accent-soft); border-radius: 10px; padding: 10px 14px; }
+
+/* ---------- Tu mes (resumen tipo Wrapped) ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.mainnav button.has-new::after { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); margin-left: 6px; vertical-align: 2px; }
+.wr-new { background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; }
+.wr-ready { margin: 0; font-weight: 800; font-size: 18px; }
+.wrapped { position: fixed; inset: 0; z-index: 50; background: #0A0E0D; color: #F8FAF9; display: flex; flex-direction: column; align-items: center;
+  padding: calc(env(safe-area-inset-top, 0px) + 10px) 12px calc(env(safe-area-inset-bottom, 0px) + 12px); gap: 10px; }
+.wr-loading { margin: auto; font-weight: 700; }
+.wr-bars { display: flex; gap: 4px; width: min(100%, 480px); }
+.wr-bar { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,.3); overflow: hidden; }
+.wr-bar i { display: block; height: 100%; width: 0; background: #fff; }
+.wr-x { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 20px); right: 14px; z-index: 2; width: 40px; height: 40px; border-radius: 50%; border: 0;
+  background: rgba(0,0,0,.45); color: #fff; font-size: 26px; line-height: 1; }
+.wr-stage { flex: 1; min-height: 0; width: 100%; display: flex; justify-content: center; align-items: center; touch-action: manipulation; user-select: none; -webkit-user-select: none; cursor: pointer; }
+.wr-slide { max-width: 100%; max-height: 100%; aspect-ratio: 9 / 16; border-radius: 14px; display: block; }
+.wr-slide.in { animation: wr-in .45s cubic-bezier(.2,.8,.2,1); }
+@keyframes wr-in { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+.wr-actions { display: flex; gap: 8px; width: min(100%, 480px); }
+.wr-actions .btn { background: rgba(255,255,255,.12); color: #fff; border-color: transparent; min-width: 48px; font-size: 18px; }
+.wr-actions .btn.primary { flex: 1; background: #4CC3A8; color: #0B1513; font-size: 16px; }
