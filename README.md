@@ -7,12 +7,12 @@
   - puntuarlos, marcarlos como encadenados o como proyecto, y guardar favoritos (los votos se guardan por dispositivo);
   - contar su propia beta con un apodo, con enlace a vídeo opcional.
 - **Novedades**: los bloques montados en los últimos 7 días llevan la marca «Nuevo» y tienen su pestaña.
-- **Mapa**: el plano de cada rocódromo (vienen ya puestos los de `mapas/`; se pueden cambiar desde la app) con un marcador por sector y el número de bloques abiertos. Al tocar un sector se filtra la lista.
+- **Mapa**: el plano de cada rocódromo dividido en **sectores que se pueden tocar** (uno por muro, con su nombre y el número de bloques abiertos). Al tocar un sector se resalta y salen debajo sus bloques, de fácil a difícil; «Ver en la lista» lo lleva a la lista filtrada. El equipador puede redibujar la zona de cada sector con el dedo.
 - **Mi progreso**: encadenados por nivel ("Rojo 4/9"), el nivel más alto conseguido y los proyectos en curso.
 - **El equipador** entra con email y contraseña ("Acceso equipador", al pie de la página) y puede:
   - crear, editar, desmontar o borrar bloques, con foto;
   - **resaltar presas** en la foto, en tres pasos: 1) marcas la zona a analizar rodeando el muro con el dedo (o arrastrando en diagonal para un rectángulo, o «Analizar toda la foto»); 2) eliges el color de las presas y la web deja en color solo esas, oscureciendo el resto; 3) tocas las presas para marcar la **salida** y el **top**, añadir las que falten o quitar las que sobren. Los **volúmenes estructurales** (madera, negro o gris, del color del muro) se marcan rodeándolos con «◇ Volumen» y funcionan como una presa más;
-  - gestionar el plano y los sectores;
+  - gestionar el plano y los sectores (renombrarlos, añadirlos y dibujar su zona en el plano);
   - borrar comentarios;
   - ver **Estadísticas**: bloques por nivel y estilo, los que más y menos gustan, los poco encadenados, los más proyectados y los más comentados.
 - Cada rocódromo tiene sus bloques, sectores, plano y estadísticas. La web recuerda el rocódromo elegido en cada móvil.
@@ -62,7 +62,8 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `supabase/schema.sql` | tablas y reglas de acceso |
 | `manifest.webmanifest`, `icon*` | instalación en la pantalla de inicio, con el logo de Xlp.Boulder |
 | `og.png` | imagen de vista previa al compartir el enlace |
-| `mapas/` | planos de Natural Patraix y Natural Benimaclet (PNG, SVG y el script que los genera) |
+| `mapas/` | planos de Natural Patraix y Natural Benimaclet (PNG, SVG y el script que los genera) y `sectores.py`, que calcula las zonas de los sectores |
+| `supabase/002-sectores.sql` | crea los sectores de los dos planos con sus zonas (ejecutar una vez) |
 
 ## Añadir otro rocódromo
 

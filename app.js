@@ -46,7 +46,7 @@ const S = {
   comments: {}, drafts: {},
   session: null, isSetter: false,
   page: "bloques", view: "open", level: null, sector: null, styles: new Set(), colors: new Set(), q: "", sort: "new",
-  placing: null, loaded: false, error: null,
+  drawingSector: null, mapSel: null, loaded: false, error: null,
 };
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, ...kids) => {
@@ -79,7 +79,7 @@ const currentGym = () => S.gyms.find(g => g.id === S.gym);
 function setGym(id) {
   if (id === S.gym) return;
   S.gym = id; store.set("lb-gym", id);
-  S.level = null; S.sector = null; S.colors.clear(); S.placing = null; S.loaded = false;
+  S.level = null; S.sector = null; S.colors.clear(); S.drawingSector = null; S.mapSel = null; S.loaded = false;
   if (/^#[a-z0-9-]{2,30}$/.test(location.hash) && !location.hash.startsWith("#b-")) history.replaceState(null, "", "#" + id);
   render(); refresh();
 }
@@ -272,43 +272,108 @@ function renderBloques() {
 
 /* ---------- página: mapa ---------- */
 function goSector(name) { S.sector = name; S.level = null; S.view = "open"; setPage("bloques"); window.scrollTo({ top: 0 }); }
+const shortName = n => n.split("·").pop().trim();
+function selectSector(name, scroll) {
+  S.mapSel = S.mapSel === name && !scroll ? null : name;
+  render();
+  if (scroll && S.mapSel) document.querySelector(".sector-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+const svgEl = (tag, attrs) => { const n = document.createElementNS("http://www.w3.org/2000/svg", tag); for (const k in attrs) n.setAttribute(k, attrs[k]); return n; };
+
 function renderMapa() {
   const root = $("page-mapa");
-  const openBy = {};
+  const openBy = {}, newBy = {};
   S.blocks.filter(b => b.active).forEach(b => { if (b.sector) openBy[b.sector] = (openBy[b.sector] || 0) + 1; });
-  const newBy = {};
   S.blocks.filter(isNew).forEach(b => { if (b.sector) newBy[b.sector] = (newBy[b.sector] || 0) + 1; });
   const names = sectorNames();
+  if (S.mapSel && !names.includes(S.mapSel)) S.mapSel = null;
   const kids = [];
 
   if (S.mapPath) {
-    const placingSec = S.sectors.find(s => s.id === S.placing);
-    const plan = el("div", { class: "plan" + (placingSec ? " placing" : "") },
-      el("img", { src: photoUrl(S.mapPath), alt: "Plano de la sala" }),
-      S.sectors.filter(s => s.x != null && s.y != null).map(s => el("button", { class: "pin" + (newBy[s.name] ? " fresh" : ""), style: `left:${s.x * 100}%;top:${s.y * 100}%`,
-        "aria-label": `${s.name}: ${openBy[s.name] || 0} bloques`, onclick: e => { e.stopPropagation(); if (!S.placing) goSector(s.name); } },
-        el("span", { class: "pin-name", text: s.name }), openBy[s.name] ? el("span", { class: "pin-n", text: openBy[s.name] }) : null)));
-    if (placingSec) plan.addEventListener("click", async e => {
-      const r = plan.getBoundingClientRect();
-      const x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), y = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
-      const { error } = await sb.from("sectors").update({ x, y }).eq("id", placingSec.id);
-      if (error) return toast("No se pudo colocar");
-      placingSec.x = x; placingSec.y = y; S.placing = null; render(); toast(`${placingSec.name} colocado`);
+    const drawingSec = S.sectors.find(s => s.id === S.drawingSector);
+    // Zonas de sector: un polígono por sector, en fracciones del plano (0-1)
+    const svg = svgEl("svg", { class: "plan-zones", viewBox: "0 0 1 1", preserveAspectRatio: "none" });
+    S.sectors.filter(s => Array.isArray(s.shape) && s.shape.length > 2).forEach(s => {
+      const poly = svgEl("polygon", { points: s.shape.map(p => p.join(",")).join(" "), class: "zone" + (s.name === S.mapSel ? " sel" : "") + (newBy[s.name] ? " fresh" : ""),
+        "vector-effect": "non-scaling-stroke", tabindex: "0", role: "button", "aria-label": `${s.name}: ${openBy[s.name] || 0} bloques abiertos` });
+      poly.addEventListener("click", () => !drawingSec && selectSector(s.name));
+      poly.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectSector(s.name); } });
+      svg.append(poly);
     });
-    if (placingSec) kids.push(el("div", { class: "banner" }, `Toca el plano donde está «${placingSec.name}».`, el("button", { class: "linkbtn", onclick: () => { S.placing = null; render(); } }, "Cancelar")));
+    const plan = el("div", { class: "plan" + (drawingSec ? " placing" : "") },
+      el("img", { src: photoUrl(S.mapPath), alt: "Plano de la sala" }), svg,
+      S.sectors.filter(s => s.x != null && s.y != null).map(s => el("button", {
+        class: "pin" + (newBy[s.name] ? " fresh" : "") + (s.name === S.mapSel ? " sel" : ""),
+        // Cerca de los bordes, la etiqueta se alinea hacia dentro para que no se corte
+        style: `left:${s.x * 100}%;top:${s.y * 100}%;transform:translate(${s.x < .1 ? -8 : s.x > .9 ? -92 : -50}%,-50%)`,
+        "aria-label": `${s.name}: ${openBy[s.name] || 0} bloques abiertos`, onclick: e => { e.stopPropagation(); if (!drawingSec) selectSector(s.name); } },
+        el("span", { class: "pin-name", text: shortName(s.name) }), openBy[s.name] ? el("span", { class: "pin-n", text: openBy[s.name] }) : null)));
+    if (drawingSec) {
+      kids.push(el("div", { class: "banner" }, `Rodea con el dedo la zona de «${drawingSec.name}» en el plano.`,
+        el("button", { class: "linkbtn", onclick: () => { S.drawingSector = null; render(); } }, "Cancelar")));
+      lassoOn(plan, async pts => {
+        const shape = pts.map(([x, y]) => [Math.round(x * 1e4) / 1e4, Math.round(y * 1e4) / 1e4]);
+        const x = shape.reduce((a, p) => a + p[0], 0) / shape.length, y = shape.reduce((a, p) => a + p[1], 0) / shape.length;
+        const { error } = await sb.from("sectors").update({ shape, x, y }).eq("id", drawingSec.id);
+        if (error) return toast("No se pudo guardar la zona");
+        Object.assign(drawingSec, { shape, x, y }); S.drawingSector = null; S.mapSel = drawingSec.name; render(); toast(`Zona de ${drawingSec.name} guardada`);
+      });
+    }
     kids.push(el("div", { class: "plan-scroll" }, plan));
-    kids.push(el("p", { class: "note", text: "Toca un sector para ver sus bloques. La burbuja indica cuántos hay abiertos; en verde, los sectores con novedades. En el móvil, desliza el plano de lado." }));
+    kids.push(el("p", { class: "note", text: "Toca un sector del plano para ver sus bloques. El número es cuántos hay abiertos; en verde, los sectores con novedades. En el móvil, desliza el plano de lado." }));
+  }
+
+  // Bloques del sector elegido, debajo del plano
+  if (S.mapSel) {
+    const list = S.blocks.filter(b => b.active && b.sector === S.mapSel).sort((a, b) => gIdx(a.level) - gIdx(b.level));
+    kids.push(el("section", { class: "section sector-panel" },
+      el("div", { class: "sector-panel-head" },
+        el("div", {}, el("span", { class: "label", text: "Sector" }), el("h2", { class: "sector-title", text: S.mapSel }),
+          el("span", { class: "note", text: `${list.length} ${list.length === 1 ? "bloque abierto" : "bloques abiertos"}` + (newBy[S.mapSel] ? ` · ${newBy[S.mapSel]} nuevos` : "") })),
+        el("div", { class: "row" },
+          list.length ? el("button", { class: "btn small", onclick: () => goSector(S.mapSel) }, "Ver en la lista") : null,
+          el("button", { class: "sector-close", "aria-label": "Cerrar sector", onclick: () => selectSector(S.mapSel) }, "×"))),
+      list.length ? el("div", { class: "grid" }, list.map(card))
+        : el("p", { class: "note", text: "Ahora mismo no hay bloques abiertos en este sector." })));
   }
 
   if (names.length) {
     kids.push(el("div", { class: "section" }, el("span", { class: "label", text: "Sectores" }),
-      el("div", { class: "sector-grid" }, names.map(n => el("button", { class: "sector-btn", onclick: () => goSector(n) },
+      el("div", { class: "sector-grid" }, names.map(n => el("button", { class: "sector-btn" + (n === S.mapSel ? " sel" : ""), onclick: () => selectSector(n, true) },
         el("span", { class: "sector-name", text: n }),
         el("span", { class: "note", text: `${openBy[n] || 0} abiertos` + (newBy[n] ? ` · ${newBy[n]} nuevos` : "") }))))));
   } else if (!S.isSetter) kids.push(emptyBox("Sin sectores todavía", "Cuando el equipador apunte los sectores de la sala, aparecerán aquí."));
 
   if (S.isSetter) kids.push(mapEditor());
   root.replaceChildren(...kids);
+}
+
+// Dibujo a mano alzada sobre el plano; devuelve los puntos en fracciones (0-1)
+function lassoOn(plan, done) {
+  const layer = el("div", { class: "plan-draw" });
+  const svg = svgEl("svg", { viewBox: "0 0 1 1", preserveAspectRatio: "none" });
+  const line = svgEl("polyline", { "vector-effect": "non-scaling-stroke" });
+  svg.append(line); layer.append(svg); plan.append(layer);
+  let pts = null;
+  const at = e => { const r = layer.getBoundingClientRect(); return [Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), Math.min(1, Math.max(0, (e.clientY - r.top) / r.height))]; };
+  layer.addEventListener("pointerdown", e => { e.preventDefault(); layer.setPointerCapture(e.pointerId); pts = [at(e)]; });
+  layer.addEventListener("pointermove", e => {
+    if (!pts) return;
+    const p = at(e), q = pts[pts.length - 1];
+    if (Math.hypot(p[0] - q[0], p[1] - q[1]) > .004) { pts.push(p); line.setAttribute("points", pts.map(p => p.join(",")).join(" ")); }
+  });
+  const end = () => {
+    if (!pts) return;
+    let p = pts; pts = null;
+    const xs = p.map(q => q[0]), ys = p.map(q => q[1]);
+    const bw = Math.max(...xs) - Math.min(...xs), bh = Math.max(...ys) - Math.min(...ys);
+    if (bw < .01 || bh < .01) { line.setAttribute("points", ""); return toast("Zona demasiado pequeña. Rodéala con el dedo o arrastra en diagonal."); }
+    let area = 0; p.forEach(([x, y], i) => { const [x2, y2] = p[(i + 1) % p.length]; area += x * y2 - x2 * y; });
+    if (Math.abs(area) / 2 < .2 * bw * bh) { const [x0, y0] = p[0], [x1, y1] = p[p.length - 1]; p = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]; }
+    if (p.length > 60) p = p.filter((_, i) => i % Math.ceil(p.length / 60) === 0);   // menos puntos para guardar
+    done(p);
+  };
+  layer.addEventListener("pointerup", end); layer.addEventListener("pointercancel", end);
 }
 
 function mapEditor() {
@@ -327,7 +392,7 @@ function mapEditor() {
   } });
   box.append(el("div", { class: "actions" }, file,
     el("button", { class: "btn", onclick: () => file.click() }, S.mapPath ? "Cambiar imagen del plano" : "Subir imagen del plano")),
-    el("p", { class: "note", text: "Vale una foto de un plano dibujado a mano o una captura. Luego coloca cada sector tocando el plano." }));
+    el("p", { class: "note", text: "Vale una foto de un plano dibujado a mano o una captura. Luego dibuja la zona de cada sector rodeándola con el dedo sobre el plano." }));
 
   const nameIn = el("input", { id: "new-sector", placeholder: "Nombre del sector, p. ej. Desplome sur", maxlength: "40" });
   box.append(el("form", { class: "row", onsubmit: async e => {
@@ -355,8 +420,9 @@ function mapEditor() {
           el("button", { class: "btn", type: "button", onclick: () => { mode = "view"; draw(); } }, "Cancelar")));
         return;
       }
-      row.replaceChildren(el("span", { class: "grow", text: s.name + (s.x == null ? " · sin colocar" : "") }),
-        S.mapPath ? el("button", { class: "btn small", onclick: () => { S.placing = s.id; render(); window.scrollTo({ top: 0, behavior: "smooth" }); } }, s.x == null ? "Colocar" : "Mover") : null,
+      row.replaceChildren(el("span", { class: "grow", text: s.name + (Array.isArray(s.shape) && s.shape.length > 2 ? "" : " · sin zona") }),
+        S.mapPath ? el("button", { class: "btn small", onclick: () => { S.drawingSector = s.id; S.mapSel = null; render(); window.scrollTo({ top: 0, behavior: "smooth" }); } },
+          Array.isArray(s.shape) && s.shape.length > 2 ? "Redibujar zona" : "Dibujar zona") : null,
         el("button", { class: "btn small", onclick: () => { mode = "rename"; draw(); } }, "Renombrar"),
         mode === "confirm"
           ? el("button", { class: "btn small danger solid", onclick: async () => {

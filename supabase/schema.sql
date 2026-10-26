@@ -130,9 +130,11 @@ create table if not exists public.sectors (
   name       text not null check (char_length(name) between 1 and 40),
   x          real check (x between 0 and 1),
   y          real check (y between 0 and 1),
+  shape      jsonb,                                  -- zona tocable en el plano: [[x, y], …] en fracciones 0-1
   created_at timestamptz not null default now(),
   unique (gym_id, name)
 );
+alter table public.sectors add column if not exists shape jsonb;
 alter table public.sectors enable row level security;
 drop policy if exists "todos leen los sectores" on public.sectors;
 create policy "todos leen los sectores" on public.sectors for select to anon, authenticated using (true);

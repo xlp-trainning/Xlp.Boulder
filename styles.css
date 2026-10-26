@@ -272,3 +272,23 @@ td.num { text-align: right; font-family: var(--f-mono); font-size: 13px; font-va
 .ed-tools { flex-wrap: nowrap; gap: 6px; min-height: 34px; }
 .ed-tools .btn { white-space: nowrap; }
 @media (max-width: 380px) { .ed-tools .btn.small { padding: 5px 8px; font-size: 12.5px; } }
+
+/* Mapa por sectores: zonas tocables sobre el plano */
+.plan-zones { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.plan-zones .zone { pointer-events: all; cursor: pointer; fill: var(--accent); fill-opacity: .1; stroke: var(--accent); stroke-opacity: .55; stroke-width: 1.5; transition: fill-opacity .15s; outline: none; }
+.plan-zones .zone:hover, .plan-zones .zone:focus-visible { fill-opacity: .24; }
+.plan-zones .zone.fresh { fill-opacity: .18; }
+.plan-zones .zone.sel { fill-opacity: .34; stroke: var(--ink); stroke-opacity: 1; stroke-width: 2.5; }
+.plan.placing .plan-zones .zone { pointer-events: none; }
+.pin.sel { background: var(--ink); color: var(--bg); outline: 3px solid var(--accent); }
+.plan-draw { position: absolute; inset: 0; z-index: 3; touch-action: none; cursor: crosshair; }
+.plan-draw svg { width: 100%; height: 100%; display: block; }
+.plan-draw polyline { fill: rgba(76,195,168,.18); stroke: #0D6B5B; stroke-width: 3; stroke-dasharray: 8 6; }
+.sector-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; scroll-margin-top: 12px; }
+.sector-panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.sector-title { font-family: var(--f-display); font-weight: 900; font-size: 26px; text-transform: uppercase; line-height: 1; margin: 2px 0 4px; }
+.sector-btn.sel { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.sector-close { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; width: 36px; height: 36px; font-size: 18px; line-height: 1; flex: none; }
+.sector-panel-head { flex-wrap: wrap; }
+.sector-panel-head > div:first-child { flex: 1 1 220px; min-width: 0; }
+.sector-title { font-size: 24px; }
