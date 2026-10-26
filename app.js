@@ -673,14 +673,25 @@ function openForm(b) {
   drawSt();
 
   const photoBox = el("div", { class: "photo-edit" });
-  const fileIn = el("input", { type: "file", accept: "image/*", id: "f-photo", hidden: true, onchange: () => { d.file = fileIn.files[0] || null; drawPhoto(); } });
+  // d.raw es la foto tal cual sale del móvil; d.file, la que se sube (editada o no)
+  const editPhoto = async () => {
+    const r = await openHoldEditor({ source: d.raw, color: d.color });
+    if (!r) return;
+    if (r.color && r.color !== d.color) { d.color = r.color; drawSw(); }
+    d.file = r.blob || d.raw; drawPhoto();
+  };
+  const fileIn = el("input", { type: "file", accept: "image/*", id: "f-photo", hidden: true, onchange: () => {
+    d.raw = fileIn.files[0] || null; d.file = d.raw; drawPhoto();
+    if (d.raw) editPhoto();
+  } });
   const drawPhoto = () => {
     const src = d.file ? URL.createObjectURL(d.file) : d.photo ? photoUrl(d.photo) : "";
     photoBox.replaceChildren(fileIn,
       src ? el("img", { class: "photo", src, alt: "Vista previa de la foto" }) : null,
       el("div", { class: "actions" },
         el("button", { type: "button", class: "btn", onclick: () => fileIn.click() }, src ? "Cambiar foto" : "📷 Añadir foto"),
-        src ? el("button", { type: "button", class: "btn danger", onclick: () => { d.file = null; d.photo = ""; fileIn.value = ""; drawPhoto(); } }, "Quitar foto") : null));
+        d.raw ? el("button", { type: "button", class: "btn", onclick: editPhoto }, "✎ Resaltar presas") : null,
+        src ? el("button", { type: "button", class: "btn danger", onclick: () => { d.file = null; d.raw = null; d.photo = ""; fileIn.value = ""; drawPhoto(); } }, "Quitar foto") : null));
   };
   drawPhoto();
 
