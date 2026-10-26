@@ -52,8 +52,10 @@ create table if not exists public.blocks (
   video        text not null default '' check (video = '' or video ~* '^https?://'),
   photo_path   text not null default '' check (char_length(photo_path) <= 200),
   active       boolean not null default true,
+  xlp          boolean not null default false,   -- sello Xlp: equipado por el dueño de la web
   created_at   timestamptz not null default now()
 );
+alter table public.blocks add column if not exists xlp boolean not null default false;
 create index if not exists blocks_gym_idx on public.blocks (gym_id);
 alter table public.blocks enable row level security;
 

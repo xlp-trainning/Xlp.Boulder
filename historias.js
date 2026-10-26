@@ -76,6 +76,7 @@ async function storyBlock(b, mine) {
   y += 190; x.fillStyle = STORY.ink; fitText(x, title(b).toUpperCase(), 920, 150); x.fillText(title(b).toUpperCase(), 80, y);
   y += 80; x.fillStyle = STORY.muted; x.font = `600 40px ${BODY}`;
   x.fillText([b.sector, `+${pointsFor(b, mine.flash)} puntos`, fmtDate(mine.sent_at || new Date().toISOString())].filter(Boolean).join("  ·  "), 80, y);
+  if (b.xlp) { y += 70; x.fillStyle = "#F5CE1B"; x.font = `700 38px ${BODY}`; x.fillText("✕ Equipado por Xlp", 80, y); }
   drawFooter(x);
   showStory(c, `${title(b)} · ${lvName(b)}`);
 }

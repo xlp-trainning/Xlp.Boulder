@@ -6,6 +6,7 @@
   - ver los bloques con su foto y la beta;
   - puntuarlos, marcarlos como encadenados o como proyecto, y guardar favoritos (los votos se guardan por dispositivo);
   - contar su propia beta con un apodo, con enlace a vídeo opcional.
+- **Sello Xlp**: los bloques equipados por el dueño de la web llevan el distintivo Xlp (la X del logo) en la lista, en la ficha y en la tarjeta para historias, y se pueden filtrar con «Equipados por Xlp». Se marca con la casilla «Equipado por mí» al crear o editar un bloque (al crear, recuerda la última elección).
 - **Novedades**: los bloques montados en los últimos 7 días llevan la marca «Nuevo» y tienen su pestaña.
 - **Mapa**: el plano de cada rocódromo dividido en **sectores que se pueden tocar** (uno por muro, con su nombre y el número de bloques abiertos). Al tocar un sector se resalta y salen debajo sus bloques, de fácil a difícil; «Ver en la lista» lo lleva a la lista filtrada. El equipador puede redibujar la zona de cada sector con el dedo.
 - **Mi progreso**, pensado para que la gente vuelva:
@@ -28,7 +29,10 @@
   - **resaltar presas** en la foto, en tres pasos: 1) marcas la zona a analizar rodeando el muro con el dedo (o arrastrando en diagonal para un rectángulo, o «Analizar toda la foto»); 2) eliges el color de las presas y la web deja en color solo esas, oscureciendo el resto; 3) tocas las presas para marcar la **salida** y el **top**, añadir las que falten o quitar las que sobren. Los **volúmenes estructurales** (madera, negro o gris, del color del muro) se marcan rodeándolos con «◇ Volumen» y funcionan como una presa más;
   - gestionar el plano y los sectores (renombrarlos, añadirlos y dibujar su zona en el plano);
   - borrar comentarios;
-  - ver **Estadísticas**: bloques por nivel y estilo, los que más y menos gustan, los poco encadenados, los más proyectados y los más comentados.
+  - ver **Estadísticas** de **todos los bloques** o **solo de los suyos** (sello Xlp):
+    - **por zona**, agrupando por **rocódromo** (con el total de los dos), por **sala** (la parte del sector antes del «·», p. ej. «Sala 2») o por **sector**: bloques abiertos, mezcla de niveles, media de estrellas, encadenados, encadenados por bloque y desmontados;
+    - con «Solo los míos», qué parte de los bloques abiertos son suyos y cómo puntúan frente a los demás;
+    - bloques por nivel y estilo, los que más y menos gustan, los poco encadenados, los más proyectados y los más comentados.
 - Cada rocódromo tiene sus bloques, sectores, plano y estadísticas. La web recuerda el rocódromo elegido en cada móvil.
 - Enlaces directos: `…/#patraix` y `…/#benimaclet` abren cada rocódromo. Cada bloque tiene su enlace (`…/#b-<id>`) y un botón **Compartir**, útil para historias de Instagram; si el bloque es del otro rocódromo, la web cambia sola.
 - Se puede añadir a la pantalla de inicio del móvil como una app.
@@ -74,6 +78,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `progreso.js` | Mi progreso: puntos, rachas, medallas y siguiente reto |
 | `ranking.js` | ranking mensual por ligas de color |
 | `historias.js` | tarjeta para historias de Instagram de un bloque |
+| `estadisticas.js` | estadísticas del equipador: todos o solo los suyos, por rocódromo, sala y sector |
 | `wrapped.js` | «Tu mes»: el resumen del mes tipo Wrapped |
 | `editor.js` | editor de la foto del bloque: resaltar presas por color, salida y top |
 | `config.js` | dirección y clave pública de Supabase |
@@ -84,6 +89,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `supabase/002-sectores.sql` | crea los sectores de los dos planos con sus zonas (ejecutar una vez) |
 | `supabase/003-progreso.sql` | añade flash y fecha de encadenado a los votos (ejecutar una vez) |
 | `supabase/004-ranking.sql` | ranking por ligas: apodos y cálculo del ranking (ejecutar una vez) |
+| `supabase/005-sello.sql` | añade el sello Xlp a los bloques (ejecutar una vez) |
 
 ## Añadir otro rocódromo
 

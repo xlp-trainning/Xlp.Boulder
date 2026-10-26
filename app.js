@@ -46,7 +46,7 @@ const S = {
   comments: {}, drafts: {},
   session: null, isSetter: false,
   page: "bloques", view: "open", level: null, sector: null, styles: new Set(), colors: new Set(), q: "", sort: "new",
-  drawingSector: null, mapSel: null, loaded: false, error: null,
+  xlp: false, drawingSector: null, mapSel: null, loaded: false, error: null,
 };
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, ...kids) => {
@@ -127,7 +127,7 @@ async function refresh() {
   try {
     await loadSession();
     await Promise.all([loadAll(), loadMine()]);
-    S.comments = {}; invalidateRanking();
+    S.comments = {}; invalidateRanking(); ST.all = null;
     if (S.isSetter) await loadAllComments();
     S.error = null;
   } catch (e) {
@@ -161,6 +161,13 @@ function tape(b) {
   if (l.solid) inner.style.cssText = `background:${l.solid};padding:2px 5px;border-radius:3px`;
   return el("div", { class: "tape", style: `background:${l.bg};color:${l.fg}` }, inner);
 }
+// Sello Xlp de los bloques equipados por el dueño de la web: la X del logo y «Xlp»
+const XLP_MARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#1C2422"/><g transform="translate(11 11)"><rect x="-7" y="-1.9" width="14" height="3.8" rx=".8" fill="#F5CE1B" transform="rotate(45)"/><rect x="-7" y="-1.9" width="14" height="3.8" rx=".8" fill="#4CC3A8" transform="rotate(-45)"/></g><circle cx="18.6" cy="18.6" r="2" fill="#F8FAF9"/></svg>';
+function xlpBadge(iconOnly, label = "Xlp") {
+  const s = el("span", { class: "xlp-badge" + (iconOnly ? " icon" : ""), title: "Equipado por Xlp", "aria-label": iconOnly ? "Equipado por Xlp" : null });
+  s.innerHTML = XLP_MARK; if (!iconOnly) s.append(label);
+  return s;
+}
 const levelDot = k => el("span", { class: "dot", style: `background:${LV[k].bg}` });
 const holdMeta = b => COLORS[b.hold_color] ? el("span", { class: "hold" }, el("span", { class: "dot", style: `background:${COLORS[b.hold_color].hex}` }), "Presa " + COLORS[b.hold_color].name.toLowerCase()) : null;
 const starsLine = (st, long) => el("div", { class: "stars-line" },
@@ -177,6 +184,7 @@ function card(b) {
     tape(b),
     el("div", { class: "card-body" },
       el("div", { class: "card-top" }, el("h3", { text: title(b) }),
+        b.xlp ? xlpBadge() : null,
         isNew(b) ? el("span", { class: "new-badge", text: "Nuevo" }) : null,
         fav ? el("span", { class: "fav-ind", title: "En favoritos", text: "♥" }) : null),
       el("div", { class: "meta" }, b.sector ? el("span", { text: b.sector }) : null, holdMeta(b), b.set_date ? el("span", { class: "mono", text: fmtDate(b.set_date) }) : null),
@@ -196,6 +204,7 @@ function visible() {
     if (v === "proj" && !(S.mine[b.id]?.project && !S.mine[b.id]?.sent)) return false;
     if (S.level && b.level !== S.level) return false;
     if (S.sector && b.sector !== S.sector) return false;
+    if (S.xlp && !b.xlp) return false;
     if (S.styles.size && ![...S.styles].every(s => (b.styles || []).includes(s))) return false;
     if (S.colors.size && !S.colors.has(b.hold_color)) return false;
     if (S.q) {
@@ -240,6 +249,8 @@ function renderChips() {
   STYLES.forEach(s => sc.append(el("button", { class: "chip", "aria-pressed": S.styles.has(s) ? "true" : "false",
     onclick: () => { S.styles.has(s) ? S.styles.delete(s) : S.styles.add(s); render(); } }, s)));
   const cc = $("colorChips"); cc.replaceChildren();
+  if (S.blocks.some(b => b.xlp)) cc.append(el("button", { class: "chip", "aria-pressed": S.xlp ? "true" : "false", onclick: () => { S.xlp = !S.xlp; render(); } },
+    xlpBadge(true), "Equipados por Xlp"));
   if (S.sector) cc.append(el("span", { class: "label", text: "Sector" }),
     el("button", { class: "chip", "aria-pressed": "true", onclick: () => { S.sector = null; render(); } }, S.sector + "  ×"));
   const used = new Set(S.blocks.map(b => b.hold_color).filter(Boolean));
@@ -247,8 +258,8 @@ function renderChips() {
   Object.entries(COLORS).filter(([k]) => used.has(k)).forEach(([k, c]) => cc.append(el("button", { class: "chip", "aria-pressed": S.colors.has(k) ? "true" : "false",
     onclick: () => { S.colors.has(k) ? S.colors.delete(k) : S.colors.add(k); render(); } },
     el("span", { class: "dot", style: `background:${c.hex}` }), c.name)));
-  const filtering = S.level || S.sector || S.styles.size || S.colors.size || S.q;
-  if (filtering) cc.append(el("button", { class: "clear", onclick: () => { S.level = null; S.sector = null; S.styles.clear(); S.colors.clear(); S.q = ""; $("q").value = ""; render(); } }, "Quitar filtros"));
+  const filtering = S.level || S.sector || S.xlp || S.styles.size || S.colors.size || S.q;
+  if (filtering) cc.append(el("button", { class: "clear", onclick: () => { S.level = null; S.sector = null; S.xlp = false; S.styles.clear(); S.colors.clear(); S.q = ""; $("q").value = ""; render(); } }, "Quitar filtros"));
   cc.hidden = !cc.firstChild;
 }
 
@@ -422,7 +433,7 @@ function mapEditor() {
       }
       row.replaceChildren(el("span", { class: "grow", text: s.name + (Array.isArray(s.shape) && s.shape.length > 2 ? "" : " · sin zona") }),
         S.mapPath ? el("button", { class: "btn small", onclick: () => { S.drawingSector = s.id; S.mapSel = null; render(); window.scrollTo({ top: 0, behavior: "smooth" }); } },
-          Array.isArray(s.shape) && s.shape.length > 2 ? "Redibujar zona" : "Dibujar zona") : null,
+          Array.isArray(s.shape) && s.shape.length > 2 ? "Redibujar zona" : "Dibujar zona") :"",
         el("button", { class: "btn small", onclick: () => { mode = "rename"; draw(); } }, "Renombrar"),
         mode === "confirm"
           ? el("button", { class: "btn small danger solid", onclick: async () => {
@@ -441,60 +452,7 @@ function mapEditor() {
 // renderProgreso() está en progreso.js
 
 /* ---------- página: estadísticas (equipador) ---------- */
-function renderStats() {
-  const root = $("page-stats");
-  const open = S.blocks.filter(b => b.active);
-  const st = id => statsFor(id);
-  const sum = (arr, f) => arr.reduce((a, b) => a + f(b), 0);
-  const commentsBy = {}; allComments.forEach(c => commentsBy[c.block_id] = (commentsBy[c.block_id] || 0) + 1);
-  const kpi = (n, l) => el("div", { class: "kpi" }, el("span", { class: "kpi-n", text: n }), el("span", { class: "note", text: l }));
-  const rated = open.filter(b => st(b.id).n);
-  const avgAll = rated.length ? sum(rated, b => st(b.id).avg * st(b.id).n) / sum(rated, b => st(b.id).n) : 0;
-
-  const table = (cols, rows) => el("div", { class: "table-scroll" }, el("table", {},
-    el("thead", {}, el("tr", {}, cols.map(c => el("th", { text: c })))),
-    el("tbody", {}, rows)));
-  const blockCell = b => el("td", {}, el("button", { class: "linkbtn strong", onclick: () => openDetail(b.id) }, levelDot(b.level), " ", title(b)));
-
-  const byLevel = LEVELS.map(l => {
-    const bl = open.filter(b => b.level === l.k);
-    const r = bl.filter(b => st(b.id).n);
-    const avg = r.length ? sum(r, b => st(b.id).avg) / r.length : 0;
-    return el("tr", {}, el("td", {}, el("span", { class: "hold" }, levelDot(l.k), l.name)),
-      el("td", { class: "num", text: bl.length }),
-      el("td", { class: "num", text: avg ? avg.toFixed(1) + " ★" : "—" }),
-      el("td", { class: "num", text: bl.length ? (sum(bl, b => st(b.id).sends) / bl.length).toFixed(1) : "—" }));
-  });
-  const styleCounts = STYLES.map(s => [s, open.filter(b => (b.styles || []).includes(s)).length]).filter(([, n]) => n).sort((a, b) => b[1] - a[1]);
-  const maxStyle = Math.max(1, ...styleCounts.map(([, n]) => n));
-
-  const ranking = (label, list, value, empty) => el("section", { class: "section" }, el("span", { class: "label", text: label }),
-    list.length ? table(["Bloque", ""], list.map(b => el("tr", {}, blockCell(b), el("td", { class: "num", text: value(b) })))) : el("p", { class: "note", text: empty }));
-  const best = rated.slice().sort((a, b) => st(b.id).avg - st(a.id).avg || st(b.id).n - st(a.id).n).slice(0, 5);
-  const worst = rated.filter(b => st(b.id).n >= 2).sort((a, b) => st(a.id).avg - st(b.id).avg).slice(0, 5);
-  const fewSends = open.filter(b => daysSince(b.set_date) >= 14).sort((a, b) => st(a.id).sends - st(b.id).sends).slice(0, 5);
-  const projected = open.filter(b => st(b.id).projects).sort((a, b) => st(b.id).projects - st(a.id).projects).slice(0, 5);
-  const talked = open.filter(b => commentsBy[b.id]).sort((a, b) => commentsBy[b.id] - commentsBy[a.id]).slice(0, 5);
-
-  root.replaceChildren(
-    el("div", { class: "kpis" },
-      kpi(open.length, "bloques abiertos"),
-      kpi(S.blocks.filter(isNew).length, `montados en ${NEW_DAYS} días`),
-      kpi(avgAll ? avgAll.toFixed(1) + " ★" : "—", "puntuación media"),
-      kpi(sum(open, b => st(b.id).sends), "encadenados"),
-      kpi(allComments.filter(c => S.blocks.some(b => b.id === c.block_id)).length, "comentarios")),
-    el("section", { class: "section" }, el("span", { class: "label", text: "Por nivel (abiertos)" }),
-      table(["Nivel", "Bloques", "Media", "Encad."], byLevel)),
-    el("section", { class: "section" }, el("span", { class: "label", text: "Estilos (abiertos)" }),
-      styleCounts.length ? el("div", { class: "hbars" }, styleCounts.map(([s, n]) => el("div", { class: "hbar" },
-        el("span", { text: s }), el("span", { class: "hbar-track" }, el("span", { class: "hbar-fill", style: `width:${n / maxStyle * 100}%` })), el("span", { class: "mono", text: n }))))
-        : el("p", { class: "note", text: "Aún no hay bloques con estilo." })),
-    ranking("Los que más gustan", best, b => `${st(b.id).avg.toFixed(1)} ★ · ${st(b.id).n}`, "Todavía nadie ha puntuado."),
-    ranking("Los que menos gustan (2 votos o más)", worst, b => `${st(b.id).avg.toFixed(1)} ★ · ${st(b.id).n}`, "Hace falta algún voto más."),
-    ranking("Poco encadenados (montados hace 14 días o más)", fewSends, b => `${st(b.id).sends} encad.`, "Ningún bloque lleva 14 días montado."),
-    ranking("Más proyectados", projected, b => `${st(b.id).projects} probando`, "Nadie lo ha marcado como proyecto todavía."),
-    ranking("Con más comentarios", talked, b => `${commentsBy[b.id]} coment.`, "Sin comentarios todavía."));
-}
+// renderStats() está en estadisticas.js
 
 /* ---------- navegación ---------- */
 function setPage(p) { S.page = p; store.set("lb-page", p); render(); }
@@ -641,6 +599,7 @@ function openDetail(id) {
     el("div", { class: "hero-tag" }, tape(b),
       el("div", { class: "info" },
         el("h2", { text: title(b) }),
+        b.xlp ? xlpBadge(false, "Equipado por Xlp") : null,
         el("div", { class: "meta" }, b.sector ? el("button", { class: "linkbtn", onclick: () => { closeSheet(); goSector(b.sector); } }, b.sector) : null, holdMeta(b),
           b.set_date ? el("span", { class: "mono", text: "Montado " + fmtDate(b.set_date) }) : null,
           !b.active && b.removed_date ? el("span", { class: "mono", text: "Desmontado " + fmtDate(b.removed_date) }) : null),
@@ -729,12 +688,12 @@ function openForm(b) {
   } });
   const drawPhoto = () => {
     const src = d.file ? URL.createObjectURL(d.file) : d.photo ? photoUrl(d.photo) : "";
-    photoBox.replaceChildren(fileIn,
+    photoBox.replaceChildren(...[fileIn,
       src ? el("img", { class: "photo", src, alt: "Vista previa de la foto" }) : null,
       el("div", { class: "actions" },
         el("button", { type: "button", class: "btn", onclick: () => fileIn.click() }, src ? "Cambiar foto" : "📷 Añadir foto"),
         d.raw ? el("button", { type: "button", class: "btn", onclick: editPhoto }, "✎ Resaltar presas") : null,
-        src ? el("button", { type: "button", class: "btn danger", onclick: () => { d.file = null; d.raw = null; d.photo = ""; fileIn.value = ""; drawPhoto(); } }, "Quitar foto") : null));
+        src ? el("button", { type: "button", class: "btn danger", onclick: () => { d.file = null; d.raw = null; d.photo = ""; fileIn.value = ""; drawPhoto(); } }, "Quitar foto") : null)].filter(Boolean));
   };
   drawPhoto();
 
@@ -746,6 +705,8 @@ function openForm(b) {
   const fVideo = inp("f-video", b?.video, { type: "url", placeholder: "https://…" });
   const fBeta = el("textarea", { id: "f-beta", maxlength: "4000", placeholder: "Salida de pies en las regletas negras, mano izquierda al romo grande, talón derecho y lance al top…" });
   fBeta.value = b?.beta || "";
+  const fXlp = el("input", { type: "checkbox", id: "f-xlp" });
+  fXlp.checked = edit ? !!b.xlp : store.get("lb-xlp-default", true);
   const saveBtn = el("button", { class: "btn primary", type: "submit" }, edit ? "Guardar cambios" : "Añadir bloque");
 
   const form = el("form", { class: "f", onsubmit: async e => {
@@ -759,7 +720,8 @@ function openForm(b) {
     catch (err) { console.error(err); saveBtn.disabled = false; saveBtn.textContent = edit ? "Guardar cambios" : "Añadir bloque"; return fail("No se pudo subir la foto. Prueba con otra imagen."); }
     const sector = fSector.value.trim();
     const body = { ...(edit ? {} : { gym_id: S.gym }), name: fName.value.trim(), level: d.level, hold_color: d.color, sector, styles: d.styles,
-      set_date: fDate.value || today(), beta: fBeta.value.trim(), video, photo_path };
+      set_date: fDate.value || today(), beta: fBeta.value.trim(), video, photo_path, xlp: fXlp.checked };
+    if (!edit) store.set("lb-xlp-default", fXlp.checked);
     const { data, error } = edit
       ? await sb.from("blocks").update(body).eq("id", b.id).select().single()
       : await sb.from("blocks").insert(body).select().single();
@@ -775,10 +737,12 @@ function openForm(b) {
       if (!r.error) S.sectors.push(r.data);
     }
     S.blocks = edit ? S.blocks.map(x => x.id === data.id ? data : x) : [data, ...S.blocks];
+    ST.all = null;
     toast(edit ? "Bloque actualizado" : "Bloque añadido");
     render(); openDetail(data.id);
   } },
     el("div", { class: "field" }, el("span", { class: "label", text: "Nivel (de fácil a difícil)" }), lvBox),
+    el("label", { class: "xlp-check" }, fXlp, xlpBadge(true), el("span", {}, el("strong", { text: "Equipado por mí" }), el("span", { class: "note", text: "Lleva el sello Xlp en la web" }))),
     el("div", { class: "field" }, el("span", { class: "label", text: "Foto del bloque (opcional)" }), photoBox),
     el("div", { class: "field" }, el("span", { class: "label", text: "Color de presa (opcional)" }), sw),
     el("div", { class: "two" },
