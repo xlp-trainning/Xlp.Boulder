@@ -269,3 +269,6 @@ td.num { text-align: right; font-family: var(--f-mono); font-size: 13px; font-va
 .ed-info { font-weight: 700; font-size: 14px; }
 .ed-help { margin: 0; }
 .ed-canvas.drawing { touch-action: none; cursor: crosshair; outline: 3px solid var(--accent); outline-offset: -3px; }
+.ed-tools { flex-wrap: nowrap; gap: 6px; min-height: 34px; }
+.ed-tools .btn { white-space: nowrap; }
+@media (max-width: 380px) { .ed-tools .btn.small { padding: 5px 8px; font-size: 12.5px; } }
