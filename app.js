@@ -127,7 +127,7 @@ async function refresh() {
   try {
     await loadSession();
     await Promise.all([loadAll(), loadMine()]);
-    S.comments = {};
+    S.comments = {}; invalidateRanking();
     if (S.isSetter) await loadAllComments();
     S.error = null;
   } catch (e) {
@@ -517,6 +517,7 @@ function render() {
   document.querySelectorAll(".page").forEach(p => p.hidden = p.id !== "page-" + page);
   if (page === "bloques") return renderBloques();
   if (S.page === "mapa") renderMapa();
+  if (S.page === "ranking") renderRanking();
   if (S.page === "progreso") renderProgreso();
   if (S.page === "stats") renderStats();
 }
@@ -828,7 +829,7 @@ function saveMine(id, next) {
   // Al encadenar, el proyecto queda cumplido y se apunta la fecha (para rachas y medallas)
   if (next.sent) next = { ...next, project: false, sent_at: prev?.sent ? (prev.sent_at || new Date().toISOString()) : new Date().toISOString() };
   else next = { ...next, flash: false, sent_at: null };
-  const before = earnedMedals();
+  const before = { medals: earnedMedals(), league: myLeague().ord };
   S.mine[id] = next;
   if (next.sent && !prev?.sent || next.sent && next.flash !== !!prev?.flash) celebrate(id, next, before);
   render(); if (openId === id) openDetail(id);
@@ -839,6 +840,7 @@ function saveMine(id, next) {
     if (error) throw error;
     const s = await sb.rpc("block_stats");
     if (!s.error) S.stats = toStats(s.data);
+    invalidateRanking();
   }).catch(e => {
     console.error(e);
     if (prev) S.mine[id] = prev; else delete S.mine[id];
@@ -882,6 +884,8 @@ document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible" && sb && S.loaded && !document.querySelector(".sheet form:not(.comment-form)")) refresh();
 });
 
+// Arranca cuando ya están cargados también progreso.js, historias.js y ranking.js
+document.addEventListener("DOMContentLoaded", () => {
 render();
 if (sb) refresh().then(async () => {
   const m = location.hash.match(/^#b-([0-9a-f-]{36})$/);
@@ -892,4 +896,5 @@ if (sb) refresh().then(async () => {
     if (r.data && r.data.gym_id !== S.gym) { S.gym = r.data.gym_id; store.set("lb-gym", S.gym); await refresh(); }
   }
   openDetail(m[1]);
+});
 });

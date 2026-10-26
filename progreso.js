@@ -64,9 +64,11 @@ const earnedMedals = () => { const c = progressCtx(); return new Set(MEDALS.filt
 // Al encadenar: puntos ganados y medallas nuevas
 function celebrate(id, next, before) {
   const b = S.blocks.find(x => x.id === id); if (!b) return;
-  const fresh = [...earnedMedals()].filter(m => !before.has(m)).map(m => MEDALS.find(x => x.id === m));
-  const pts = `+${pointsFor(b, next.flash)} puntos${next.flash ? " ⚡" : ""}`;
-  toast(fresh.length ? `${pts} · 🏅 ${fresh.map(m => m.name).join(", ")}` : pts);
+  const fresh = [...earnedMedals()].filter(m => !before.medals.has(m)).map(m => MEDALS.find(x => x.id === m));
+  const lg = myLeague();
+  toast([`+${pointsFor(b, next.flash)} puntos${next.flash ? " ⚡" : ""}`,
+    lg.ord > before.league ? `⬆️ ¡Subes a la liga ${lg.l.name}!` : null,
+    fresh.length ? `🏅 ${fresh.map(m => m.name).join(", ")}` : null].filter(Boolean).join(" · "));
 }
 
 // «Tu siguiente reto»: bloques abiertos sin encadenar, cerca de tu nivel, de estilos que tocas poco

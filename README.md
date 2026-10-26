@@ -16,6 +16,11 @@
   - **Tu siguiente reto**: tres bloques abiertos recomendados según tu nivel, los estilos que menos tocas, tus proyectos y los recién montados.
   - **Tarjetas para historias de Instagram** (1080×1920): una por bloque encadenado y otra con el resumen del mes, para compartir o guardar.
   - Encadenados por nivel ("Rojo 4/9") y proyectos en curso.
+- **Ranking** mensual por **ligas de color**, en cada rocódromo:
+  - Todos empiezan en la liga Azul. Para subir a la liga de un color hay que encadenar **10 bloques de ese color**; nunca se baja.
+  - Dentro de cada liga gana quien más puntos sume en el mes. Se reinicia el día 1 y se puede ver el mes pasado.
+  - Es voluntario: cada uno se apunta con un apodo (sin email). El equipador puede quitar a alguien del ranking.
+  - La fecha de cada encadenado la pone el servidor, así que no se puede trampear con fechas, y no cuentan los bloques marcados después de desmontarse.
 - **El equipador** entra con email y contraseña ("Acceso equipador", al pie de la página) y puede:
   - crear, editar, desmontar o borrar bloques, con foto;
   - **resaltar presas** en la foto, en tres pasos: 1) marcas la zona a analizar rodeando el muro con el dedo (o arrastrando en diagonal para un rectángulo, o «Analizar toda la foto»); 2) eliges el color de las presas y la web deja en color solo esas, oscureciendo el resto; 3) tocas las presas para marcar la **salida** y el **top**, añadir las que falten o quitar las que sobren. Los **volúmenes estructurales** (madera, negro o gris, del color del muro) se marcan rodeándolos con «◇ Volumen» y funcionan como una presa más;
@@ -65,6 +70,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `styles.css` | diseño (claro y oscuro según el móvil) |
 | `app.js` | lógica: carga, filtros, votos, formulario del equipador |
 | `progreso.js` | Mi progreso: puntos, rachas, medallas y siguiente reto |
+| `ranking.js` | ranking mensual por ligas de color |
 | `historias.js` | tarjetas para historias de Instagram |
 | `editor.js` | editor de la foto del bloque: resaltar presas por color, salida y top |
 | `config.js` | dirección y clave pública de Supabase |
@@ -74,6 +80,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `mapas/` | planos de Natural Patraix y Natural Benimaclet (PNG, SVG y el script que los genera) y `sectores.py`, que calcula las zonas de los sectores |
 | `supabase/002-sectores.sql` | crea los sectores de los dos planos con sus zonas (ejecutar una vez) |
 | `supabase/003-progreso.sql` | añade flash y fecha de encadenado a los votos (ejecutar una vez) |
+| `supabase/004-ranking.sql` | ranking por ligas: apodos y cálculo del ranking (ejecutar una vez) |
 
 ## Añadir otro rocódromo
 
