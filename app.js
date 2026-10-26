@@ -86,7 +86,7 @@ function setGym(id) {
 
 /* ---------- datos ---------- */
 const toStats = rows => Object.fromEntries((rows || []).map(r => [r.block_id,
-  { avg: Number(r.avg_stars) || 0, n: Number(r.votes), sends: Number(r.sends), projects: Number(r.projects) || 0 }]));
+  { avg: Number(r.avg_stars) || 0, n: Number(r.votes), sends: Number(r.sends), projects: Number(r.projects) || 0, flashes: Number(r.flashes) || 0 }]));
 async function loadAll() {
   const g = await sb.from("gyms").select("*").order("sort");
   if (g.error) throw g.error;
@@ -106,8 +106,8 @@ async function loadAll() {
 async function loadMine() {
   S.mine = {};
   if (!S.session) return;
-  const { data } = await sb.from("ratings").select("block_id, stars, sent, project");
-  (data || []).forEach(r => S.mine[r.block_id] = { stars: r.stars || 0, sent: r.sent, project: r.project });
+  const { data } = await sb.from("ratings").select("block_id, stars, sent, project, flash, sent_at");
+  (data || []).forEach(r => S.mine[r.block_id] = { stars: r.stars || 0, sent: r.sent, project: r.project, flash: !!r.flash, sent_at: r.sent_at || null });
 }
 async function loadSession() {
   const { data } = await sb.auth.getSession();
@@ -149,7 +149,7 @@ async function loadAllComments() {
 }
 
 /* ---------- utilidades de pintado ---------- */
-const statsFor = id => S.stats[id] || { avg: 0, n: 0, sends: 0, projects: 0 };
+const statsFor = id => S.stats[id] || { avg: 0, n: 0, sends: 0, projects: 0, flashes: 0 };
 const starStr = avg => { const r = Math.round(avg); return "★".repeat(r) + "☆".repeat(5 - r); };
 const fmtDate = d => { if (!d) return ""; const [y, m, dd] = d.slice(0, 10).split("-"); return `${dd}/${m}/${y.slice(2)}`; };
 const sectorNames = () => [...new Set([...S.sectors.map(s => s.name), ...S.blocks.map(b => b.sector).filter(Boolean)])].sort((a, b) => a.localeCompare(b, "es"));
@@ -171,7 +171,7 @@ const emptyBox = (h, p, btn) => el("div", { class: "empty" }, el("h2", { text: h
 function card(b) {
   const fav = S.favs.includes(b.id), mine = S.mine[b.id] || {};
   const line = starsLine(statsFor(b.id));
-  if (mine.sent) line.append(el("span", { class: "sent-badge", text: "· Encadenado" }));
+  if (mine.sent) line.append(el("span", { class: "sent-badge", text: mine.flash ? "· ⚡ Flash" : "· Encadenado" }));
   else if (mine.project) line.append(el("span", { class: "proj-badge", text: "· Proyecto" }));
   return el("button", { class: "card" + (b.active ? "" : " off") + (b.photo_path ? " has-photo" : ""), onclick: () => openDetail(b.id), "aria-label": `Ver ${title(b)}` },
     tape(b),
@@ -438,38 +438,7 @@ function mapEditor() {
 }
 
 /* ---------- página: mi progreso ---------- */
-function renderProgreso() {
-  const root = $("page-progreso");
-  const open = S.blocks.filter(b => b.active);
-  const sent = open.filter(b => S.mine[b.id]?.sent);
-  const projects = S.blocks.filter(b => b.active && S.mine[b.id]?.project && !S.mine[b.id]?.sent);
-  const oldSent = S.blocks.filter(b => !b.active && S.mine[b.id]?.sent).length;
-  const pct = open.length ? Math.round(sent.length / open.length * 100) : 0;
-  // El nivel más alto con al menos un encadenado
-  const top = [...LEVELS].reverse().find(l => sent.some(b => b.level === l.k));
-
-  root.replaceChildren(
-    el("section", { class: "dist progress-head" },
-      el("div", { class: "dist-head" },
-        el("div", { class: "total" }, el("span", { text: sent.length }), el("small", { text: `de ${open.length} bloques abiertos encadenados` })),
-        el("span", { class: "big-pct mono", text: pct + "%" })),
-      el("div", { class: "meta" },
-        top ? el("span", { class: "hold" }, levelDot(top.k), `Tu nivel más alto: ${top.name}`) : el("span", { text: "Marca tus primeros encadenados en cada bloque." }),
-        oldSent ? el("span", { text: `${oldSent} más en bloques ya desmontados` }) : null)),
-    el("section", { class: "section" }, el("span", { class: "label", text: "Por nivel" }),
-      el("div", { class: "levels" }, LEVELS.map(l => {
-        const tot = open.filter(b => b.level === l.k).length;
-        const got = sent.filter(b => b.level === l.k).length;
-        return el("button", { class: "lvl-row", disabled: !tot, onclick: () => { S.level = l.k; S.view = "open"; setPage("bloques"); } },
-          el("span", { class: "lvl-name" }, levelDot(l.k), l.name),
-          el("span", { class: "lvl-track" }, el("span", { class: "lvl-fill", style: `width:${tot ? got / tot * 100 : 0}%;background:${l.bg}` })),
-          el("span", { class: "mono lvl-n", text: tot ? `${got}/${tot}` : "—" }));
-      }))),
-    el("section", { class: "section" }, el("span", { class: "label", text: "Proyectos en curso" }),
-      projects.length ? el("div", { class: "grid" }, projects.map(card))
-        : el("p", { class: "note", text: "Marca «Es mi proyecto» en los bloques que estés probando para tenerlos a mano aquí." })),
-    el("p", { class: "note", text: "Tu progreso se guarda en este móvil, sin cuenta. Si cambias de móvil o borras los datos del navegador, empezarás de cero." }));
-}
+// renderProgreso() está en progreso.js
 
 /* ---------- página: estadísticas (equipador) ---------- */
 function renderStats() {
@@ -645,7 +614,7 @@ function openDetail(id) {
   openId = id;
   if (location.hash !== "#b-" + id) history.replaceState(null, "", "#b-" + id);
   const st = statsFor(id);
-  const mine = { stars: 0, sent: false, project: false, ...S.mine[id] };
+  const mine = { stars: 0, sent: false, project: false, flash: false, sent_at: null, ...S.mine[id] };
   const fav = S.favs.includes(id);
 
   const rate = el("div", { class: "rate", role: "group", "aria-label": "Tu puntuación" },
@@ -675,16 +644,22 @@ function openDetail(id) {
           !b.active && b.removed_date ? el("span", { class: "mono", text: "Desmontado " + fmtDate(b.removed_date) }) : null),
         (b.styles || []).length ? el("div", { class: "styles" }, b.styles.map(s => el("span", { class: "tag", text: s }))) : null,
         starsLine(st, true),
-        el("div", { class: "note", text: `${st.sends} ${st.sends === 1 ? "persona lo ha encadenado" : "personas lo han encadenado"}` + (st.projects ? ` · ${st.projects} lo ${st.projects === 1 ? "está" : "están"} probando` : "") }))),
+        el("div", { class: "note", text: `${st.sends} ${st.sends === 1 ? "persona lo ha encadenado" : "personas lo han encadenado"}` + (st.flashes ? ` · ⚡ ${st.flashes} al flash` : "") + (st.projects ? ` · ${st.projects} lo ${st.projects === 1 ? "está" : "están"} probando` : "") }))),
     el("div", { class: "section" }, el("span", { class: "label", text: "Beta del equipador" }),
       el("div", { class: "beta" + (b.beta ? "" : " none"), text: b.beta || "El equipador no ha escrito la beta de este bloque." }),
       b.video ? el("a", { class: "link", href: b.video, target: "_blank", rel: "noopener" }, "▶ Ver vídeo de la beta") : null),
     el("div", { class: "section" }, el("span", { class: "label", text: "Tu puntuación" }), rate,
+      el("div", { class: "send-pick", role: "group", "aria-label": "¿Lo has encadenado?" },
+        el("button", { class: "btn" + (mine.sent && !mine.flash ? " primary" : ""), "aria-pressed": mine.sent && !mine.flash ? "true" : "false",
+          onclick: () => saveMine(id, mine.sent && !mine.flash ? { ...mine, sent: false, flash: false } : { ...mine, sent: true, flash: false }) }, mine.sent && !mine.flash ? "✓ Encadenado" : "Encadenado"),
+        el("button", { class: "btn" + (mine.flash ? " primary" : ""), "aria-pressed": mine.flash ? "true" : "false",
+          onclick: () => saveMine(id, mine.flash ? { ...mine, sent: false, flash: false } : { ...mine, sent: true, flash: true }) }, "⚡ Flash")),
+      mine.sent ? el("div", { class: "note", text: `${mine.flash ? "Flash" : "Encadenado"}${mine.sent_at ? " el " + fmtDate(mine.sent_at) : ""} · +${pointsFor(b, mine.flash)} puntos` }) : null,
       el("div", { class: "actions" },
-        el("button", { class: "btn" + (mine.sent ? " primary" : ""), onclick: () => saveMine(id, { ...mine, sent: !mine.sent }) }, mine.sent ? "✓ Encadenado" : "Marcar encadenado"),
         mine.sent ? null : el("button", { class: "btn" + (mine.project ? " primary" : ""), onclick: () => saveMine(id, { ...mine, project: !mine.project }) }, mine.project ? "◎ Es mi proyecto" : "Es mi proyecto"),
         el("button", { class: "btn" + (fav ? " primary" : ""), onclick: () => toggleFav(id) }, fav ? "♥ En favoritos" : "♡ Guardar"),
-        el("button", { class: "btn", onclick: () => shareBlock(b) }, "Compartir")),
+        el("button", { class: "btn", onclick: () => shareBlock(b) }, "Compartir"),
+        mine.sent ? el("button", { class: "btn", onclick: () => storyBlock(b, mine) }, "📸 Historia") : null),
       el("div", { class: "note", text: "Sin registro: tus votos, proyectos y favoritos se guardan en este móvil." })),
     commentsSection(b),
     S.isSetter ? el("div", { class: "section" }, el("span", { class: "label", text: "Equipador" }), adminBox) : null,
@@ -849,14 +824,18 @@ async function ensureVoter() {
 }
 let mineBusy = Promise.resolve();
 function saveMine(id, next) {
-  // Al encadenar, el proyecto queda cumplido
-  if (next.sent) next = { ...next, project: false };
   const prev = S.mine[id];
+  // Al encadenar, el proyecto queda cumplido y se apunta la fecha (para rachas y medallas)
+  if (next.sent) next = { ...next, project: false, sent_at: prev?.sent ? (prev.sent_at || new Date().toISOString()) : new Date().toISOString() };
+  else next = { ...next, flash: false, sent_at: null };
+  const before = earnedMedals();
   S.mine[id] = next;
+  if (next.sent && !prev?.sent || next.sent && next.flash !== !!prev?.flash) celebrate(id, next, before);
   render(); if (openId === id) openDetail(id);
   mineBusy = mineBusy.then(async () => {
     if (!(await ensureVoter())) throw new Error("sin sesión");
-    const { error } = await sb.from("ratings").upsert({ user_id: S.session.user.id, block_id: id, stars: next.stars || null, sent: next.sent, project: next.project, updated_at: new Date().toISOString() });
+    const { error } = await sb.from("ratings").upsert({ user_id: S.session.user.id, block_id: id, stars: next.stars || null, sent: next.sent, project: next.project,
+      flash: !!next.flash, sent_at: next.sent_at, updated_at: new Date().toISOString() });
     if (error) throw error;
     const s = await sb.rpc("block_stats");
     if (!s.error) S.stats = toStats(s.data);

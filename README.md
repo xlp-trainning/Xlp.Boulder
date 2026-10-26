@@ -8,7 +8,14 @@
   - contar su propia beta con un apodo, con enlace a vídeo opcional.
 - **Novedades**: los bloques montados en los últimos 7 días llevan la marca «Nuevo» y tienen su pestaña.
 - **Mapa**: el plano de cada rocódromo dividido en **sectores que se pueden tocar** (uno por muro, con su nombre y el número de bloques abiertos). Al tocar un sector se resalta y salen debajo sus bloques, de fácil a difícil; «Ver en la lista» lo lleva a la lista filtrada. El equipador puede redibujar la zona de cada sector con el dedo.
-- **Mi progreso**: encadenados por nivel ("Rojo 4/9"), el nivel más alto conseguido y los proyectos en curso.
+- **Mi progreso**, pensado para que la gente vuelva:
+  - **Flash o encadenado**: en cada bloque se marca «Encadenado» o «⚡ Flash» (a la primera), con la fecha.
+  - **Puntos por color** (azul 1 … compe 8; el flash suma la mitad más), en total y del mes.
+  - **Rachas**: semanas seguidas encadenando algo, con aviso si la racha está a punto de perderse.
+  - **Medallas** (primer bloque de cada color, flashes, 10/50 encadenados, 100 puntos, recién montado, sector completo, 6 estilos, rachas de 4 y 12 semanas), con barra de avance.
+  - **Tu siguiente reto**: tres bloques abiertos recomendados según tu nivel, los estilos que menos tocas, tus proyectos y los recién montados.
+  - **Tarjetas para historias de Instagram** (1080×1920): una por bloque encadenado y otra con el resumen del mes, para compartir o guardar.
+  - Encadenados por nivel ("Rojo 4/9") y proyectos en curso.
 - **El equipador** entra con email y contraseña ("Acceso equipador", al pie de la página) y puede:
   - crear, editar, desmontar o borrar bloques, con foto;
   - **resaltar presas** en la foto, en tres pasos: 1) marcas la zona a analizar rodeando el muro con el dedo (o arrastrando en diagonal para un rectángulo, o «Analizar toda la foto»); 2) eliges el color de las presas y la web deja en color solo esas, oscureciendo el resto; 3) tocas las presas para marcar la **salida** y el **top**, añadir las que falten o quitar las que sobren. Los **volúmenes estructurales** (madera, negro o gris, del color del muro) se marcan rodeándolos con «◇ Volumen» y funcionan como una presa más;
@@ -57,6 +64,8 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `index.html` | estructura de la página |
 | `styles.css` | diseño (claro y oscuro según el móvil) |
 | `app.js` | lógica: carga, filtros, votos, formulario del equipador |
+| `progreso.js` | Mi progreso: puntos, rachas, medallas y siguiente reto |
+| `historias.js` | tarjetas para historias de Instagram |
 | `editor.js` | editor de la foto del bloque: resaltar presas por color, salida y top |
 | `config.js` | dirección y clave pública de Supabase |
 | `supabase/schema.sql` | tablas y reglas de acceso |
@@ -64,6 +73,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `og.png` | imagen de vista previa al compartir el enlace |
 | `mapas/` | planos de Natural Patraix y Natural Benimaclet (PNG, SVG y el script que los genera) y `sectores.py`, que calcula las zonas de los sectores |
 | `supabase/002-sectores.sql` | crea los sectores de los dos planos con sus zonas (ejecutar una vez) |
+| `supabase/003-progreso.sql` | añade flash y fecha de encadenado a los votos (ejecutar una vez) |
 
 ## Añadir otro rocódromo
 

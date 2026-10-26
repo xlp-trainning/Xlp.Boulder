@@ -84,9 +84,13 @@ create table if not exists public.ratings (
   stars      smallint check (stars between 1 and 5),
   sent       boolean not null default false,
   project    boolean not null default false,
+  flash      boolean not null default false,       -- encadenado a la primera
+  sent_at    timestamptz,                          -- cuándo se encadenó (rachas y medallas)
   updated_at timestamptz not null default now(),
   primary key (user_id, block_id)
 );
+alter table public.ratings add column if not exists flash boolean not null default false;
+alter table public.ratings add column if not exists sent_at timestamptz;
 alter table public.ratings enable row level security;
 
 drop policy if exists "cada uno ve sus votos" on public.ratings;
@@ -110,7 +114,7 @@ grant select, insert, update, delete on public.ratings to authenticated;
 -- Medias públicas, sin exponer quién ha votado qué.
 drop function if exists public.block_stats();
 create function public.block_stats()
-returns table (block_id uuid, avg_stars numeric, votes bigint, sends bigint, projects bigint)
+returns table (block_id uuid, avg_stars numeric, votes bigint, sends bigint, projects bigint, flashes bigint)
 language sql stable security definer
 set search_path = ''
 as $$
@@ -118,7 +122,8 @@ as $$
          round(avg(r.stars), 2),
          count(r.stars),
          count(*) filter (where r.sent),
-         count(*) filter (where r.project and not r.sent)
+         count(*) filter (where r.project and not r.sent),
+         count(*) filter (where r.sent and r.flash)
   from public.ratings r
   group by r.block_id;
 $$;
