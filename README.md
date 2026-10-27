@@ -28,6 +28,17 @@
   - Dentro de cada liga gana quien más puntos sume en el mes. Se reinicia el día 1 y se puede ver el mes pasado.
   - Es voluntario: cada uno se apunta con un apodo (sin email). El equipador puede quitar a alguien del ranking.
   - La fecha de cada encadenado la pone el servidor, así que no se puede trampear con fechas, y no cuentan los bloques marcados después de desmontarse.
+- **Grupos de amigos** (pestaña «Grupos»; hace falta un apodo, que no obliga a salir en el ranking público):
+  - crear un grupo o **unirse con su código** o con el enlace de invitación (`…/#g-CODIGO`), que se comparte por WhatsApp;
+  - **ranking del grupo** por semana, mes o desde siempre, todos contra todos y con los dos rocódromos;
+  - **actividad**: lo que encadena cada uno (con intentos y flash) y **reacciones** 🔥 👏 💪; arriba, los **proyectos compartidos** (bloques en los que andan metidos varios) y quién lo sacó primero;
+  - **«Tus amigos»** en la ficha de cada bloque: quién lo ha encadenado (y cómo) y quién lo está probando;
+  - **duelos**: retar a alguien del grupo a un bloque (quien lo encadene antes) o a una semana de puntos; se aceptan o rechazan;
+  - **retos del grupo**: «entre todos, 50 encadenados de techo en un mes», con barra de avance y lo que aporta cada uno;
+  - **sesión en grupo**: alguien la empieza, el resto se une desde la pestaña, y al terminar sale el resumen conjunto y su tarjeta para historias;
+  - en **«Tu mes»**, una pantalla con los premios del mes en el grupo (más puntos, más constante, más flashes, más insistente);
+  - **avisos al abrir la app** y número en la pestaña: retos de duelo, quién te ha adelantado, bloques que han hecho varios amigos y tú no, y sesiones en grupo en marcha.
+  El creador del grupo puede sacar a gente o borrarlo; cada uno puede salir cuando quiera.
 - **Modo sesión** («🧗 Empezar sesión», arriba): una vista rápida para apuntar entre pegue y pegue, con filtros por sector y color y tres botones por bloque: **+1** (un pegue sin encadenar), **✓** (encadenado en este pegue; se deshace tocando otra vez) y **⚡** (a la primera). Arriba, el marcador de la sesión (encadenados, flashes, intentos y puntos). Se puede minimizar (queda una barra «Sesión en curso») y sigue aunque se cierre la web. Al terminar, resumen con lo encadenado y tarjeta para historias.
 - **Instalar la app**: a partir de la 2.ª visita o tras el primer encadenado, un aviso invita a instalarla; los pasos para **iPhone** (Safari → Compartir → «Añadir a pantalla de inicio») y **Android** (Chrome → ⋮ → «Instalar aplicación») salen según el móvil, con botón de instalar directo cuando el navegador lo permite. También desde «📲 Instalar la app», al pie.
 - **Pasar el progreso**: como en iPhone la app instalada no comparte datos con Safari (ni Safari con el navegador de Instagram), «Copiar mi código» y «Recuperar» llevan los votos, encadenados y apodo de un sitio a otro.
@@ -93,6 +104,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `sesion.js` | modo sesión: apuntar rápido en la sala y resumen de la sesión |
 | `instalar.js` | invitación e instrucciones para instalar la app, y código para pasar el progreso |
 | `sw.js` | service worker mínimo para poder instalar la web (no guarda caché) |
+| `grupos.js` | grupos de amigos: ranking, actividad, reacciones, duelos, retos, sesiones en grupo y avisos |
 | `wrapped.js` | «Tu mes»: el resumen del mes tipo Wrapped |
 | `editor.js` | editor de la foto del bloque: resaltar presas por color, salida y top |
 | `config.js` | dirección y clave pública de Supabase |
@@ -105,6 +117,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `supabase/004-ranking.sql` | ranking por ligas: apodos y cálculo del ranking (ejecutar una vez) |
 | `supabase/005-sello.sql` | añade el sello Xlp a los bloques (ejecutar una vez) |
 | `supabase/007-buzon.sql` | buzón de sugerencias (ejecutar una vez) |
+| `supabase/008-grupos.sql` | grupos de amigos (ejecutar una vez, después de 004, 006 y 007) |
 | `supabase/006-sensaciones.sql` | sensación de dificultad, intentos y «primero en encadenarlo» (ejecutar una vez, después de 004) |
 
 ## Añadir otro rocódromo

@@ -93,7 +93,7 @@ function renderSession(s) {
   };
   root.replaceChildren(el("div", { class: "session", role: "dialog", "aria-modal": "true", "aria-label": "Sesión de escalada" },
     el("div", { class: "ses-head" },
-      el("div", {}, el("span", { class: "label", text: `Sesión · ${(currentGym()?.name || "").replace(/^Natural /, "")}` }), el("div", { class: "ses-clock", text: fmtMins(r.mins) })),
+      el("div", {}, el("span", { class: "label", text: s.group ? `Sesión en grupo · ${s.group.name}` : `Sesión · ${(currentGym()?.name || "").replace(/^Natural /, "")}` }), el("div", { class: "ses-clock", text: fmtMins(r.mins) })),
       el("div", { class: "row" },
         el("button", { class: "btn", onclick: () => { SES.open = false; render(); } }, "Minimizar"),
         el("button", { class: "btn primary", onclick: endSession }, "Terminar"))),
@@ -117,8 +117,10 @@ function endSession() {
   const s = sesActive(); if (!s) return;
   const r = sesSummary(s);
   sesSet(null); SES.open = false; clearInterval(SES.timer); SES.timer = 0;
-  if (!r.sends.length && !r.tries) { closeSessionView(); render(); return toast("Sesión terminada"); }
+  if (!r.sends.length && !r.tries && !s.group) { closeSessionView(); render(); return toast("Sesión terminada"); }
   SES.ended = r;
+  const gbox = s.group ? el("div", { class: "section ses-group" }, el("p", { class: "note", text: "Cargando la sesión del grupo…" })) : null;
+  if (gbox) groupSessionEnd(s.group, gbox);
   const root = $("sessionRoot");
   root.replaceChildren(el("div", { class: "session ses-end", role: "dialog", "aria-modal": "true", "aria-label": "Resumen de la sesión" },
     el("span", { class: "label", text: "Sesión terminada" }),
@@ -129,6 +131,7 @@ function endSession() {
     r.sends.length ? el("ul", { class: "ses-sent" }, r.sends.map(({ b, m }) => el("li", {},
       el("span", { class: "ses-tape", style: `background:${LV[b.level].bg};color:${LV[b.level].fg}`, text: SHORT[b.level] }),
       el("strong", { text: title(b) }), el("span", { class: "note", text: m.flash ? "⚡ flash" : m.attempts > 1 ? `al ${m.attempts}.º intento` : "encadenado" })))) : el("p", { class: "note", text: `Probaste ${r.tried} ${r.tried === 1 ? "bloque" : "bloques"}. ¡La próxima cae!` }),
+    gbox,
     el("div", { class: "actions" },
       el("button", { class: "btn primary", onclick: () => storySession(r) }, "📸 Compartir sesión"),
       el("button", { class: "btn", onclick: () => { SES.ended = null; closeSessionView(); render(); } }, "Cerrar"))));

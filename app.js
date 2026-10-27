@@ -134,6 +134,7 @@ async function refresh() {
   try {
     await loadSession();
     await Promise.all([loadAll(), loadMine()]);
+    await loadGroups();
     S.comments = {}; invalidateRanking(); ST.all = null;
     if (S.isSetter) await loadAllComments();
     await loadSuggestions();
@@ -481,10 +482,11 @@ function render() {
   const page = !sb || !S.loaded || S.error ? "bloques" : S.page;
   document.querySelectorAll("[data-page]").forEach(b => b.setAttribute("aria-current", b.dataset.page === S.page ? "page" : "false"));
   document.querySelectorAll(".page").forEach(p => p.hidden = p.id !== "page-" + page);
-  markWrapped(); markBuzon(); markInstall(); markSession();
+  markWrapped(); markBuzon(); markInstall(); markSession(); markGroups();
   if (page === "bloques") return renderBloques();
   if (S.page === "mapa") renderMapa();
   if (S.page === "ranking") renderRanking();
+  if (S.page === "grupos") renderGrupos();
   if (S.page === "progreso") renderProgreso();
   if (S.page === "stats") renderStats();
   if (S.page === "buzon") renderBuzon();
@@ -680,6 +682,7 @@ function openDetail(id) {
         el("button", { class: "btn", onclick: () => shareBlock(b) }, "Compartir"),
         mine.sent ? el("button", { class: "btn", onclick: () => storyBlock(b, mine) }, "📸 Historia") : null),
       el("div", { class: "note", text: "Sin registro: tus votos, proyectos y favoritos se guardan en este móvil." })),
+    friendsBox(b),
     commentsSection(b),
     S.isSetter ? el("div", { class: "section" }, el("span", { class: "label", text: "Equipador" }), adminBox) : null,
   );
@@ -868,7 +871,7 @@ function saveMine(id, next) {
       S.firsts = toFirsts(f.data);
       if (next.sent && !prev?.sent && S.firsts[id]?.is_me && !wasFirst) setTimeout(() => toast("🥇 ¡Eres el primero en encadenarlo!"), 1800);
     }
-    invalidateRanking();
+    invalidateRanking(); invalidateGroups();
   }).catch(e => {
     console.error(e);
     if (prev) S.mine[id] = prev; else delete S.mine[id];

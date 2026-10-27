@@ -56,7 +56,7 @@ const kicker = (x, text, y, color = STORY.muted) => { x.fillStyle = color; x.fon
 const lvColor = l => l.solid ? "#F4F4F2" : l.bg;
 const nf = n => n.toLocaleString("es-ES", { maximumFractionDigits: 1 });
 
-async function buildSlides(d, rank) {
+async function buildSlides(d, rank, grp) {
   const gym = currentGym()?.name || "";
   const M = cap(d.month), out = [];
   const add = (c, label) => out.push({ c, label });
@@ -169,6 +169,23 @@ async function buildSlides(d, rank) {
     add(c, `${d.back ? "Terminaste" : "Vas"} ${rank.pos}.º de ${rank.total} en la liga ${l.name} con ${rank.points} puntos.`);
   }
 
+  // 7b · Tu grupo de amigos: premios del mes
+  if (grp && grp.awards.length) {
+    const [c, x] = await slideCanvas("#2A2140", gym);
+    kicker(x, d.back ? `${cap(d.month)} en tu grupo` : "Este mes en tu grupo", 420, "#CBB8E8");
+    x.fillStyle = STORY.ink; fitText(x, grp.name.toUpperCase(), 920, 120); x.fillText(grp.name.toUpperCase(), 76, 540);
+    let y = 650;
+    grp.awards.forEach(a => {
+      x.font = `80px ${BODY}`; x.fillText(a.icon, 80, y + 70);
+      x.fillStyle = "#CBB8E8"; x.font = `700 38px ${BODY}`; x.fillText(a.title.toUpperCase(), 210, y + 10);
+      x.fillStyle = a.me ? "#F5CE1B" : STORY.ink; fitText(x, a.nick + (a.me ? " (tú)" : ""), 790, 76, 800, BODY); x.fillText(a.nick + (a.me ? " (tú)" : ""), 210, y + 95);
+      x.fillStyle = STORY.muted; x.font = `600 40px ${BODY}`; x.fillText(a.value, 210, y + 150);
+      y += 250;
+    });
+    if (grp.pos) { x.fillStyle = STORY.ink; x.font = `800 56px ${BODY}`; x.fillText(`Tú: ${grp.pos}.º de ${grp.size} en puntos`, 80, Math.min(y + 60, 1720)); }
+    add(c, `En ${grp.name}: ` + grp.awards.map(a => `${a.title}: ${a.nick} (${a.value})`).join(". ") + (grp.pos ? `. Tú: ${grp.pos}.º de ${grp.size}.` : ""));
+  }
+
   // 8 · Resumen para compartir
   { const [c, x] = await slideCanvas(STORY.bg, gym);
     kicker(x, d.back ? "Mi resumen de" : "Mi mes hasta ahora", 400);
@@ -222,7 +239,8 @@ async function openWrapped(back) {
   if (back) { store.set("lb-wrapped-seen", [...new Set([...seenWrapped(), wrappedId(back)])].slice(-24)); render(); }
   const loading = el("div", { class: "wrapped", role: "dialog", "aria-modal": "true", "aria-label": "Tu resumen del mes" }, el("p", { class: "wr-loading", text: "Preparando tu resumen…" }));
   document.body.append(loading); document.body.style.overflow = "hidden";
-  const slides = await buildSlides(d, await myRankFor(back));
+  const [rank, grp] = await Promise.all([myRankFor(back), wrappedGroup(back).catch(() => null)]);
+  const slides = await buildSlides(d, rank, grp);
   loading.remove();
   wrappedViewer(slides, `Mi ${d.month} en ${currentGym()?.name || "el rocódromo"}`);
 }

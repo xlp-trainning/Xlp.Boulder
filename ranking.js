@@ -32,13 +32,14 @@ async function loadRanking() {
   RK.key = key; RK.loading = true; RK.error = false;
   const [r, me] = await Promise.all([
     sb.rpc("ranking", { p_gym: S.gym, p_month: RK.month === "prev" ? ymd(monthStart(1)) : null }),
-    S.session ? sb.from("climbers").select("nick").eq("user_id", S.session.user.id).maybeSingle() : Promise.resolve({ data: null }),
+    S.session ? sb.from("climbers").select("nick, in_ranking").eq("user_id", S.session.user.id).maybeSingle() : Promise.resolve({ data: null }),
   ]);
   if (RK.key !== key) return;   // mientras tanto se cambió de mes o de rocódromo
   RK.loading = false;
   if (r.error) { console.error(r.error); RK.error = true; RK.rows = []; }
   else RK.rows = r.data || [];
-  RK.me = me.data?.nick || null;
+  RK.nick = me.data?.nick || null;   // apodo (también lo usan los grupos)
+  RK.me = me.data && me.data.in_ranking !== false ? me.data.nick : null;
   if (S.page === "ranking") renderRanking();
 }
 
@@ -47,15 +48,16 @@ async function joinRanking(nick) {
   if (nick.length < 2 || nick.length > 20) return toast("El apodo tiene que tener entre 2 y 20 letras");
   if (!(await ensureVoter())) return;
   store.set("lb-nick", nick);
-  const q = RK.me ? sb.from("climbers").update({ nick }).eq("user_id", S.session.user.id) : sb.from("climbers").insert({ nick });
+  const q = RK.nick || G.me ? sb.from("climbers").update({ nick, in_ranking: true }).eq("user_id", S.session.user.id) : sb.from("climbers").insert({ nick });
   const { error } = await q;
   if (error) return toast(error.code === "23505" ? "Ese apodo ya lo usa otra persona" : "No se pudo guardar");
   toast(RK.me ? "Apodo cambiado" : "¡Ya estás en el ranking!");
+  G.me = { nick, in_ranking: true };
   RK.editing = false; invalidateRanking(); renderRanking();
 }
 async function leaveRanking() {
-  if (!confirm("¿Salir del ranking? Tus encadenados no se borran; solo dejas de aparecer.")) return;
-  const { error } = await sb.from("climbers").delete().eq("user_id", S.session.user.id);
+  if (!confirm("¿Salir del ranking? Tus encadenados no se borran; solo dejas de aparecer. Tus grupos de amigos siguen igual.")) return;
+  const { error } = await sb.from("climbers").update({ in_ranking: false }).eq("user_id", S.session.user.id);
   if (error) return toast("No se pudo salir");
   toast("Has salido del ranking"); invalidateRanking(); renderRanking();
 }
