@@ -225,7 +225,10 @@ function card(b) {
 function visible() {
   const list = S.blocks.filter(b => {
     const v = S.view;
-    if ((v === "open" || v === "new") && !b.active) return false;
+    if ((v === "open" || v === "new" || v === "sent") && !b.active) return false;
+    // «Abiertos» son los que te quedan por encadenar; los que ya tienes, en «Encadenados»
+    if (v === "open" && S.mine[b.id]?.sent) return false;
+    if (v === "sent" && !S.mine[b.id]?.sent) return false;
     if (v === "new" && !isNew(b)) return false;
     if (v === "old" && b.active) return false;
     if (v === "fav" && !S.favs.includes(b.id)) return false;
@@ -251,12 +254,13 @@ function visible() {
 }
 
 function renderBars() {
-  const pool = S.blocks.filter(b => S.view === "old" ? !b.active : b.active);
+  const pool = S.blocks.filter(b => S.view === "old" ? !b.active : b.active && (S.view === "open" ? !S.mine[b.id]?.sent : S.view === "sent" ? S.mine[b.id]?.sent : true));
   const counts = Object.fromEntries(LEVELS.map(l => [l.k, 0]));
   pool.forEach(b => { if (b.level in counts) counts[b.level]++; });
   const max = Math.max(1, ...Object.values(counts));
   $("totalN").textContent = pool.length;
-  $("totalLbl").textContent = S.view === "old" ? "bloques desmontados" : (pool.length === 1 ? "bloque abierto" : "bloques abiertos");
+  $("totalLbl").textContent = S.view === "old" ? "bloques desmontados" : S.view === "open" ? "abiertos sin encadenar"
+    : S.view === "sent" ? (pool.length === 1 ? "encadenado abierto" : "encadenados abiertos") : (pool.length === 1 ? "bloque abierto" : "bloques abiertos");
   $("bars").replaceChildren(...LEVELS.map(l => {
     const c = counts[l.k];
     return el("button", { class: "bar" + (c ? " has" : "") + (S.level === l.k ? " sel" : ""), "aria-pressed": S.level === l.k ? "true" : "false", "aria-label": `${l.name}: ${c} bloques`,
@@ -304,6 +308,8 @@ function renderBloques() {
     ? (S.isSetter ? ["La libreta está vacía", "Añade el primer bloque que hayas equipado: nivel, sector, estilo y la beta."] : ["Aún no hay bloques", "El equipador todavía no ha apuntado ningún bloque. Vuelve pronto."])
     : S.view === "fav" ? ["Sin favoritos", "Abre un bloque y toca «Guardar» para tenerlo aquí."]
     : S.view === "proj" ? ["Sin proyectos", "Abre un bloque que estés probando y toca «Es mi proyecto». Cuando lo encadenes, sale de aquí."]
+    : S.view === "sent" ? ["Aún no has encadenado nada", "Cuando marques un bloque como encadenado o flash, sale de «Abiertos» y lo tienes aquí."]
+    : S.view === "open" && !S.level && !S.sector && !S.xlp && !S.styles.size && !S.colors.size && !S.q && S.blocks.some(b => b.active) ? ["¡Todo encadenado!", "Has encadenado todos los bloques abiertos. Vuelve cuando el equipador monte bloques nuevos."]
     : S.view === "new" ? ["Nada nuevo esta semana", `Aquí salen los bloques montados en los últimos ${NEW_DAYS} días.`]
     : ["Nada con estos filtros", "Prueba a quitar algún nivel, sector, estilo o color."];
   list.replaceChildren(emptyBox(h, p, none && S.isSetter ? el("button", { class: "btn primary", onclick: () => openForm() }, ico("plus"), "Nuevo bloque")

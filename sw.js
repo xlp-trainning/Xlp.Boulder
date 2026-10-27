@@ -3,7 +3,7 @@
 // - Fotos de Supabase (bucket público «fotos»): primero la copia del móvil. Cada foto tiene un nombre único
 //   que no cambia, así que nunca se queda vieja; se ahorra transferencia y se ven sin conexión.
 // Los datos de Supabase no pasan por aquí: los guarda la propia web (offline.js).
-const CACHE = "xlp-web-v3";
+const CACHE = "xlp-web-v4";
 const PHOTOS = "xlp-fotos-v1";
 const PHOTO_PATH = "/storage/v1/object/public/fotos/";
 const MAX_BYTES = 30 * 1024 * 1024, MAX_COUNT = 600;    // tope de la caché de fotos (~30 MB)

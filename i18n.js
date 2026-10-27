@@ -398,7 +398,9 @@ I18N_RX.unshift(...I18N_RX.map(([rx, f]) => {
   return src === rx.source ? null : [new RegExp(src, rx.flags.includes("u") ? rx.flags : rx.flags + "u"), m => { const r = f(m); return r == null ? r : r.replace(EMOJI_HEAD, ""); }];
 }).filter(Boolean));
 Object.assign(I18N, {
-  "Pídeles la beta.": "Ask them for the beta.", "¡Conseguido!": "Done!", "Creó el grupo": "Created the group", "Primero en encadenarlo": "First to send it",
+  "Pídeles la beta.": "Ask them for the beta.", "Encadenados": "Sent", "abiertos sin encadenar": "open, not sent yet", "encadenados abiertos": "sent, still open", "encadenado abierto": "sent, still open",
+  "Aún no has encadenado nada": "You haven't sent anything yet", "Cuando marques un bloque como encadenado o flash, sale de «Abiertos» y lo tienes aquí.": "When you mark a problem as sent or flashed, it leaves “Open” and shows up here.",
+  "¡Todo encadenado!": "All sent!", "Has encadenado todos los bloques abiertos. Vuelve cuando el equipador monte bloques nuevos.": "You've sent every open problem. Come back when new ones are set.", "¡Conseguido!": "Done!", "Creó el grupo": "Created the group", "Primero en encadenarlo": "First to send it",
   "+1 = un pegue sin encadenar": "+1 = a go without sending", "= encadenado en este pegue (vuelve a tocar para deshacer)": "= sent on this go (tap again to undo)", "= a la primera": "= first go",
   "semanas de racha": "week streak", "semana de racha": "week streak", "puntos este mes": "points this month", "nivel real": "real level", "Quitar filtros": "Clear filters",
   "Medalla": "Medal", "Punto fuerte:": "Strength:", "A mejorar:": "To improve:", "ORO": "GOLD", "PLATA": "SILVER", "BRONCE": "BRONZE", "EQUIPADO POR XLP": "SET BY XLP",
