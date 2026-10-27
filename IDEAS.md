@@ -19,3 +19,13 @@ Ideas que el equipador ha aprobado o le han parecido interesantes y quedan para 
 - Avisos de presas sueltas o giradas, con lista de pendientes para el equipador.
 - Códigos QR por sector para pegar en la pared.
 - Valenciano (el inglés ya está).
+- Pantalla «Hoy» al abrir la app: bloques nuevos, tu plan, duelos, racha y grupo, todo en un vistazo (28/10/2026).
+- Bienvenida de 3 pantallas para quien entra por primera vez (qué es, cómo apuntar, instalar).
+- Estadísticas de uso para el equipador: personas activas por semana, instalaciones, sesiones, retención.
+- Dónde está cada bloque: punto en el plano dentro del sector y flecha «está aquí» en la ficha.
+- Encuesta de remontaje: la gente vota qué estilo o zona quiere en el próximo remontaje.
+- Notas privadas por bloque (libreta personal).
+- Notas privadas del equipador por bloque (presas usadas, ideas, qué cambiar).
+- Eventos temáticos de temporada (Halloween, Navidad…) con medalla especial.
+- Modo oscuro/claro manual y tamaño de letra más grande.
+- Copias de seguridad de la base de datos y exportar a Excel.
