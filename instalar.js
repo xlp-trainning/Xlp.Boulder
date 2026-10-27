@@ -10,7 +10,7 @@ const inAppBrowser = () => /Instagram|FBAN|FBAV|FB_IAB|TikTok|musical_ly|Line\//
 
 addEventListener("beforeinstallprompt", e => { e.preventDefault(); INST.evt = e; markInstall(); });
 addEventListener("appinstalled", () => { store.set("lb-install-done", 1); INST.evt = null; markInstall(); toast("¡Instalada! Ya tienes Xlp.Boulder en tu pantalla de inicio"); });
-if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+if ("serviceWorker" in navigator && window.isSecureContext) navigator.serviceWorker.register("sw.js").catch(() => {});
 
 // Banner de invitación: a partir de la 2.ª visita o tras el primer encadenado; «Ahora no» lo esconde 14 días
 store.set("lb-visits", store.get("lb-visits", 0) + 1);

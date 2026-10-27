@@ -89,7 +89,8 @@ function setGym(id) {
 const toFirsts = rows => Object.fromEntries((rows || []).map(r => [r.block_id, r]));
 const toStats = rows => Object.fromEntries((rows || []).map(r => [r.block_id,
   { avg: Number(r.avg_stars) || 0, n: Number(r.votes), sends: Number(r.sends), projects: Number(r.projects) || 0, flashes: Number(r.flashes) || 0,
-    soft: Number(r.soft) || 0, fair: Number(r.fair) || 0, hard: Number(r.hard) || 0, attempts: Number(r.avg_attempts) || 0 }]));
+    soft: Number(r.soft) || 0, fair: Number(r.fair) || 0, hard: Number(r.hard) || 0, attempts: Number(r.avg_attempts) || 0,
+    mShort: Number(r.m_short) || 0, mAny: Number(r.m_any) || 0, mTall: Number(r.m_tall) || 0 }]));
 async function loadAll() {
   const g = await sb.from("gyms").select("*").order("sort");
   if (g.error) throw g.error;
@@ -111,9 +112,9 @@ async function loadAll() {
 async function loadMine() {
   S.mine = {};
   if (!S.session) return;
-  const { data } = await sb.from("ratings").select("block_id, stars, sent, project, flash, sent_at, feel, attempts");
+  const { data } = await sb.from("ratings").select("block_id, stars, sent, project, flash, sent_at, feel, attempts, morpho");
   (data || []).forEach(r => S.mine[r.block_id] = { stars: r.stars || 0, sent: r.sent, project: r.project, flash: !!r.flash, sent_at: r.sent_at || null,
-    feel: r.feel ?? null, attempts: r.attempts || null });
+    feel: r.feel ?? null, attempts: r.attempts || null, morpho: r.morpho ?? null });
 }
 async function loadSession() {
   const { data } = await sb.auth.getSession();
@@ -138,11 +139,15 @@ async function refresh() {
     S.comments = {}; invalidateRanking(); ST.all = null;
     if (S.isSetter) await loadAllComments();
     await loadSuggestions();
-    S.error = null;
+    S.error = null; S.offline = false;
+    saveSnapshot(); flushOutbox();
   } catch (e) {
     console.error(e);
-    S.error = "No se pudieron cargar los bloques. Comprueba la conexión y vuelve a intentarlo.";
+    // Sin cobertura: se abre con la última copia guardada en el móvil
+    if (isNetErr(e) && loadSnapshot()) S.error = null;
+    else S.error = "No se pudieron cargar los bloques. Comprueba la conexión y vuelve a intentarlo.";
   }
+  markNet();
   S.loaded = true;
   render();
   if (openId) openDetail(openId);
@@ -158,7 +163,7 @@ async function loadAllComments() {
 }
 
 /* ---------- utilidades de pintado ---------- */
-const statsFor = id => S.stats[id] || { avg: 0, n: 0, sends: 0, projects: 0, flashes: 0, soft: 0, fair: 0, hard: 0, attempts: 0 };
+const statsFor = id => S.stats[id] || { avg: 0, n: 0, sends: 0, projects: 0, flashes: 0, soft: 0, fair: 0, hard: 0, attempts: 0, mShort: 0, mAny: 0, mTall: 0 };
 const starStr = avg => { const r = Math.round(avg); return "★".repeat(r) + "☆".repeat(5 - r); };
 const fmtDate = d => { if (!d) return ""; const [y, m, dd] = d.slice(0, 10).split("-"); return `${dd}/${m}/${y.slice(2)}`; };
 const sectorNames = () => [...new Set([...S.sectors.map(s => s.name), ...S.blocks.map(b => b.sector).filter(Boolean)])].sort((a, b) => a.localeCompare(b, "es"));
@@ -177,8 +182,13 @@ function xlpBadge(iconOnly, label = "Xlp") {
   s.innerHTML = XLP_MARK; if (!iconOnly) s.append(label);
   return s;
 }
-const levelDot = k => el("span", { class: "dot", style: `background:${LV[k].bg}` });
-const holdMeta = b => COLORS[b.hold_color] ? el("span", { class: "hold" }, el("span", { class: "dot", style: `background:${COLORS[b.hold_color].hex}` }), "Presa " + COLORS[b.hold_color].name.toLowerCase()) : null;
+// Modo daltónico: cada punto de color lleva su abreviatura (y los colores de presa, su nombre)
+const ABBR = { amarillo: "Am", naranja: "Na", rojo: "Ro", rosa: "Rs", morado: "Mo", azul: "Az", turquesa: "Tu", verde: "Ve", negro: "Ne", blanco: "Bl", gris: "Gr", marron: "Ma", compe: "Co" };
+const inkOn = hex => { const n = parseInt(hex.slice(1), 16); return (0.299 * (n >> 16) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) > 150 ? "#111" : "#fff"; };
+const colorDot = (k, bg, solid) => el("span", { class: "dot", "data-l": ABBR[k] || "", style: `background:${bg};--dot-ink:${inkOn(solid || (bg.startsWith("#") ? bg : "#F4F4F2"))}` });
+const levelDot = k => colorDot(k, LV[k].bg, LV[k].solid);
+function setColorBlind(on) { document.body.classList.toggle("cb", on); store.set("lb-cb", on); const b = $("cbBtn"); if (b) b.setAttribute("aria-pressed", on ? "true" : "false"); }
+const holdMeta = b => COLORS[b.hold_color] ? el("span", { class: "hold" }, colorDot(b.hold_color, COLORS[b.hold_color].hex), "Presa " + COLORS[b.hold_color].name.toLowerCase()) : null;
 const starsLine = (st, long) => el("div", { class: "stars-line" },
   st.n ? [el("span", { class: "s", text: starStr(st.avg) }), el("span", { text: long ? `${st.avg.toFixed(1)} de 5 · ${st.n} ${st.n === 1 ? "voto" : "votos"}` : `${st.avg.toFixed(1)} · ${st.n}` })]
        : el("span", { text: long ? "Sin puntuar todavía" : "Sin puntuar" }));
@@ -266,7 +276,7 @@ function renderChips() {
   if (used.size) cc.append(el("span", { class: "label", text: "Presa" }));
   Object.entries(COLORS).filter(([k]) => used.has(k)).forEach(([k, c]) => cc.append(el("button", { class: "chip", "aria-pressed": S.colors.has(k) ? "true" : "false",
     onclick: () => { S.colors.has(k) ? S.colors.delete(k) : S.colors.add(k); render(); } },
-    el("span", { class: "dot", style: `background:${c.hex}` }), c.name)));
+    colorDot(k, c.hex), c.name)));
   const filtering = S.level || S.sector || S.xlp || S.styles.size || S.colors.size || S.q;
   if (filtering) cc.append(el("button", { class: "clear", onclick: () => { S.level = null; S.sector = null; S.xlp = false; S.styles.clear(); S.colors.clear(); S.q = ""; $("q").value = ""; render(); } }, "Quitar filtros"));
   cc.hidden = !cc.firstChild;
@@ -536,10 +546,16 @@ function commentsSection(b) {
   const body = el("textarea", { id: "c-body", maxlength: "1000", placeholder: "Cómo lo hiciste tú: pies, secuencia, el truco del paso clave…", oninput: e => d.body = e.target.value });
   body.value = d.body;
   const video = el("input", { id: "c-video", type: "url", value: d.video, placeholder: "Enlace a tu vídeo (opcional)", oninput: e => d.video = e.target.value });
+  const myH = store.get("lb-height", null);
+  const height = el("input", { id: "c-height", type: "number", min: "120", max: "220", inputmode: "numeric", value: myH || "", placeholder: "Tu altura en cm (opcional)", "aria-label": "Tu altura en centímetros",
+    oninput: e => { const v = parseInt(e.target.value, 10); store.set("lb-height", v >= 120 && v <= 220 ? v : null); } });
+  const near = c => myH && c.height && Math.abs(c.height - myH) <= 7;
+  const onlyNear = !!(myH && S.nearOnly);
   const err = el("div", { class: "err", hidden: true });
   const send = el("button", { class: "btn primary", type: "submit" }, "Publicar");
 
-  const items = (list || []).map(c => {
+  const shown = (list || []).filter(c => !onlyNear || near(c));
+  const items = shown.map(c => {
     const canDel = c.user_id === myId || S.isSetter;
     let confirm = false;
     const del = el("span");
@@ -553,13 +569,17 @@ function commentsSection(b) {
       : el("button", { class: "linkbtn", onclick: () => { confirm = true; drawDel(); } }, "Borrar"));
     drawDel();
     return el("li", { class: "comment" },
-      el("div", { class: "comment-head" }, el("strong", { text: c.author }), el("span", { class: "mono note", text: fmtDate(c.created_at) }), del),
+      el("div", { class: "comment-head" }, el("strong", { text: c.author }), c.height ? el("span", { class: "h-tag" + (near(c) ? " near" : ""), text: `📏 ${(c.height / 100).toLocaleString("es-ES", { minimumFractionDigits: 2 })} m` }) : null,
+        el("span", { class: "mono note", text: fmtDate(c.created_at) }), del),
       el("p", { text: c.body }),
       c.video ? el("a", { class: "link", href: c.video, target: "_blank", rel: "noopener" }, "▶ Ver su vídeo") : null);
   });
 
   return el("div", { class: "section" }, el("span", { class: "label", text: `Betas de la gente${list?.length ? " · " + list.length : ""}` }),
-    !list ? el("p", { class: "note", text: "Cargando…" }) : items.length ? el("ul", { class: "comments" }, items) : el("p", { class: "note", text: "Nadie ha contado su beta todavía. ¡Sé el primero!" }),
+    myH && (list || []).some(c => c.height) ? el("label", { class: "near-toggle" }, el("input", { type: "checkbox", checked: onlyNear, onchange: e => { S.nearOnly = e.target.checked; openDetail(id); } }),
+      ` Solo betas de gente de tu altura (${myH} cm ± 7)`) : null,
+    !list ? el("p", { class: "note", text: "Cargando…" }) : items.length ? el("ul", { class: "comments" }, items)
+      : el("p", { class: "note", text: onlyNear ? "Nadie de tu altura ha contado su beta todavía." : "Nadie ha contado su beta todavía. ¡Sé el primero!" }),
     el("form", { class: "f comment-form", onsubmit: async e => {
       e.preventDefault(); err.hidden = true;
       const author = nick.value.trim(), text = body.value.trim(), vid = video.value.trim();
@@ -568,7 +588,8 @@ function commentsSection(b) {
       if (vid && !/^https?:\/\//i.test(vid)) { err.textContent = "El enlace del vídeo debe empezar por https://"; err.hidden = false; return; }
       send.disabled = true;
       if (!(await ensureVoter())) { send.disabled = false; return; }
-      const { data, error } = await sb.from("comments").insert({ block_id: id, user_id: S.session.user.id, author, body: text, video: vid }).select().single();
+      const h = parseInt(height.value, 10);
+      const { data, error } = await sb.from("comments").insert({ block_id: id, user_id: S.session.user.id, author, body: text, video: vid, height: h >= 120 && h <= 220 ? h : null }).select().single();
       send.disabled = false;
       if (error) { err.textContent = error.code === "P0001" ? "Has publicado muchos comentarios seguidos. Espera un rato." : "No se pudo publicar. Inténtalo de nuevo."; err.hidden = false; return; }
       (S.comments[id] ||= []).push(data); allComments.push(data);
@@ -577,6 +598,7 @@ function commentsSection(b) {
     } },
       el("label", { class: "field" }, el("span", { class: "label", text: "Cuenta tu beta" }), body),
       el("div", { class: "two" }, el("div", { class: "field" }, nick), el("div", { class: "field" }, video)),
+      el("div", { class: "field" }, height, el("span", { class: "note", text: "Con tu altura, la gente de tu talla encontrará tu beta. Se guarda en este móvil." })),
       err, el("div", { class: "actions" }, send)));
 }
 
@@ -616,7 +638,20 @@ function feelBox(id, b, mine) {
       el("button", { class: "btn" + (mine.feel === v ? " primary" : ""), "aria-pressed": mine.feel === v ? "true" : "false",
         onclick: () => saveMine(id, { ...mine, feel: mine.feel === v ? null : v }) }, t)))
       : el("p", { class: "note", text: "Pruébalo (o apunta un intento) para votar si es blando, justo o duro." }),
-    feelSummary(statsFor(id)));
+    feelSummary(statsFor(id)),
+    tried ? el("span", { class: "label", text: "¿Depende de la altura?" }) : null,
+    tried ? el("div", { class: "send-pick", role: "group", "aria-label": "¿Depende de la altura?" }, MORPHO.map(([v, t]) =>
+      el("button", { class: "btn" + (mine.morpho === v ? " primary" : ""), "aria-pressed": mine.morpho === v ? "true" : "false",
+        onclick: () => saveMine(id, { ...mine, morpho: mine.morpho === v ? null : v }) }, t))) : null,
+    morphoSummary(statsFor(id)));
+}
+// Voto «morfo»: ¿va mejor si eres bajo, alto o da igual?
+const MORPHO = [[-1, "Mejor si eres bajo"], [0, "Da igual"], [1, "Mejor si eres alto"]];
+function morphoSummary(st) {
+  const total = st.mShort + st.mAny + st.mTall;
+  if (!total) return null;
+  const top = [[st.mShort, "va mejor si eres bajo"], [st.mTall, "va mejor si eres alto"], [st.mAny, "da igual la altura"]].sort((a, b) => b[0] - a[0])[0];
+  return el("p", { class: "note morpho-sum", text: `📏 ${Math.round(top[0] / total * 100)} % dice que ${top[1]} (${total} ${total === 1 ? "voto" : "votos"})` });
 }
 
 // «Primero en encadenarlo», solo entre quienes salen en el ranking con apodo
@@ -632,7 +667,7 @@ function openDetail(id) {
   openId = id;
   if (location.hash !== "#b-" + id) history.replaceState(null, "", "#b-" + id);
   const st = statsFor(id);
-  const mine = { stars: 0, sent: false, project: false, flash: false, sent_at: null, feel: null, attempts: null, ...S.mine[id] };
+  const mine = { stars: 0, sent: false, project: false, flash: false, sent_at: null, feel: null, attempts: null, morpho: null, ...S.mine[id] };
   const fav = S.favs.includes(id);
 
   const rate = el("div", { class: "rate", role: "group", "aria-label": "Tu puntuación" },
@@ -665,6 +700,7 @@ function openDetail(id) {
         starsLine(st, true),
         firstLine(b),
         el("div", { class: "note", text: `${st.sends} ${st.sends === 1 ? "persona lo ha encadenado" : "personas lo han encadenado"}` + (st.flashes ? ` · ⚡ ${st.flashes} al flash` : "") + (st.projects ? ` · ${st.projects} lo ${st.projects === 1 ? "está" : "están"} probando` : "") + (st.attempts ? ` · de media en ${st.attempts.toLocaleString("es-ES")} intentos` : "") }))),
+    diffBox(b),
     el("div", { class: "section" }, el("span", { class: "label", text: "Beta del equipador" }),
       el("div", { class: "beta" + (b.beta ? "" : " none"), text: b.beta || "El equipador no ha escrito la beta de este bloque." }),
       b.video ? el("a", { class: "link", href: b.video, target: "_blank", rel: "noopener" }, "▶ Ver vídeo de la beta") : null),
@@ -727,7 +763,7 @@ function openForm(b) {
   const sw = el("div", { class: "swatches", role: "group", "aria-label": "Color de presa" });
   const drawSw = () => sw.replaceChildren(
     el("button", { type: "button", class: "none-sw", title: "Sin especificar", "aria-label": "Sin especificar", "aria-pressed": !d.color ? "true" : "false", onclick: () => { d.color = ""; drawSw(); } }, "–"),
-    ...Object.entries(COLORS).map(([k, c]) => el("button", { type: "button", title: c.name, "aria-label": c.name, "aria-pressed": d.color === k ? "true" : "false", style: `background:${c.hex}`,
+    ...Object.entries(COLORS).map(([k, c]) => el("button", { type: "button", title: c.name, "aria-label": c.name, "data-l": ABBR[k], "aria-pressed": d.color === k ? "true" : "false", style: `background:${c.hex};--dot-ink:${inkOn(c.hex)}`,
       onclick: () => { d.color = k; drawSw(); } })));
   drawSw();
   const stc = el("div", { class: "row" });
@@ -844,6 +880,7 @@ function openLogin() {
 /* ---------- escrituras de los escaladores ---------- */
 async function ensureVoter() {
   if (S.session) return true;
+  if (!navigator.onLine) return false;
   const { data, error } = await sb.auth.signInAnonymously();
   if (error) { toast("Ahora mismo no se puede guardar"); console.error(error); return false; }
   S.session = data.session;
@@ -862,8 +899,9 @@ function saveMine(id, next) {
   mineBusy = mineBusy.then(async () => {
     if (!(await ensureVoter())) throw new Error("sin sesión");
     const { error } = await sb.from("ratings").upsert({ user_id: S.session.user.id, block_id: id, stars: next.stars || null, sent: next.sent, project: next.project,
-      flash: !!next.flash, sent_at: next.sent_at, feel: next.feel ?? null, attempts: next.attempts || null, updated_at: new Date().toISOString() });
+      flash: !!next.flash, sent_at: next.sent_at, feel: next.feel ?? null, attempts: next.attempts || null, morpho: next.morpho ?? null, updated_at: new Date().toISOString() });
     if (error) throw error;
+    unqueue(id);
     const [s, f] = await Promise.all([sb.rpc("block_stats"), sb.rpc("first_sends", { p_gym: S.gym })]);
     if (!s.error) S.stats = toStats(s.data);
     if (!f.error) {
@@ -873,10 +911,12 @@ function saveMine(id, next) {
     }
     invalidateRanking(); invalidateGroups();
   }).catch(e => {
+    // Sin cobertura: se queda apuntado en el móvil y se sube al volver la conexión
+    if (isNetErr(e)) { queueMine(id, next); toast("📴 Sin conexión: guardado en el móvil, se subirá solo"); return; }
     console.error(e);
     if (prev) S.mine[id] = prev; else delete S.mine[id];
     toast("No se pudo guardar");
-  }).finally(() => { render(); if (openId === id) openDetail(id); });
+  }).finally(() => { store.set("lb-snap-mine", S.mine); render(); if (openId === id) openDetail(id); });
 }
 function toggleFav(id) {
   S.favs = S.favs.includes(id) ? S.favs.filter(x => x !== id) : [...S.favs, id];
@@ -905,6 +945,8 @@ document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click"
 $("q").addEventListener("input", e => { S.q = e.target.value.trim(); render(); });
 $("sort").addEventListener("change", e => { S.sort = e.target.value; render(); });
 $("addBtn").addEventListener("click", () => openForm());
+$("cbBtn").addEventListener("click", () => { setColorBlind(!document.body.classList.contains("cb")); render(); toast(document.body.classList.contains("cb") ? "Modo daltónico activado: los colores llevan su nombre" : "Modo daltónico desactivado"); });
+setColorBlind(store.get("lb-cb", false));
 $("buzonBtn").addEventListener("click", () => sb ? openBuzon() : toast("Falta configurar Supabase"));
 $("installLink").addEventListener("click", () => openInstall());
 $("installGo").addEventListener("click", () => openInstall());

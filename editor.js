@@ -246,7 +246,7 @@ function openHoldEditor({ source, color }) {
     }
     function drawChips() {
       chips.replaceChildren(...Object.entries(COLORS).map(([key, c]) => el("button", { type: "button", class: "chip", "aria-pressed": chosen === key ? "true" : "false",
-        onclick: () => { chosen = key; drawChips(); if (zoneReady) run(); else updateInfo(); } }, el("span", { class: "dot", style: `background:${c.hex}` }), c.name)));
+        onclick: () => { chosen = key; drawChips(); if (zoneReady) run(); else updateInfo(); } }, colorDot(key, c.hex), c.name)));
     }
     function run() {
       info.textContent = "Buscando presas…";

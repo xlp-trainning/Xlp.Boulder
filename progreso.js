@@ -131,6 +131,7 @@ function renderProgreso() {
       kpi(c.top ? c.top.name : "—", "nivel más alto", c.top ? el("span", { class: "kpi-tape", style: `background:${c.top.bg}` }) : null)),
     st.cur > 0 && !st.thisWeek ? el("div", { class: "banner" }, `🔥 Encadena algo esta semana para no perder tu racha de ${st.cur} ${st.cur === 1 ? "semana" : "semanas"}.`) : null,
     wrappedSection(),
+    levelSection(),
 
     el("section", { class: "section" }, el("span", { class: "label", text: "Tu siguiente reto" }),
       recs.length ? el("div", { class: "grid" }, recs.map(r => el("div", { class: "rec" }, el("span", { class: "rec-why", text: r.why }), card(r.b))))

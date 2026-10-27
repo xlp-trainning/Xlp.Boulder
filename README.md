@@ -7,6 +7,14 @@
   - puntuarlos, marcarlos como encadenados o como proyecto, y guardar favoritos (los votos se guardan por dispositivo);
   - contar su propia beta con un apodo, con enlace a vídeo opcional.
 - **Sello Xlp**: los bloques equipados por el dueño de la web llevan el distintivo Xlp (la X del logo) en la lista, en la ficha y en la tarjeta para historias, y se pueden filtrar con «Equipados por Xlp». Se marca con la casilla «Equipado por mí» al crear o editar un bloque (al crear, recuerda la última elección).
+- **Idioma**: español e inglés, con el botón «🌐 EN / ES» arriba. Sale en el idioma del móvil y recuerda la elección. Se traduce todo al mostrarse (`i18n.js`): textos, avisos, ventanas, tarjetas para historias y fechas.
+- **Modo daltónico** («👁 Daltónico», arriba): cada punto de color de nivel o de presa lleva su abreviatura (Az, Ve, Na, Am, Mo, Ro, Ne, Co…).
+- **Sin cobertura**: la web se abre sin conexión con la última copia guardada (bloques, estadísticas y lo tuyo) y lo que apuntas (encadenados, intentos, votos) se guarda en el móvil y se sube solo al volver la conexión. Un aviso arriba lo indica.
+- **Grado real del bloque**: con la sensación de la gente, los intentos, los flashes y cuántos lo sacan, cada bloque muestra dónde cae dentro de su color (de los más fáciles … de los más duros). Sale con 3 personas que lo hayan probado o votado.
+- **Tu nivel real** (en «Mi progreso»): un número tipo Elo (azul ≈ 1000 … compe ≈ 2050) que sale de tus 10 mejores encadenados de los últimos 90 días, según el color, la dificultad real de cada bloque y los intentos, con la variación del mes.
+- **Tu perfil de escalador**: gráfico de araña por estilos (placa, desplome, regletas, romos, pinzas, dinámico, técnica) con tu punto fuerte y el que mejorar; se comparte en historias.
+- **Plan de la semana**: tres bloques abiertos de tu estilo más flojo cerca de tu nivel; cambia cada lunes.
+- **Beta según tu altura**: quien cuenta su beta puede poner su altura; las betas muestran la altura, se resaltan las de gente de tu talla (± 7 cm) y se pueden filtrar. Quien ha probado el bloque vota si va mejor siendo bajo, alto o da igual («morfo»).
 - **En cada bloque**, además:
   - **Intentos**: un contador (− / +) para apuntar cada pegue; al encadenar queda «encadenado al 4.º intento» (1 intento = flash). La ficha muestra los intentos medios de la gente.
   - **Sensación de dificultad**: quien lo ha probado vota si, para su color, le parece **blando, justo o duro**; todo el mundo ve el reparto («20 % blando · 50 % justo · 30 % duro»).
@@ -94,6 +102,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | archivo | qué es |
 | --- | --- |
 | `index.html` | estructura de la página |
+| `IDEAS.md` | ideas aprobadas para más adelante y propuestas sin decidir |
 | `styles.css` | diseño (claro y oscuro según el móvil) |
 | `app.js` | lógica: carga, filtros, votos, formulario del equipador |
 | `progreso.js` | Mi progreso: puntos, rachas, medallas y siguiente reto |
@@ -103,8 +112,11 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `buzon.js` | buzón de sugerencias: formulario y pestaña del equipador |
 | `sesion.js` | modo sesión: apuntar rápido en la sala y resumen de la sesión |
 | `instalar.js` | invitación e instrucciones para instalar la app, y código para pasar el progreso |
-| `sw.js` | service worker mínimo para poder instalar la web (no guarda caché) |
+| `sw.js` | service worker: instalar la web y abrirla sin conexión (primero la red; si no hay, la copia guardada) |
 | `grupos.js` | grupos de amigos: ranking, actividad, reacciones, duelos, retos, sesiones en grupo y avisos |
+| `nivel.js` | grado real de cada bloque, nivel real, perfil por estilos y plan de la semana |
+| `i18n.js` | traducción al inglés y botón de idioma |
+| `offline.js` | copia local de los datos y cola de lo apuntado sin conexión |
 | `wrapped.js` | «Tu mes»: el resumen del mes tipo Wrapped |
 | `editor.js` | editor de la foto del bloque: resaltar presas por color, salida y top |
 | `config.js` | dirección y clave pública de Supabase |
@@ -118,6 +130,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `supabase/005-sello.sql` | añade el sello Xlp a los bloques (ejecutar una vez) |
 | `supabase/007-buzon.sql` | buzón de sugerencias (ejecutar una vez) |
 | `supabase/008-grupos.sql` | grupos de amigos (ejecutar una vez, después de 004, 006 y 007) |
+| `supabase/009-altura.sql` | altura en las betas y voto «morfo» (ejecutar una vez, después de 006) |
 | `supabase/006-sensaciones.sql` | sensación de dificultad, intentos y «primero en encadenarlo» (ejecutar una vez, después de 004) |
 
 ## Añadir otro rocódromo

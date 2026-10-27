@@ -90,6 +90,7 @@ create table if not exists public.ratings (
   sent_at    timestamptz,                          -- cuándo se encadenó (rachas y medallas)
   feel       smallint check (feel between -1 and 1),         -- sensación: -1 blando, 0 justo, 1 duro
   attempts   smallint check (attempts between 1 and 999),    -- intentos
+  morpho     smallint check (morpho between -1 and 1),       -- morfo: -1 mejor bajos, 0 da igual, 1 mejor altos
   updated_at timestamptz not null default now(),
   primary key (user_id, block_id)
 );
@@ -97,6 +98,7 @@ alter table public.ratings add column if not exists flash boolean not null defau
 alter table public.ratings add column if not exists sent_at timestamptz;
 alter table public.ratings add column if not exists feel smallint check (feel between -1 and 1);
 alter table public.ratings add column if not exists attempts smallint check (attempts between 1 and 999);
+alter table public.ratings add column if not exists morpho smallint check (morpho between -1 and 1);
 alter table public.ratings enable row level security;
 
 drop policy if exists "cada uno ve sus votos" on public.ratings;
@@ -121,7 +123,7 @@ grant select, insert, update, delete on public.ratings to authenticated;
 drop function if exists public.block_stats();
 create function public.block_stats()
 returns table (block_id uuid, avg_stars numeric, votes bigint, sends bigint, projects bigint, flashes bigint,
-               soft bigint, fair bigint, hard bigint, avg_attempts numeric)
+               soft bigint, fair bigint, hard bigint, avg_attempts numeric, m_short bigint, m_any bigint, m_tall bigint)
 language sql stable security definer
 set search_path = ''
 as $$
@@ -134,7 +136,10 @@ as $$
          count(*) filter (where r.feel = -1),
          count(*) filter (where r.feel = 0),
          count(*) filter (where r.feel = 1),
-         round(avg(r.attempts) filter (where r.sent), 1)
+         round(avg(r.attempts) filter (where r.sent), 1),
+         count(*) filter (where r.morpho = -1),
+         count(*) filter (where r.morpho = 0),
+         count(*) filter (where r.morpho = 1)
   from public.ratings r
   group by r.block_id;
 $$;
@@ -169,8 +174,10 @@ create table if not exists public.comments (
   author     text not null check (char_length(btrim(author)) between 1 and 30),
   body       text not null check (char_length(btrim(body)) between 1 and 1000),
   video      text not null default '' check (video = '' or video ~* '^https?://'),
+  height     smallint check (height between 120 and 220),   -- altura de quien cuenta la beta (cm, opcional)
   created_at timestamptz not null default now()
 );
+alter table public.comments add column if not exists height smallint check (height between 120 and 220);
 create index if not exists comments_block_idx on public.comments (block_id, created_at);
 alter table public.comments enable row level security;
 drop policy if exists "todos leen los comentarios" on public.comments;

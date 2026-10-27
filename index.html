@@ -37,12 +37,15 @@
       <div class="gympick" id="gymPick" role="group" aria-label="Rocódromo" hidden></div>
     </div>
     <div class="row">
+      <button class="btn small tool-btn" id="langBtn" aria-label="Change language to English">🌐 EN</button>
+      <button class="btn small tool-btn" id="cbBtn" aria-pressed="false" aria-label="Modo daltónico" title="Modo daltónico">👁 Daltónico</button>
       <span class="status" id="who"></span>
       <button class="btn" id="sessionBtn" hidden>🧗 Empezar sesión</button>
       <button class="btn primary" id="addBtn" hidden>+ Nuevo bloque</button>
     </div>
   </header>
 
+  <div class="banner net-banner" id="netBanner" role="status" hidden></div>
   <div class="banner install-banner" id="installBanner" hidden>
     <span>📲 Instala Xlp.Boulder en tu móvil: icono en la pantalla de inicio y a pantalla completa.</span>
     <span class="row"><button class="btn primary small" id="installGo">Cómo instalarla</button><button class="linkbtn" id="installNo">Ahora no</button></span>
@@ -113,14 +116,17 @@
 <button class="session-bar" id="sessionBar" hidden><span class="sb-dot" aria-hidden="true"></span><span class="sb-txt">Sesión</span><span class="sb-go">Abrir</span></button>
 <div class="toast" id="toast" role="status" hidden></div>
 
+<script src="i18n.js"></script>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="editor.js"></script>
 <script src="app.js"></script>
+<script src="offline.js"></script>
 <script src="progreso.js"></script>
 <script src="historias.js"></script>
 <script src="ranking.js"></script>
 <script src="wrapped.js"></script>
+<script src="nivel.js"></script>
 <script src="estadisticas.js"></script>
 <script src="buzon.js"></script>
 <script src="instalar.js"></script>
