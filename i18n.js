@@ -211,6 +211,9 @@ const I18N = {
   "No se pudieron generar las miniaturas. Comprueba la conexión e inténtalo de nuevo.": "Couldn't generate the thumbnails. Check your connection and try again.",
 
   // Hoy, bienvenida y ajustes
+  "Registrar": "Log it", "Cuenta tu beta (opcional)": "Share your beta (optional)", "Ascensión registrada": "Ascent logged", "⚡ Flash registrado": "⚡ Flash logged", "Guardado": "Saved",
+  "Ascensión registrada con tu beta": "Ascent logged with your beta", "Marca «Encadenado» o «⚡ Flash» (o apunta un intento) antes de registrar.": "Tap “Sent” or “⚡ Flash” (or log an attempt) before logging.",
+  "Escribe tu beta para acompañar el vídeo.": "Write your beta to go with the video.",
   "Bienvenido": "Welcome", "Todos los bloques de Natural Climb Patraix y Natural Climb Benimaclet.": "Every problem at Natural Climb Patraix and Natural Climb Benimaclet.",
   "Paso a paso": "Step by step", "Encadenado o flash": "Sent or flash", "Abre el bloque y márcalo con un toque.": "Open the problem and mark it with one tap.", "Cuenta tus intentos": "Count your attempts",
   "Suma uno cada vez que lo pruebes.": "Add one every time you try it.", "Modo sesión": "Session mode", "En la sala, todo en dos toques y sin abrir fichas.": "At the gym, everything in two taps without opening any problem.",

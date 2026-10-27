@@ -559,7 +559,7 @@ function commentsSection(b) {
   const near = c => myH && c.height && Math.abs(c.height - myH) <= 7;
   const onlyNear = !!(myH && S.nearOnly);
   const err = el("div", { class: "err", hidden: true });
-  const send = el("button", { class: "btn primary", type: "submit" }, "Publicar");
+  const send = el("button", { class: "btn primary", type: "submit" }, "Registrar");
 
   const shown = (list || []).filter(c => !onlyNear || near(c));
   const items = shown.map(c => {
@@ -590,8 +590,15 @@ function commentsSection(b) {
     el("form", { class: "f comment-form", onsubmit: async e => {
       e.preventDefault(); err.hidden = true;
       const author = nick.value.trim(), text = body.value.trim(), vid = video.value.trim();
+      // La beta es opcional: sin texto, «Registrar» solo confirma lo marcado (encadenado, flash, intentos…) y vuelve a la lista
+      if (!text && !vid) {
+        const m = S.mine[id] || {};
+        if (!m.sent && !m.project && !m.attempts && !m.stars && m.feel == null) { err.textContent = "Marca «Encadenado» o «⚡ Flash» (o apunta un intento) antes de registrar."; err.hidden = false; return; }
+        toast(m.sent ? (m.flash ? "⚡ Flash registrado" : "Ascensión registrada") : "Guardado");
+        return backToOpen();
+      }
+      if (!text) { err.textContent = "Escribe tu beta para acompañar el vídeo."; err.hidden = false; return; }
       if (!author) { err.textContent = "Pon un apodo para firmar tu beta."; err.hidden = false; return; }
-      if (!text) { err.textContent = "Escribe tu beta o comentario."; err.hidden = false; return; }
       if (vid && !/^https?:\/\//i.test(vid)) { err.textContent = "El enlace del vídeo debe empezar por https://"; err.hidden = false; return; }
       send.disabled = true;
       if (!(await ensureVoter())) { send.disabled = false; return; }
@@ -601,12 +608,19 @@ function commentsSection(b) {
       if (error) { err.textContent = error.code === "P0001" ? "Has publicado muchos comentarios seguidos. Espera un rato." : "No se pudo publicar. Inténtalo de nuevo."; err.hidden = false; return; }
       (S.comments[id] ||= []).push(data); allComments.push(data);
       S.drafts[id] = { body: "", video: "" };
-      toast("Beta publicada"); openDetail(id);
+      toast(S.mine[id]?.sent ? "Ascensión registrada con tu beta" : "Beta publicada"); backToOpen();
     } },
-      el("label", { class: "field" }, el("span", { class: "label", text: "Cuenta tu beta" }), body),
+      el("label", { class: "field" }, el("span", { class: "label", text: "Cuenta tu beta (opcional)" }), body),
       el("div", { class: "two" }, el("div", { class: "field" }, nick), el("div", { class: "field" }, video)),
       el("div", { class: "field" }, height, el("span", { class: "note", text: "Con tu altura, la gente de tu talla encontrará tu beta. Se guarda en este móvil." })),
       err, el("div", { class: "actions" }, send)));
+}
+
+// Tras registrar: de vuelta a la lista de bloques abiertos
+function backToOpen() {
+  closeSheet();
+  S.view = "open"; store.set("lb-view", "open");
+  setPage("bloques"); window.scrollTo({ top: 0 });
 }
 
 // Intentos: + y − en la ficha. Encadenar con 1 intento es flash, y al revés

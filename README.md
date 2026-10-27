@@ -5,7 +5,7 @@
 - **Cualquiera** la abre sin registrarse y puede:
   - ver los bloques con su foto y la beta;
   - puntuarlos, marcarlos como encadenados o como proyecto, y guardar favoritos (los votos se guardan por dispositivo);
-  - contar su propia beta con un apodo, con enlace a vídeo opcional.
+  - registrar sus ascensiones (encadenado o flash) con «Registrar», que vuelve a los bloques abiertos; contar su beta es opcional (con apodo y enlace a vídeo si se quiere).
 - **Sello Xlp**: los bloques equipados por el dueño de la web llevan el distintivo Xlp (la X del logo) en la lista, en la ficha y en la tarjeta para historias, y se pueden filtrar con «Equipados por Xlp». Se marca con la casilla «Equipado por mí» al crear o editar un bloque (al crear, recuerda la última elección).
 - **Hoy** (la pestaña de inicio): un resumen de un vistazo con saludo, racha, puntos del mes, nivel, avisos que piden hacer algo (sesión en marcha, duelos, sesiones en grupo, resumen del mes listo, racha a punto de perderse), botones para empezar sesión o ver el mapa, novedades, el plan de la semana (o el siguiente reto), tus proyectos y lo último de tus grupos.
 - **Bienvenida**: la primera vez, tres pantallas explican qué es la app, cómo apuntar y lo que hay para picarse con los amigos, con botón para instalarla y para leerla en inglés. Se puede volver a ver desde Ajustes.
