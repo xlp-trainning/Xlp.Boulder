@@ -821,3 +821,8 @@ html.big-text .wordmark .mark { width: clamp(33px, 8vw, 42px); }
 .net-banner > span { flex: 1; }
 .ses-btns .btn.primary:disabled { opacity: 1; }
 .today-hero { border: 1px solid var(--wall-line); }
+/* perfil: dos arañas (estilos de escalada y tipos de agarre), una al lado de otra desde 640 px */
+.radars { display: grid; grid-template-columns: 1fr; gap: var(--s-3); }
+@media (min-width: 640px) { .radars { grid-template-columns: 1fr 1fr; } }
+.radar-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-4); padding: var(--s-4); display: flex; flex-direction: column; gap: var(--s-2); }
+.radar-title { font-family: var(--f-display); font-weight: 900; font-size: var(--fd-1); line-height: 1; text-transform: uppercase; }

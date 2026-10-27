@@ -54,9 +54,12 @@ function levelAt(t = Date.now()) {
 }
 const levelColor = v => [...LEVELS].reverse().find(l => v >= BASE[l.k] - 75) || LEVELS[0];
 
-/* ---------- perfil por estilos ---------- */
-const AXES = [["Placa", ["Placa", "Vertical", "Equilibrio"]], ["Desplome", ["Desplome", "Techo"]], ["Regletas", ["Regletas", "Bidedos"]],
-  ["Romos", ["Romos"]], ["Pinzas", ["Pinzas", "Compresión"]], ["Dinámico", ["Dinámico", "Coordinación"]], ["Técnica", ["Diedro", "Arista", "Talonajes"]]];
+/* ---------- perfil: estilos de escalada y tipos de agarre ---------- */
+// Dos arañas de 6 ejes cada una. Cada eje junta las etiquetas del bloque que se parecen
+const STYLE_AXES = [["Placa", ["Placa", "Equilibrio"]], ["Vertical", ["Vertical", "Diedro", "Arista"]], ["Desplome", ["Desplome"]],
+  ["Techo", ["Techo", "Talonajes"]], ["Dinámico", ["Dinámico", "Coordinación"]], ["Compresión", ["Compresión"]]];
+const GRIP_AXES = GRIPS.map(g => [g, [g]]);
+const AXES = [...STYLE_AXES, ...GRIP_AXES];
 const inAxis = (b, ax) => (b.styles || []).some(s => ax[1].includes(s));
 function profile() {
   const lvl = levelAt();
@@ -66,9 +69,12 @@ function profile() {
     const v = perfs.length ? perfs.reduce((a, x) => a + x, 0) / perfs.length : null;
     return { name: ax[0], styles: ax[1], n: perfs.length, score: v == null ? 0 : Math.round(clamp((v - (lvl - 450)) / 500, 0, 1) * 100) };
   });
+  // Para el punto fuerte y el débil solo cuentan los ejes con bloques abiertos (si no, no hay con qué entrenarlo)
   const avail = axes.filter(a => S.blocks.some(b => b.active && inAxis(b, [a.name, a.styles])));
-  const ranked = [...avail].sort((a, b) => a.score - b.score);
-  return { lvl, axes, ranked, weak: ranked[0], strong: ranked[ranked.length - 1] };
+  const rank = list => [...list].sort((a, b) => a.score - b.score);
+  const group = list => { const r = rank(list.filter(a => avail.includes(a))); return { axes: list, weak: r[0] || null, strong: r.length > 1 ? r[r.length - 1] : null }; };
+  const ranked = rank(avail);
+  return { lvl, axes, ranked, styles: group(axes.slice(0, STYLE_AXES.length)), grips: group(axes.slice(STYLE_AXES.length)), weak: ranked[0], strong: ranked[ranked.length - 1] };
 }
 function radarSvg(axes, size = 260) {
   const c = size / 2, r = size / 2 - 40, N = axes.length;
@@ -120,8 +126,14 @@ function levelSection() {
         delta != null ? el("span", { class: "lvl-delta" + (delta >= 0 ? " up" : " down"), text: `${delta >= 0 ? "+" : "−"}${Math.abs(delta)} este mes` }) : null),
       el("p", { class: "note", text: `Como un ${lc.name.toLowerCase()} ${lvl >= BASE[lc.k] + 40 ? "alto" : lvl <= BASE[lc.k] - 40 ? "bajo" : "medio"}. Sale de tus 10 mejores encadenados de los últimos 90 días: cuenta el color, lo duro que es cada bloque según la gente y los intentos que te costó.` })),
     pf ? el("section", { class: "section" }, el("span", { class: "label", text: "Tu perfil de escalador" }),
-      radarSvg(pf.axes),
-      el("p", { class: "note pf-line" }, el("span", {}, ico("trendUp", "sm"), "Punto fuerte:"), el("strong", { text: pf.strong.name }), el("span", {}, ico("target", "sm"), "A mejorar:"), el("strong", { text: pf.weak.name })),
+      el("div", { class: "radars" },
+        [["Estilos de escalada", pf.styles], ["Tipos de agarre", pf.grips]].map(([t, g]) => el("div", { class: "radar-card" },
+          el("h3", { class: "radar-title", text: t }),
+          radarSvg(g.axes),
+          g.strong || g.weak ? el("p", { class: "note pf-line" },
+            g.strong ? [el("span", {}, ico("trendUp", "sm"), "Punto fuerte:"), el("strong", { text: g.strong.name })] : null,
+            g.weak ? [el("span", {}, ico("target", "sm"), "A mejorar:"), el("strong", { text: g.weak.name })] : null) : null))),
+      el("p", { class: "note", text: "Cada eje sale de tus mejores encadenados con esa etiqueta. Los ejes sin bloques abiertos no cuentan para el punto débil." }),
       el("div", { class: "actions" }, el("button", { class: "btn", onclick: () => storyProfile(pf) }, ico("camera"), "Compartir mi perfil"))) : null,
     plan ? el("section", { class: "section" }, el("span", { class: "label", text: `Tu plan de la semana · ${plan.axis.toLowerCase()}` }),
       el("p", { class: "note", text: `Tres bloques de ${plan.axis.toLowerCase()} cerca de tu nivel para mejorar tu punto débil. ${done} de ${plan.blocks.length} hechos${done === plan.blocks.length ? ". ¡Completo!" : ""}. Cada lunes, plan nuevo.` }),
@@ -131,20 +143,25 @@ function levelSection() {
 async function storyProfile(pf) {
   const [c, x] = await storyCanvas();
   drawHeader(x, currentGym()?.name || ""); drawFooter(x);
-  x.fillStyle = STORY.muted; x.font = `700 46px ${BODY}`; x.fillText("MI PERFIL DE ESCALADOR", 80, 400);
-  x.fillStyle = STORY.accent; x.font = `900 200px ${DISPLAY}`; x.fillText(pf.lvl.toLocaleString("es-ES"), 70, 600);
-  x.fillStyle = STORY.ink; x.font = `700 44px ${BODY}`; x.fillText("nivel real", 84, 660);
-  const cx = 540, cy = 1130, r = 330, N = pf.axes.length;
-  const pt = (i, f) => { const a = -Math.PI / 2 + i * 2 * Math.PI / N; return [cx + Math.cos(a) * r * f, cy + Math.sin(a) * r * f]; };
-  x.strokeStyle = "#3A4642"; x.lineWidth = 3;
-  [.25, .5, .75, 1].forEach(f => { x.beginPath(); pf.axes.forEach((_, i) => { const [px, py] = pt(i, f); i ? x.lineTo(px, py) : x.moveTo(px, py); }); x.closePath(); x.stroke(); });
-  x.beginPath(); pf.axes.forEach((a, i) => { const [px, py] = pt(i, Math.max(.04, a.score / 100)); i ? x.lineTo(px, py) : x.moveTo(px, py); }); x.closePath();
-  x.fillStyle = "rgba(76,195,168,.45)"; x.fill(); x.strokeStyle = STORY.accent; x.lineWidth = 6; x.stroke();
-  x.fillStyle = STORY.ink; x.font = `800 40px ${BODY}`; x.textAlign = "center"; x.textBaseline = "middle";
-  pf.axes.forEach((a, i) => { const [px, py] = pt(i, 1.2); x.fillText(a.name, px, py); });
-  x.textAlign = "left"; x.textBaseline = "alphabetic";
-  x.font = `700 46px ${BODY}`;
-  drawIco(x, "trendUp", 104, 1604, 48, STORY.accent); x.fillStyle = STORY.ink; x.fillText(`Punto fuerte: ${pf.strong.name}`, 148, 1620);
-  drawIco(x, "target", 104, 1684, 48, STORY.muted); x.fillStyle = STORY.muted; x.fillText(`A mejorar: ${pf.weak.name}`, 148, 1700);
+  x.fillStyle = STORY.muted; x.font = `800 44px ${BODY}`; x.fillText("MI PERFIL DE ESCALADOR", 80, 380);
+  x.fillStyle = STORY.accent; x.font = `900 150px ${DISPLAY}`; x.fillText(pf.lvl.toLocaleString("es-ES"), 72, 530);
+  const lw = x.measureText(pf.lvl.toLocaleString("es-ES")).width;
+  x.fillStyle = STORY.ink; x.font = `700 44px ${BODY}`; x.fillText("nivel real", 100 + lw, 528);
+  // Dos arañas, una debajo de otra: estilos y agarres
+  const radar = (g, title, top) => {
+    tapeLabel(x, title.toUpperCase(), 80, top, 56);
+    const cx = 540, cy = top + 320, r = 190, N = g.axes.length;
+    const pt = (i, f) => { const a = -Math.PI / 2 + i * 2 * Math.PI / N; return [cx + Math.cos(a) * r * f, cy + Math.sin(a) * r * f]; };
+    x.strokeStyle = "#3A4642"; x.lineWidth = 3;
+    [.25, .5, .75, 1].forEach(f => { x.beginPath(); g.axes.forEach((_, i) => { const [px, py] = pt(i, f); i ? x.lineTo(px, py) : x.moveTo(px, py); }); x.closePath(); x.stroke(); });
+    x.beginPath(); g.axes.forEach((a, i) => { const [px, py] = pt(i, Math.max(.04, a.score / 100)); i ? x.lineTo(px, py) : x.moveTo(px, py); }); x.closePath();
+    x.fillStyle = "rgba(76,195,168,.45)"; x.fill(); x.strokeStyle = STORY.accent; x.lineWidth = 6; x.stroke();
+    x.fillStyle = STORY.ink; x.font = `800 36px ${BODY}`; x.textAlign = "center"; x.textBaseline = "middle";
+    g.axes.forEach((a, i) => { const [px, py] = pt(i, 1.24); x.fillText(a.name, px, py); });
+    x.textAlign = "left"; x.textBaseline = "alphabetic";
+    if (g.strong) { x.fillStyle = STORY.ink; x.font = `700 34px ${BODY}`; x.textAlign = "right"; x.fillText(`Fuerte: ${g.strong.name}`, 1000, top + 30); x.textAlign = "left"; }
+  };
+  radar(pf.styles, "Estilos", 580);
+  radar(pf.grips, "Agarres", 1190);
   showStory(c, "Mi perfil de escalador");
 }

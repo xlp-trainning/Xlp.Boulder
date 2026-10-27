@@ -398,6 +398,10 @@ I18N_RX.unshift(...I18N_RX.map(([rx, f]) => {
   return src === rx.source ? null : [new RegExp(src, rx.flags.includes("u") ? rx.flags : rx.flags + "u"), m => { const r = f(m); return r == null ? r : r.replace(EMOJI_HEAD, ""); }];
 }).filter(Boolean));
 I18N_RX.unshift([/^Apuntarme como «(.+)»$/, m => `Join as “${m[1]}”`]);
+I18N_RX.unshift([/^Fuerte: (.+)$/, m => `Strength: ${tw(m[1])}`]);
+Object.assign(I18N, { "Agarre": "Grip", "Agarres": "Grips", "Cazos": "Jugs", "Volúmenes": "Volumes", "cazos": "jugs", "volúmenes": "volumes", "Estilos": "Styles",
+  "Estilos de escalada": "Climbing styles", "Tipos de agarre": "Grip types",
+  "Cada eje sale de tus mejores encadenados con esa etiqueta. Los ejes sin bloques abiertos no cuentan para el punto débil.": "Each axis comes from your best sends with that tag. Axes with no open problems don't count for your weak spot." });
 Object.assign(I18N, {
   "Pídeles la beta.": "Ask them for the beta.", "Encadenados": "Sent", "abiertos sin encadenar": "open, not sent yet", "encadenados abiertos": "sent, still open", "encadenado abierto": "sent, still open",
   "Aún no has encadenado nada": "You haven't sent anything yet", "Cuando marques un bloque como encadenado o flash, sale de «Abiertos» y lo tienes aquí.": "When you mark a problem as sent or flashed, it leaves “Open” and shows up here.",

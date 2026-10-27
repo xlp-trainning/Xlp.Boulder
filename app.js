@@ -11,7 +11,10 @@ const LEVELS = [
 ];
 const SHORT = { azul: "Azul", verde: "Verde", naranja: "Nar", amarillo: "Ama", morado: "Mor", rojo: "Rojo", negro: "Neg", compe: "Comp" };
 const LV = Object.fromEntries(LEVELS.map(l => [l.k, l]));
-const STYLES = ["Placa","Vertical","Desplome","Techo","Diedro","Arista","Regletas","Romos","Pinzas","Bidedos","Dinámico","Coordinación","Compresión","Talonajes","Equilibrio"];
+// Etiquetas de cada bloque: estilo de escalada (cómo es el bloque) y tipo de agarre (con qué presas)
+const CLIMB_STYLES = ["Placa","Vertical","Desplome","Techo","Diedro","Arista","Dinámico","Coordinación","Compresión","Talonajes","Equilibrio"];
+const GRIPS = ["Regletas","Romos","Pinzas","Bidedos","Cazos","Volúmenes"];
+const STYLES = [...CLIMB_STYLES, ...GRIPS];
 const COLORS = {
   amarillo: { hex: "#F5CE1B", name: "Amarillo" },
   naranja:  { hex: "#F07A1A", name: "Naranja" },
@@ -276,9 +279,9 @@ function renderChips() {
     b.setAttribute("aria-pressed", S.view === b.dataset.view ? "true" : "false");
     if (b.dataset.view === "new") b.textContent = newCount ? `Novedades · ${newCount}` : "Novedades";
   });
-  const sc = $("styleChips"); sc.replaceChildren(el("span", { class: "label", text: "Estilo" }));
-  STYLES.forEach(s => sc.append(el("button", { class: "chip", "aria-pressed": S.styles.has(s) ? "true" : "false",
-    onclick: () => { S.styles.has(s) ? S.styles.delete(s) : S.styles.add(s); render(); } }, s)));
+  const sc = $("styleChips"); sc.replaceChildren();
+  const styleChip = s => el("button", { class: "chip", "aria-pressed": S.styles.has(s) ? "true" : "false", onclick: () => { S.styles.has(s) ? S.styles.delete(s) : S.styles.add(s); render(); } }, s);
+  sc.append(el("span", { class: "label", text: "Estilo" }), ...CLIMB_STYLES.map(styleChip), el("span", { class: "label", text: "Agarre" }), ...GRIPS.map(styleChip));
   const cc = $("colorChips"); cc.replaceChildren();
   if (S.blocks.some(b => b.xlp)) cc.append(el("button", { class: "chip", "aria-pressed": S.xlp ? "true" : "false", onclick: () => { S.xlp = !S.xlp; render(); } },
     xlpBadge(true), "Equipados por Xlp"));
@@ -804,9 +807,10 @@ function openForm(b) {
     ...Object.entries(COLORS).map(([k, c]) => el("button", { type: "button", title: c.name, "aria-label": c.name, "data-l": ABBR[k], "aria-pressed": d.color === k ? "true" : "false", style: `background:${c.hex};--dot-ink:${inkOn(c.hex)}`,
       onclick: () => { d.color = k; drawSw(); } })));
   drawSw();
-  const stc = el("div", { class: "row" });
-  const drawSt = () => stc.replaceChildren(...STYLES.map(s => el("button", { type: "button", class: "chip", "aria-pressed": d.styles.includes(s) ? "true" : "false",
-    onclick: () => { d.styles = d.styles.includes(s) ? d.styles.filter(x => x !== s) : [...d.styles, s]; drawSt(); } }, s)));
+  const stc = el("div", { class: "row" }), grc = el("div", { class: "row" });
+  const tagChip = s => el("button", { type: "button", class: "chip", "aria-pressed": d.styles.includes(s) ? "true" : "false",
+    onclick: () => { d.styles = d.styles.includes(s) ? d.styles.filter(x => x !== s) : [...d.styles, s]; drawSt(); } }, s);
+  const drawSt = () => { stc.replaceChildren(...CLIMB_STYLES.map(tagChip)); grc.replaceChildren(...GRIPS.map(tagChip)); };
   drawSt();
 
   const photoBox = el("div", { class: "photo-edit" });
@@ -885,6 +889,7 @@ function openForm(b) {
       el("label", { class: "field" }, el("span", { class: "label", text: "Sector / muro" }), fSector, sectorList)),
     el("label", { class: "field" }, el("span", { class: "label", text: "Fecha de montaje" }), fDate),
     el("div", { class: "field" }, el("span", { class: "label", text: "Estilo" }), stc),
+    el("div", { class: "field" }, el("span", { class: "label", text: "Agarres" }), grc),
     el("label", { class: "field" }, el("span", { class: "label", text: "Beta" }), fBeta),
     el("label", { class: "field" }, el("span", { class: "label", text: "Vídeo de la beta (opcional)" }), fVideo),
     errBox,
