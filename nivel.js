@@ -121,10 +121,10 @@ function levelSection() {
       el("p", { class: "note", text: `Como un ${lc.name.toLowerCase()} ${lvl >= BASE[lc.k] + 40 ? "alto" : lvl <= BASE[lc.k] - 40 ? "bajo" : "medio"}. Sale de tus 10 mejores encadenados de los últimos 90 días: cuenta el color, lo duro que es cada bloque según la gente y los intentos que te costó.` })),
     pf ? el("section", { class: "section" }, el("span", { class: "label", text: "Tu perfil de escalador" }),
       radarSvg(pf.axes),
-      el("p", { class: "note" }, "💪 Punto fuerte: ", el("strong", { text: pf.strong.name }), " · 🎯 A mejorar: ", el("strong", { text: pf.weak.name })),
-      el("div", { class: "actions" }, el("button", { class: "btn", onclick: () => storyProfile(pf) }, "📸 Compartir mi perfil"))) : null,
+      el("p", { class: "note pf-line" }, el("span", {}, ico("trendUp", "sm"), "Punto fuerte:"), el("strong", { text: pf.strong.name }), el("span", {}, ico("target", "sm"), "A mejorar:"), el("strong", { text: pf.weak.name })),
+      el("div", { class: "actions" }, el("button", { class: "btn", onclick: () => storyProfile(pf) }, ico("camera"), "Compartir mi perfil"))) : null,
     plan ? el("section", { class: "section" }, el("span", { class: "label", text: `Tu plan de la semana · ${plan.axis.toLowerCase()}` }),
-      el("p", { class: "note", text: `Tres bloques de ${plan.axis.toLowerCase()} cerca de tu nivel para mejorar tu punto débil. ${done} de ${plan.blocks.length} hechos${done === plan.blocks.length ? " 🎉" : ""}. Cada lunes, plan nuevo.` }),
+      el("p", { class: "note", text: `Tres bloques de ${plan.axis.toLowerCase()} cerca de tu nivel para mejorar tu punto débil. ${done} de ${plan.blocks.length} hechos${done === plan.blocks.length ? ". ¡Completo!" : ""}. Cada lunes, plan nuevo.` }),
       el("div", { class: "grid" }, plan.blocks.map(card))) : null);
 }
 
@@ -143,6 +143,8 @@ async function storyProfile(pf) {
   x.fillStyle = STORY.ink; x.font = `800 40px ${BODY}`; x.textAlign = "center"; x.textBaseline = "middle";
   pf.axes.forEach((a, i) => { const [px, py] = pt(i, 1.2); x.fillText(a.name, px, py); });
   x.textAlign = "left"; x.textBaseline = "alphabetic";
-  x.font = `700 46px ${BODY}`; x.fillStyle = STORY.ink; x.fillText(`💪 ${pf.strong.name}`, 80, 1620); x.fillStyle = STORY.muted; x.fillText(`🎯 A mejorar: ${pf.weak.name}`, 80, 1700);
+  x.font = `700 46px ${BODY}`;
+  drawIco(x, "trendUp", 104, 1604, 48, STORY.accent); x.fillStyle = STORY.ink; x.fillText(`Punto fuerte: ${pf.strong.name}`, 148, 1620);
+  drawIco(x, "target", 104, 1684, 48, STORY.muted); x.fillStyle = STORY.muted; x.fillText(`A mejorar: ${pf.weak.name}`, 148, 1700);
   showStory(c, "Mi perfil de escalador");
 }

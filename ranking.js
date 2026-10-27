@@ -68,6 +68,8 @@ async function kickClimber(row) {
   toast("Quitado del ranking"); invalidateRanking(); renderRanking();
 }
 
+// Puesto en una clasificación: los tres primeros, en un trozo de cinta oro, plata o bronce
+const rkPos = (i, text) => el("span", { class: "rk-pos" + (i < 3 && text == null ? ` p${i + 1}` : ""), "aria-label": text == null ? `Puesto ${i + 1}` : null, text: text ?? String(i + 1) });
 function leagueBadge(l, big) {
   return el("span", { class: "lg-badge" + (big ? " big" : ""), style: `background:${l.bg};color:${l.fg}` },
     l.solid ? el("span", { class: "lg-badge-in", text: l.name }) : l.name);
@@ -99,7 +101,6 @@ function renderRanking() {
   RK.league ??= lg.l.k;
   const view = LEVELS.find(l => l.k === RK.league) || lg.l;
   const rows = RK.rows.filter(r => r.league === view.k && (r.sends > 0 || RK.month === "cur"));
-  const pos = i => i < 3 ? ["🥇", "🥈", "🥉"][i] : String(i + 1);
 
   // Tu liga y lo que te falta para subir
   const myCard = el("section", { class: "lg-card", style: `--lg:${lg.l.solid ? "#F4F4F2" : lg.l.bg}` },
@@ -148,9 +149,9 @@ function renderRanking() {
       RK.loading && !RK.rows.length ? el("p", { class: "note", text: "Cargando ranking…" })
         : RK.error ? el("p", { class: "note", text: "No se pudo cargar el ranking. Inténtalo de nuevo en un rato." })
         : rows.length ? el("ol", { class: "rk-list" }, rows.map((r, i) => el("li", { class: "rk-row" + (r.is_me ? " me" : "") },
-            el("span", { class: "rk-pos", text: pos(i) }),
+            rkPos(i),
             el("span", { class: "rk-who" }, el("strong", { text: r.nick + (r.is_me ? " (tú)" : "") }),
-              el("span", { class: "note", text: `${r.sends} ${r.sends === 1 ? "bloque" : "bloques"}` + (r.flashes ? ` · ⚡ ${r.flashes}` : "") })),
+              el("span", { class: "note", text: `${r.sends} ${r.sends === 1 ? "bloque" : "bloques"}` + (r.flashes ? ` · ${r.flashes} flash` : "") })),
             el("span", { class: "rk-pts" }, el("strong", { text: String(r.points) }), el("span", { class: "note", text: "puntos" })),
             S.isSetter && !r.is_me ? el("button", { class: "linkbtn rk-kick", "aria-label": `Quitar a ${r.nick}`, onclick: () => kickClimber(r) }, "Quitar") : null)))
         : el("p", { class: "note", text: RK.month === "cur" ? `Nadie ha puntuado todavía en la liga ${view.name} este mes. ¡Estrénala!` : `Nadie puntuó en la liga ${view.name} ese mes.` })),

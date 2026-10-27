@@ -13,7 +13,8 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#18201E">
+<meta name="theme-color" content="#E8EDE9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1513" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -21,34 +22,38 @@
 <meta name="apple-mobile-web-app-title" content="Xlp.Boulder">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
 <link rel="stylesheet" href="styles.css">
 <script>/* tema y letra elegidos en Ajustes, antes de pintar */ try { var t = JSON.parse(localStorage.getItem("lb-theme")); if (t && t !== "auto") document.documentElement.dataset.theme = t; if (JSON.parse(localStorage.getItem("lb-big"))) document.documentElement.classList.add("big-text"); } catch (e) {}</script>
 </head>
 <body>
 <div class="wrap">
   <header class="top">
-    <div class="brand">
-      <div class="label" id="gymName">Rocódromo</div>
+    <div class="top-bar">
       <h1 class="wordmark" aria-label="Xlp.Boulder">
         <svg class="mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="#18201E"/>   <!-- X de dos tiras de cinta de salida, y el punto de Xlp.Boulder -->   <g transform="translate(236 236)">     <rect x="-170" y="-46" width="340" height="92" rx="14" fill="#F5CE1B" transform="rotate(45)"/>     <rect x="-170" y="-46" width="340" height="92" rx="14" fill="#4CC3A8" transform="rotate(-45)"/>     <path d="M-150 -10h300M-150 10h300" stroke="#18201E" stroke-opacity=".18" stroke-width="6" transform="rotate(-45)"/>   </g>   <circle cx="420" cy="420" r="44" fill="#F8FAF9"/></svg>
         <span aria-hidden="true">XLP<span class="wm-dot">.</span>BOULDER</span>
       </h1>
-      <p>Todos los problemas abiertos en la sala, por nivel y estilo. Puntúalos, guarda tus favoritos y mira la beta.</p>
-      <div class="gympick" id="gymPick" role="group" aria-label="Rocódromo" hidden></div>
+      <div class="tools">
+        <button class="icon-btn" id="langBtn" aria-label="Change language to English"><span data-ico="globe"></span><span class="lang-code">EN</span></button>
+        <button class="icon-btn" id="settingsBtn" aria-label="Ajustes: idioma, tema, letra y modo daltónico"><span data-ico="sliders"></span></button>
+      </div>
     </div>
-    <div class="row">
-      <button class="btn small tool-btn" id="langBtn" aria-label="Change language to English">🌐 EN</button>
-      <button class="btn small tool-btn" id="settingsBtn" aria-label="Ajustes: idioma, tema, letra y modo daltónico">⚙️ Ajustes</button>
+    <div class="brand">
+      <div class="label" id="gymName">Rocódromo</div>
+      <p>Todos los problemas abiertos en la sala, por nivel y estilo. Puntúalos, guarda tus favoritos y mira la beta.</p>
+    </div>
+    <div class="top-actions">
+      <div class="gympick" id="gymPick" role="group" aria-label="Rocódromo" hidden></div>
       <span class="status" id="who"></span>
-      <button class="btn" id="sessionBtn" hidden>🧗 Empezar sesión</button>
-      <button class="btn primary" id="addBtn" hidden>+ Nuevo bloque</button>
+      <button class="btn" id="sessionBtn" hidden>Empezar sesión</button>
+      <button class="btn primary" id="addBtn" hidden><span data-ico="plus"></span>Nuevo bloque</button>
     </div>
   </header>
 
   <div class="banner net-banner" id="netBanner" role="status" hidden></div>
   <div class="banner install-banner" id="installBanner" hidden>
-    <span>📲 Instala Xlp.Boulder en tu móvil: icono en la pantalla de inicio y a pantalla completa.</span>
+    <span class="banner-msg"><span data-ico="phone"></span><span>Instala Xlp.Boulder en tu móvil: icono en la pantalla de inicio y a pantalla completa.</span></span>
     <span class="row"><button class="btn primary small" id="installGo">Cómo instalarla</button><button class="linkbtn" id="installNo">Ahora no</button></span>
   </div>
 
@@ -77,13 +82,13 @@
         <div class="tabs" role="group" aria-label="Vista">
           <button data-view="open" aria-pressed="true">Abiertos</button>
           <button data-view="new" aria-pressed="false">Novedades</button>
-          <button data-view="fav" aria-pressed="false">♥ Favoritos</button>
+          <button data-view="fav" aria-pressed="false">Favoritos</button>
           <button data-view="proj" aria-pressed="false">Proyectos</button>
           <button data-view="old" aria-pressed="false">Desmontados</button>
         </div>
       </div>
       <div class="row">
-        <input class="search" id="q" type="search" placeholder="Buscar por nombre, sector o beta…" aria-label="Buscar">
+        <label class="search-wrap"><span data-ico="search"></span><input class="search" id="q" type="search" placeholder="Buscar por nombre, sector o beta…" aria-label="Buscar"></label>
         <select class="sort" id="sort" aria-label="Ordenar">
           <option value="new">Más recientes</option>
           <option value="gradeAsc">Más fáciles primero</option>
@@ -108,8 +113,8 @@
 
   <footer class="foot">
     <span class="foot-brand">Xlp.Boulder · bloques equipados en Natural Patraix y Natural Benimaclet</span>
-    <button class="btn buzon-btn" id="buzonBtn">💬 Buzón de sugerencias</button>
-    <button class="linkbtn" id="installLink">📲 Instalar la app · pasar mi progreso</button>
+    <button class="btn buzon-btn" id="buzonBtn"><span data-ico="message"></span>Buzón de sugerencias</button>
+    <button class="linkbtn" id="installLink">Instalar la app · pasar mi progreso</button>
     <button class="linkbtn" id="loginBtn">Acceso equipador</button>
   </footer>
 </div>
@@ -120,6 +125,7 @@
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script src="i18n.js"></script>
+<script src="icons.js"></script>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="editor.js"></script>

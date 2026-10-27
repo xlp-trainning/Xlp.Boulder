@@ -283,7 +283,13 @@ const I18N_N = {
   "🧗 Tienes una sesión en marcha ({n} min)": "🧗 You have a session going ({n} min)", "🧗 Tienes una sesión en marcha ({n} h {n} min)": "🧗 You have a session going ({n} h {n} min)",
   "{n} amigos han hecho «{x}»; ¿y tú?": "{n} friends have sent “{x}”; what about you?",
 };
+// Textos que antes llevaban un emoji delante y ahora llevan un icono SVG aparte: misma traducción sin el emoji
+const EMOJI_HEAD = /^(?:\p{Extended_Pictographic}|[✓⚡◎♡♥▶✎◇⬆])\uFE0F?\s+/u;
+for (const d of [I18N, I18N_N]) for (const [k, v] of Object.entries(d)) {
+  const k2 = k.replace(EMOJI_HEAD, ""); if (k2 !== k && !(k2 in d)) d[k2] = v.replace(EMOJI_HEAD, "");
+}
 
+I18N_N["{n} más que en {x}"] = "{n} more than in {x}";
 const I18N_NX = Object.entries(I18N_N).filter(([k]) => k.includes("{x}")).map(([k, v]) => [k, v,
   new RegExp("^" + k.replace(/[.*+?^$()[\]\\|]/g, "\\$&").replace(/\{n\}/g, "([+−-]?\\d+(?:[.,]\\d+)*)").replace(/\{x\}/g, "(.+?)") + "$")]);
 
@@ -385,6 +391,20 @@ const I18N_RX = [
   [/^Tu sector: .+$/, m => m[0].replace("Tu sector", "Your sector").replace("Tu día", "Your day").replace(/Los (\S+) son lo tuyo/, (_, d) => `${tw("Los " + d)} are your thing`).replace("El mejor valorado que encadenaste", "Top-rated problem you sent").replace("Constancia", "Consistency").replace(/ bloques\)/g, " problems)").replace(/ semanas/g, " weeks").replace("con algún encadenado", "with a send")],
 ];
 
+// Las mismas expresiones sin el emoji del principio (ahora el icono va aparte)
+// (delante de las demás, como estaban con su emoji, para que no las tape una más general)
+I18N_RX.unshift(...I18N_RX.map(([rx, f]) => {
+  const src = rx.source.replace(/^\^(?:\p{Extended_Pictographic}|[✓⚡◎♡♥▶✎◇⬆])\uFE0F?\s/u, "^");
+  return src === rx.source ? null : [new RegExp(src, rx.flags.includes("u") ? rx.flags : rx.flags + "u"), m => { const r = f(m); return r == null ? r : r.replace(EMOJI_HEAD, ""); }];
+}).filter(Boolean));
+Object.assign(I18N, {
+  "Pídeles la beta.": "Ask them for the beta.", "¡Conseguido!": "Done!", "Creó el grupo": "Created the group", "Primero en encadenarlo": "First to send it",
+  "+1 = un pegue sin encadenar": "+1 = a go without sending", "= encadenado en este pegue (vuelve a tocar para deshacer)": "= sent on this go (tap again to undo)", "= a la primera": "= first go",
+  "semanas de racha": "week streak", "semana de racha": "week streak", "puntos este mes": "points this month", "nivel real": "real level", "Quitar filtros": "Clear filters",
+  "Medalla": "Medal", "Punto fuerte:": "Strength:", "A mejorar:": "To improve:", "ORO": "GOLD", "PLATA": "SILVER", "BRONCE": "BRONZE", "EQUIPADO POR XLP": "SET BY XLP",
+  "Abre un bloque y toca «Guardar» para tenerlo aquí.": "Open a problem and tap “Save” to keep it here.",
+});
+
 // Traductor: frase entera → con números → con nombres → por trozos separados por « · »
 function tr(text) {
   if (LANG === "es" || !text) return text;
@@ -460,7 +480,7 @@ if (LANG === "en") {
 // Botón de idioma
 document.addEventListener("DOMContentLoaded", () => {
   const b = document.getElementById("langBtn"); if (!b) return;
-  b.textContent = LANG === "es" ? "🌐 EN" : "🌐 ES";
+  const code = b.querySelector(".lang-code"); if (code) code.textContent = LANG === "es" ? "EN" : "ES";
   b.setAttribute("aria-label", LANG === "es" ? "Change language to English" : "Cambiar el idioma a español");
   b.setAttribute("translate", "no");
   b.addEventListener("click", () => { try { localStorage.setItem("lb-lang", JSON.stringify(LANG === "es" ? "en" : "es")); } catch (e) {} location.reload(); });

@@ -47,7 +47,7 @@ async function flushOutbox() {
     if (sent) {
       const s = await sb.rpc("block_stats"); if (!s.error) S.stats = toStats(s.data);
       invalidateRanking(); invalidateGroups();
-      toast(`☁️ Subido lo que apuntaste sin conexión (${sent})`);
+      toast(`Subido lo que apuntaste sin conexión (${sent})`);
     }
   } finally {
     OFF.flushing = false;
@@ -63,9 +63,9 @@ function markNet() {
   b.hidden = !off && !n;
   if (b.hidden) return;
   const age = S.offline ? Math.round((Date.now() - S.offline) / 6e4) : null;
-  b.textContent = off
-    ? `📴 Sin conexión${age != null ? ` · datos guardados ${age < 60 ? `hace ${Math.max(1, age)} min` : age < 1440 ? `hace ${Math.round(age / 60)} h` : `hace ${Math.round(age / 1440)} días`}` : ""}. Lo que apuntes se guarda en el móvil${n ? ` (${n} pendiente${n === 1 ? "" : "s"})` : ""} y se sube solo al volver la conexión.`
-    : `☁️ Subiendo ${n} ${n === 1 ? "cambio" : "cambios"} que apuntaste sin conexión…`;
+  b.replaceChildren(ico(off ? "offline" : "cloud"), el("span", { text: off
+    ? `Sin conexión${age != null ? ` · datos guardados ${age < 60 ? `hace ${Math.max(1, age)} min` : age < 1440 ? `hace ${Math.round(age / 60)} h` : `hace ${Math.round(age / 1440)} días`}` : ""}. Lo que apuntes se guarda en el móvil${n ? ` (${n} pendiente${n === 1 ? "" : "s"})` : ""} y se sube solo al volver la conexión.`
+    : `Subiendo ${n} ${n === 1 ? "cambio" : "cambios"} que apuntaste sin conexión…` }));
 }
 addEventListener("online", () => { S.offline = false; markNet(); if (sb) refresh(); });
 addEventListener("offline", markNet);

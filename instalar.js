@@ -58,7 +58,7 @@ function openInstall() {
   openId = null;
   sheet(head("Instala la app", true),
     el("p", { class: "intro-txt", text: "Xlp.Boulder se instala desde el navegador, sin tienda de apps: tendrás el icono en tu pantalla de inicio y se abre a pantalla completa, como una app más." }),
-    INST.evt ? el("button", { class: "btn primary big", onclick: async () => { INST.evt.prompt(); const r = await INST.evt.userChoice; if (r.outcome === "accepted") closeSheet(); } }, "📲 Instalar ahora") : null,
+    INST.evt ? el("button", { class: "btn primary big", onclick: async () => { INST.evt.prompt(); const r = await INST.evt.userChoice; if (r.outcome === "accepted") closeSheet(); } }, ico("download"), "Instalar ahora") : null,
     inAppBrowser() ? el("div", { class: "banner", text: "Estás dentro de Instagram (u otra app): desde aquí no se puede instalar. Primero ábrela en el navegador, como dice el paso 1." }) : null,
     box,
     transferSection(),
@@ -78,7 +78,7 @@ function transferSection() {
       const code = "XLP-" + S.session.refresh_token;
       try { await navigator.clipboard.writeText(code); toast("Código copiado. Pégalo en la app la primera vez que la abras"); }
       catch (e) { prompt("Copia este código:", code); }
-    } }, "📋 Copiar mi código") : el("p", { class: "note", text: anon ? "Aquí aún no tienes nada guardado." : "" }),
+    } }, ico("copy"), "Copiar mi código") : el("p", { class: "note", text: anon ? "Aquí aún no tienes nada guardado." : "" }),
     el("form", { class: "row", onsubmit: async e => {
       e.preventDefault();
       const code = input.value.trim().replace(/^XLP-/i, "");

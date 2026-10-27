@@ -3,7 +3,8 @@
 // Usa el estado y las utilidades de app.js.
 
 const BZ = { list: [], filter: "inbox", fresh: new Set() };
-const BZ_KINDS = { idea: "💡 Idea", bloques: "🧗 Bloques", fallo: "🐞 Algo falla", otro: "💬 Otro" };
+const BZ_KINDS = { idea: "Idea", bloques: "Bloques", fallo: "Algo falla", otro: "Otro" };
+const BZ_ICONS = { idea: "bulb", bloques: "mountain", fallo: "bug", otro: "message" };
 const fmtWhen = d => new Date(d).toLocaleDateString("es-ES", { day: "numeric", month: "short" });
 
 async function loadSuggestions() {
@@ -30,7 +31,7 @@ function openBuzon() {
   const contact = el("input", { id: "bz-contact", maxlength: "100", placeholder: "Opcional", value: store.get("lb-bz-contact", "") });
   const kinds = el("div", { class: "row", role: "group", "aria-label": "Tipo de mensaje" });
   const drawKinds = () => kinds.replaceChildren(...Object.entries(BZ_KINDS).map(([k, t]) =>
-    el("button", { type: "button", class: "chip", "aria-pressed": kind === k ? "true" : "false", onclick: () => { kind = k; drawKinds(); } }, t)));
+    el("button", { type: "button", class: "chip", "aria-pressed": kind === k ? "true" : "false", onclick: () => { kind = k; drawKinds(); } }, ico(BZ_ICONS[k], "sm"), t)));
   drawKinds();
   const send = el("button", { class: "btn primary", type: "submit" }, "Enviar");
   const form = el("form", { class: "f", onsubmit: async e => {
@@ -94,7 +95,7 @@ function renderBuzon() {
       [["inbox", "Bandeja", BZ.list.filter(m => !archived(m)).length], ["archive", "Archivados", BZ.list.filter(archived).length]].map(([k, t, n]) =>
         el("button", { "aria-pressed": BZ.filter === k ? "true" : "false", onclick: () => { BZ.filter = k; renderBuzon(); } }, `${t} · ${n}`))),
     list.length ? el("div", { class: "bz-list" }, list.map(item))
-      : el("p", { class: "note", text: BZ.list.length ? "Nada por aquí." : "Todavía no ha llegado ningún mensaje. La gente escribe desde «💬 Buzón de sugerencias», al pie de la página." }),
+      : el("p", { class: "note", text: BZ.list.length ? "Nada por aquí." : "Todavía no ha llegado ningún mensaje. La gente escribe desde «Buzón de sugerencias», al pie de la página." }),
     el("p", { class: "note", text: "Nadie sabe si has leído, archivado o borrado su mensaje: el buzón no tiene respuesta ni confirmación de lectura." }));
   // Lo que se ve deja de contar como nuevo (solo para ti; se sigue resaltando mientras estés en la pestaña)
   const unseen = BZ.list.filter(m => m.status === "nuevo");

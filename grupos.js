@@ -49,25 +49,25 @@ async function groupNews() {
   const msgs = []; let count = 0; const pending = [], latest = [];
   for (const g of G.groups.slice(0, 4)) {
     const [feed, du, rk] = await Promise.all([sb.rpc("group_feed", { p_group: g.id, p_limit: 40 }), sb.rpc("group_duels", { p_group: g.id }), sb.rpc("group_ranking", { p_group: g.id, p_period: "month" })]);
-    (du.data || []).filter(d => d.i_am_rival && d.status === "pending").forEach(d => { count++; pending.push({ g, d }); msgs.push([1, `⚔️ ${d.challenger_nick} te ha retado a un duelo en «${g.name}»`]); });
+    (du.data || []).filter(d => d.i_am_rival && d.status === "pending").forEach(d => { count++; pending.push({ g, d }); msgs.push([1, `${d.challenger_nick} te ha retado a un duelo en «${g.name}»`]); });
     (feed.data || []).filter(f => !f.is_me && !latest.some(x => x.user_id === f.user_id && x.block_id === f.block_id)).slice(0, 4).forEach(f => latest.push(f));
     const fresh = (feed.data || []).filter(f => !f.is_me && f.sent_at > seen);
     count += fresh.length;
     const byBlock = {};
     fresh.forEach(f => { if (f.active && !S.mine[f.block_id]?.sent) (byBlock[f.block_id] ||= []).push(f); });
     const top = Object.values(byBlock).sort((a, b) => b.length - a.length)[0];
-    if (top?.length >= 2) msgs.push([3, `🔥 ${top.length} amigos han hecho «${top[0].block_name || "un bloque " + top[0].level}»; ¿y tú?`]);
+    if (top?.length >= 2) msgs.push([3, `${top.length} amigos han hecho «${top[0].block_name || "un bloque " + top[0].level}»; ¿y tú?`]);
     else if (fresh[0]) msgs.push([4, `${fresh[0].nick} encadenó «${fresh[0].block_name || "un bloque " + fresh[0].level}» (${LV[fresh[0].level]?.name.toLowerCase() || ""})`]);
     const rows = rk.data || [], i = rows.findIndex(r => r.is_me);
     if (i >= 0) {
       const above = rows.slice(0, i).map(r => r.nick), before = pos[g.id];
       const passed = before ? above.filter(n => !before.above.includes(n)) : [];
-      if (passed.length && before.pos < i + 1) msgs.push([2, `📉 ${passed[0]} te ha adelantado en «${g.name}»`]);
+      if (passed.length && before.pos < i + 1) msgs.push([2, `${passed[0]} te ha adelantado en «${g.name}»`]);
       pos[g.id] = { pos: i + 1, above };
     }
   }
   store.set(posKey, pos);
-  G.active.filter(s => !s.am_in).forEach(s => msgs.push([2, `🧗 ${s.starter} ha empezado una sesión en grupo en «${s.group_name}»`]));
+  G.active.filter(s => !s.am_in).forEach(s => msgs.push([2, `${s.starter} ha empezado una sesión en grupo en «${s.group_name}»`]));
   G.news = count; G.pending = pending; G.latest = latest.sort((a, b) => b.sent_at.localeCompare(a.sent_at));
   if (S.page === "hoy") renderHoy();
   markGroups();
@@ -137,12 +137,12 @@ async function createDuel(g, rival, kind, block) {
   if (kind === "block" && !block) return toast("Elige el bloque");
   const { error } = await sb.from("duels").insert({ group_id: g.id, challenger: S.session.user.id, rival, kind, block_id: kind === "block" ? block : null });
   if (error) return toast("No se pudo crear el duelo");
-  G.form = null; toast("⚔️ Reto enviado"); loadGroupData();
+  G.form = null; toast("Reto enviado"); loadGroupData();
 }
 async function respondDuel(d, accept) {
   const { error } = await sb.rpc("respond_duel", { p_duel: d.id, p_accept: accept });
   if (error) return toast("No se pudo");
-  toast(accept ? "⚔️ ¡Duelo aceptado!" : "Duelo rechazado"); G.news = Math.max(0, G.news - 1); markGroups(); loadGroupData();
+  toast(accept ? "¡Duelo aceptado!" : "Duelo rechazado"); G.news = Math.max(0, G.news - 1); markGroups(); loadGroupData();
 }
 async function dropDuel(d) {
   const { error } = await sb.from("duels").delete().eq("id", d.id);
@@ -154,7 +154,7 @@ async function createChallenge(g, f) {
   const ends = new Date(Date.now() + Number(f.days) * 864e5).toISOString();
   const { error } = await sb.from("group_challenges").insert({ group_id: g.id, created_by: S.session.user.id, metric: f.metric, target, level: f.level || null, style: f.style || null, ends_at: ends });
   if (error) return toast("No se pudo crear el reto");
-  G.form = null; toast("🎯 Reto creado"); loadGroupData();
+  G.form = null; toast("Reto creado"); loadGroupData();
 }
 async function dropChallenge(c) {
   if (!confirm("¿Borrar este reto?")) return;
@@ -168,7 +168,7 @@ async function startGroupSession(g) {
   if (error) return toast("No se pudo empezar la sesión");
   await sb.from("group_session_members").insert({ session_id: data.id, user_id: S.session.user.id });
   sesSet(null); startSession(); const s = sesGet(); sesSet({ ...s, group: { id: data.id, name: g.name, mine: true } });
-  toast(`🧗 Sesión en grupo con «${g.name}»: avisa a tu gente`); G.active = (await sb.rpc("group_active_sessions")).data || []; render();
+  toast(`Sesión en grupo con «${g.name}»: avisa a tu gente`); G.active = (await sb.rpc("group_active_sessions")).data || []; render();
 }
 async function joinGroupSession(a) {
   const { error } = await sb.from("group_session_members").insert({ session_id: a.id, user_id: S.session.user.id });
@@ -186,12 +186,12 @@ async function groupSessionEnd(gs, box) {
   if (!rows.length) return;
   const tot = rows.reduce((a, r) => ({ sends: a.sends + r.sends, flashes: a.flashes + r.flashes, points: a.points + r.points }), { sends: 0, flashes: 0, points: 0 });
   box.replaceChildren(el("span", { class: "label", text: `Sesión en grupo · ${gs.name}` }),
-    el("p", { class: "ses-group-tot", text: `Entre ${rows.length}: ${tot.sends} ${tot.sends === 1 ? "bloque" : "bloques"} · ${tot.flashes} ⚡ · +${tot.points} puntos` }),
+    el("p", { class: "ses-group-tot", text: `Entre ${rows.length}: ${tot.sends} ${tot.sends === 1 ? "bloque" : "bloques"} · ${tot.flashes} flash · +${tot.points} puntos` }),
     el("ol", { class: "rk-list" }, rows.map((r, i) => el("li", { class: "rk-row" + (r.is_me ? " me" : "") },
-      el("span", { class: "rk-pos", text: ["🥇", "🥈", "🥉"][i] || String(i + 1) }),
-      el("span", { class: "rk-who" }, el("strong", { text: r.nick }), el("span", { class: "note", text: `${r.sends} ${r.sends === 1 ? "bloque" : "bloques"}${r.flashes ? ` · ⚡ ${r.flashes}` : ""}${r.best_level ? ` · máx. ${LV[r.best_level].name.toLowerCase()}` : ""}` })),
+      rkPos(i),
+      el("span", { class: "rk-who" }, el("strong", { text: r.nick }), el("span", { class: "note", text: `${r.sends} ${r.sends === 1 ? "bloque" : "bloques"}${r.flashes ? ` · ${r.flashes} flash` : ""}${r.best_level ? ` · máx. ${LV[r.best_level].name.toLowerCase()}` : ""}` })),
       el("span", { class: "rk-pts" }, el("strong", { text: String(r.points) }), el("span", { class: "note", text: "puntos" }))))),
-    el("button", { class: "btn", onclick: () => storyGroupSession(gs.name, rows, tot) }, "📸 Compartir la sesión del grupo"));
+    el("button", { class: "btn", onclick: () => storyGroupSession(gs.name, rows, tot) }, ico("camera"), "Compartir la sesión del grupo"));
   G.active = (await sb.rpc("group_active_sessions")).data || []; markGroups();
 }
 async function storyGroupSession(name, rows, tot) {
@@ -223,11 +223,11 @@ function friendsBox(b) {
     const mine = S.mine[b.id] || {};
     box.replaceChildren(...[el("span", { class: "label", text: "Tus amigos" }),
       rows.length ? null : el("p", { class: "note", text: "Nadie de tus grupos lo ha probado todavía. ¡Estrénalo!" }),
-      sent.length ? el("p", { class: "friends-line" }, "✓ Encadenado: ", ...sent.flatMap((r, i) => [i ? ", " : "", el("strong", { text: r.nick }),
-        r.flash ? " ⚡" : r.attempts > 1 ? ` (al ${r.attempts}.º)` : ""])) : null,
-      trying.length ? el("p", { class: "friends-line" }, "◎ Probando: ", ...trying.flatMap((r, i) => [i ? ", " : "", el("strong", { text: r.nick }), r.attempts ? ` (${r.attempts} int.)` : ""])) : null,
+      sent.length ? el("p", { class: "friends-line" }, ico("check", "sm"), " Encadenado: ", ...sent.flatMap((r, i) => [i ? ", " : "", el("strong", { text: r.nick }),
+        r.flash ? " (flash)" : r.attempts > 1 ? ` (al ${r.attempts}.º)` : ""])) : null,
+      trying.length ? el("p", { class: "friends-line" }, ico("target", "sm"), " Probando: ", ...trying.flatMap((r, i) => [i ? ", " : "", el("strong", { text: r.nick }), r.attempts ? ` (${r.attempts} int.)` : ""])) : null,
       trying.length && !mine.sent && (mine.project || mine.attempts) ? el("p", { class: "note", text: `Proyecto compartido: ${trying.map(r => r.nick).join(", ")} y tú. ¿Quién lo saca antes?` }) : null,
-      sent.length && !mine.sent ? el("p", { class: "note", text: "Pídeles la beta 😉" }) : null].filter(Boolean));
+      sent.length && !mine.sent ? el("p", { class: "note", text: "Pídeles la beta." }) : null].filter(Boolean));
   });
   return box;
 }
@@ -275,11 +275,11 @@ function renderGrupos() {
   const head_ = el("section", { class: "g-head" },
     el("div", {}, el("h2", { class: "g-name", text: g.name }), el("span", { class: "note", text: `${g.members} ${g.members === 1 ? "miembro" : "miembros"} · código ${g.code}` })),
     el("div", { class: "row" },
-      el("button", { class: "btn small", onclick: () => shareInvite(g) }, "➕ Invitar"),
-      act ? (act.am_in ? el("button", { class: "btn small primary", onclick: () => { SES.open = true; render(); } }, "🧗 Volver a la sesión")
-            : el("button", { class: "btn small primary", onclick: () => joinGroupSession(act) }, "🧗 Unirme a la sesión"))
-        : el("button", { class: "btn small primary", onclick: () => startGroupSession(g) }, "🧗 Sesión en grupo")));
-  const actBox = act ? el("div", { class: "banner" }, `🧗 Sesión en grupo en marcha: ${act.members.join(", ")} (desde ${ago(act.started_at).replace("hace ", "hace ")}).`) : null;
+      el("button", { class: "btn small", onclick: () => shareInvite(g) }, ico("plus", "sm"), "Invitar"),
+      act ? (act.am_in ? el("button", { class: "btn small primary", onclick: () => { SES.open = true; render(); } }, ico("play", "sm"), "Volver a la sesión")
+            : el("button", { class: "btn small primary", onclick: () => joinGroupSession(act) }, ico("play", "sm"), "Unirme a la sesión"))
+        : el("button", { class: "btn small primary", onclick: () => startGroupSession(g) }, ico("play", "sm"), "Sesión en grupo")));
+  const actBox = act ? el("div", { class: "banner" }, `Sesión en grupo en marcha: ${act.members.join(", ")} (desde ${ago(act.started_at).replace("hace ", "hace ")}).`) : null;
   const tabs = el("div", { class: "tabs", role: "group", "aria-label": "Sección del grupo" },
     [["ranking", "Ranking"], ["actividad", "Actividad"], ["retos", "Retos"], ["gente", "Gente"]].map(([k, t]) =>
       el("button", { "aria-pressed": G.tab === k ? "true" : "false", onclick: () => { G.tab = k; store.set("lb-group-tab", k); renderGrupos(); } }, t)));
@@ -298,8 +298,8 @@ function groupRankingView(g) {
     el("div", { class: "tabs", role: "group", "aria-label": "Periodo" }, [["week", "Semana"], ["month", "Mes"], ["all", "Siempre"]].map(([k, t]) =>
       el("button", { "aria-pressed": G.period === k ? "true" : "false", onclick: () => { G.period = k; renderGrupos(); } }, t))),
     el("ol", { class: "rk-list" }, rows.map((r, i) => el("li", { class: "rk-row" + (r.is_me ? " me" : "") },
-      el("span", { class: "rk-pos", text: r.points ? (["🥇", "🥈", "🥉"][i] || String(i + 1)) : "–" }),
-      el("span", { class: "rk-who" }, el("strong", { text: r.nick + (r.is_me ? " (tú)" : "") }), el("span", { class: "note", text: `${r.sends} ${r.sends === 1 ? "bloque" : "bloques"}${r.flashes ? ` · ⚡ ${r.flashes}` : ""}` })),
+      rkPos(i, r.points ? null : "–"),
+      el("span", { class: "rk-who" }, el("strong", { text: r.nick + (r.is_me ? " (tú)" : "") }), el("span", { class: "note", text: `${r.sends} ${r.sends === 1 ? "bloque" : "bloques"}${r.flashes ? ` · ${r.flashes} flash` : ""}` })),
       el("span", { class: "rk-pts" }, el("strong", { text: String(r.points) }), el("span", { class: "note", text: "puntos" }))))),
     el("p", { class: "note", text: "Todos contra todos, sin ligas: cuentan los puntos de los dos rocódromos (azul 1 … compe 8; el flash suma la mitad más)." }));
 }
@@ -316,7 +316,7 @@ function groupFeedView() {
   return el("section", { class: "section" },
     projects.length ? el("div", { class: "section" }, el("span", { class: "label", text: "Proyectos compartidos" }),
       el("div", { class: "bz-list" }, projects.map(p => el("article", { class: "bz-item g-proj" }, blockLink(p),
-        el("span", { class: "note", text: `◎ Probando: ${p.trying.join(", ")}` + (p.sent.length ? ` · ✓ Ya lo sacó: ${p.sent.join(", ")}` : " · ¿Quién lo saca primero?") }))))) : null,
+        el("span", { class: "note", text: `Probando: ${p.trying.join(", ")}` + (p.sent.length ? ` · Ya lo sacó: ${p.sent.join(", ")}` : " · ¿Quién lo saca primero?") }))))) : null,
     el("span", { class: "label", text: "Lo último" }),
     feed.length ? el("ul", { class: "g-feed" }, feed.map(f => el("li", { class: "g-item" },
       el("p", {}, el("strong", { text: f.is_me ? "Tú" : f.nick }), f.flash ? " hizo flash a " : " encadenó ", blockLink(f),
@@ -332,7 +332,7 @@ function duelText(d) {
   if (d.kind === "week") {
     const over = Date.now() > new Date(d.ends_at);
     const lead = d.c_points === d.r_points ? "empate" : d.c_points > d.r_points ? c : r;
-    return `${c} ${d.c_points} – ${d.r_points} ${r} · ` + (over ? (lead === "empate" ? "terminó en empate" : `🏆 ganó ${lead}`) : `quedan ${daysLeft(d.ends_at)} días`);
+    return `${c} ${d.c_points} – ${d.r_points} ${r} · ` + (over ? (lead === "empate" ? "terminó en empate" : `ganó ${lead}`) : `quedan ${daysLeft(d.ends_at)} días`);
   }
   const cs = d.c_sent && new Date(d.c_sent), rs = d.r_sent && new Date(d.r_sent);
   if (!cs && !rs) return `${c} vs ${r} · nadie lo ha encadenado aún`;
@@ -350,7 +350,7 @@ function groupChallengesView(g) {
       open.sort((a, b) => gIdx(a.level) - gIdx(b.level)).map(b => el("option", { value: b.id, text: `${lvName(b)} · ${title(b)}${b.sector ? " · " + b.sector : ""}` })));
     kind.onchange = () => block.hidden = kind.value !== "block";
     form = el("form", { class: "g-form col", onsubmit: e => { e.preventDefault(); createDuel(g, rival.value, kind.value, block.value); } },
-      rival, kind, block, el("div", { class: "row" }, el("button", { class: "btn primary", type: "submit" }, "⚔️ Retar"), el("button", { class: "btn", type: "button", onclick: () => { G.form = null; renderGrupos(); } }, "Cancelar")));
+      rival, kind, block, el("div", { class: "row" }, el("button", { class: "btn primary", type: "submit" }, ico("swords"), "Retar"), el("button", { class: "btn", type: "button", onclick: () => { G.form = null; renderGrupos(); } }, "Cancelar")));
   } else if (G.form === "challenge") {
     const f = { metric: "sends", target: "10", days: "7", level: "", style: "" };
     const sel = (k, opts, label) => { const s = el("select", { "aria-label": label, onchange: e => f[k] = e.target.value }, opts.map(([v, t]) => el("option", { value: v, text: t }))); s.value = f[k]; return s; };
@@ -360,27 +360,27 @@ function groupChallengesView(g) {
       el("div", { class: "row" }, sel("level", [["", "de cualquier color"], ...LEVELS.map(l => [l.k, `solo ${l.name.toLowerCase()}`])], "Color"),
         sel("style", [["", "de cualquier estilo"], ...STYLES.map(s => [s, `solo ${s.toLowerCase()}`])], "Estilo")),
       el("div", { class: "row" }, el("span", { text: "en" }), sel("days", [["7", "1 semana"], ["14", "2 semanas"], ["30", "1 mes"]], "Duración")),
-      el("div", { class: "row" }, el("button", { class: "btn primary", type: "submit" }, "🎯 Crear reto"), el("button", { class: "btn", type: "button", onclick: () => { G.form = null; renderGrupos(); } }, "Cancelar")));
+      el("div", { class: "row" }, el("button", { class: "btn primary", type: "submit" }, ico("target"), "Crear reto"), el("button", { class: "btn", type: "button", onclick: () => { G.form = null; renderGrupos(); } }, "Cancelar")));
   }
   const chText = c => `${c.target} ${METRICS[c.metric][c.target === 1 ? 1 : 0]}` + (c.level ? ` de ${LV[c.level].name.toLowerCase()}` : "") + (c.style ? ` de ${c.style.toLowerCase()}` : "");
   return el("section", { class: "section" },
     el("div", { class: "row" },
-      el("button", { class: "btn small", onclick: () => { G.form = "challenge"; renderGrupos(); } }, "🎯 Nuevo reto del grupo"),
-      others.length ? el("button", { class: "btn small", onclick: () => { G.form = "duel"; renderGrupos(); } }, "⚔️ Retar a alguien") : null),
+      el("button", { class: "btn small", onclick: () => { G.form = "challenge"; renderGrupos(); } }, ico("target", "sm"), "Nuevo reto del grupo"),
+      others.length ? el("button", { class: "btn small", onclick: () => { G.form = "duel"; renderGrupos(); } }, ico("swords", "sm"), "Retar a alguien") : null),
     form,
     el("span", { class: "label", text: "Retos del grupo" }),
     challenges.length ? el("div", { class: "bz-list" }, challenges.map(c => {
       const done = c.progress >= c.target, over = Date.now() > new Date(c.ends_at);
       return el("article", { class: "bz-item" },
-        el("div", { class: "bz-meta" }, el("strong", { text: `🎯 ${chText(c)}` }),
-          el("span", { text: done ? "¡Conseguido! 🎉" : over ? "Terminado" : `quedan ${daysLeft(c.ends_at)} días` })),
+        el("div", { class: "bz-meta" }, el("strong", {}, ico("target", "sm"), chText(c)),
+          el("span", { text: done ? "¡Conseguido!" : over ? "Terminado" : `quedan ${daysLeft(c.ends_at)} días` })),
         el("span", { class: "medal-bar lg-bar" }, el("span", { style: `width:${Math.min(100, c.progress / c.target * 100)}%` })),
         el("span", { class: "note", text: `${c.progress} de ${c.target} entre todos · tú: ${c.mine} · propuesto por ${c.creator}` }),
         c.creator === G.me?.nick || g.is_owner ? el("button", { class: "linkbtn rk-kick", onclick: () => dropChallenge(c) }, "Borrar reto") : null);
     })) : el("p", { class: "note", text: "Sin retos. Proponed uno: «Entre todos, 50 bloques este mes»." }),
     el("span", { class: "label", text: "Duelos" }),
     duels.length ? el("div", { class: "bz-list" }, duels.map(d => el("article", { class: "bz-item" },
-      el("div", { class: "bz-meta" }, el("strong", { text: d.kind === "week" ? "⚔️ Semana de puntos" : "⚔️ Duelo de bloque" }),
+      el("div", { class: "bz-meta" }, el("strong", {}, ico("swords", "sm"), d.kind === "week" ? "Semana de puntos" : "Duelo de bloque"),
         el("span", { text: d.status === "pending" ? "pendiente" : d.accepted_at ? `desde ${fmtDate(d.accepted_at)}` : "" })),
       d.kind === "block" ? blockLink(d) : null,
       el("p", { class: "bz-body", text: duelText(d) }),
@@ -392,11 +392,11 @@ function groupChallengesView(g) {
 function groupPeopleView(g) {
   return el("section", { class: "section" },
     el("ul", { class: "rk-list" }, G.data.people.map(p => el("li", { class: "rk-row g-person" + (p.is_me ? " me" : "") },
-      el("span", { class: "rk-pos", text: p.is_owner ? "👑" : "🧗" }),
+      el("span", { class: "rk-pos", "aria-label": p.is_owner ? "Creó el grupo" : null }, p.is_owner ? ico("crown") : (p.nick[0] || "·").toUpperCase()),
       el("span", { class: "rk-who" }, el("strong", { text: p.nick + (p.is_me ? " (tú)" : "") }), el("span", { class: "note", text: p.is_owner ? "creó el grupo" : "" })),
       g.is_owner && !p.is_me ? el("button", { class: "linkbtn rk-kick", onclick: () => kickMember(g, p) }, "Sacar") : el("span")))),
     el("div", { class: "row" },
-      el("button", { class: "btn small", onclick: () => shareInvite(g) }, "➕ Invitar"),
+      el("button", { class: "btn small", onclick: () => shareInvite(g) }, ico("plus", "sm"), "Invitar"),
       el("button", { class: "btn small danger", onclick: () => leaveGroup(g) }, g.is_owner ? "Borrar el grupo" : "Salir del grupo")));
 }
 
@@ -410,6 +410,6 @@ async function wrappedGroup(back) {
   const top = (k) => [...best.rows].sort((a, b) => b[k] - a[k])[0];
   const me = best.rows.findIndex(r => r.is_me);
   return { name: best.g.name, size: best.rows.length, pos: me + 1,
-    awards: [["🏆", "Más puntos", top("points"), "points", "puntos", "punto"], ["📅", "Más constante", top("weeks"), "weeks", "semanas", "semana"], ["⚡", "Más flashes", top("flashes"), "flashes", "flashes", "flash"], ["💪", "Más insistente", top("attempts"), "attempts", "intentos", "intento"]]
+    awards: [["trophy", "Más puntos", top("points"), "points", "puntos", "punto"], ["calendar", "Más constante", top("weeks"), "weeks", "semanas", "semana"], ["zap", "Más flashes", top("flashes"), "flashes", "flashes", "flash"], ["dumbbell", "Más insistente", top("attempts"), "attempts", "intentos", "intento"]]
       .filter(([, , r, k]) => r && r[k] > 0).map(([i, t, r, k, u, u1]) => ({ icon: i, title: t, nick: r.nick, value: `${r[k]} ${r[k] === 1 ? u1 : u}`, me: r.is_me })) };
 }

@@ -4,8 +4,11 @@
 
 /* ---------- Hoy ---------- */
 function greeting() { const h = new Date().getHours(); return h < 6 ? "Buenas noches" : h < 14 ? "Buenos días" : h < 21 ? "Buenas tardes" : "Buenas noches"; }
-const todayHead = (label, more, go) => el("div", { class: "today-head" }, el("span", { class: "label", text: label }), more ? el("button", { class: "linkbtn", onclick: go }, more) : null);
-const alertBtn = (text, go, cta) => el("button", { class: "today-alert", onclick: go }, el("span", { text }), el("span", { class: "go", text: cta || "Ver →" }));
+const todayHead = (label, more, go) => el("div", { class: "today-head" }, el("span", { class: "label", text: label }), more ? el("button", { class: "linkbtn", onclick: go }, more, ico("chevron")) : null);
+const alertBtn = (icon, text, go, cta) => el("button", { class: "today-alert", onclick: go }, el("span", {}, ico(icon), el("span", { text })), el("span", { class: "go" }, cta || "Ver", ico("chevron", "sm")));
+// Un número del marcador de «Hoy»
+const scoreChip = (n, label, icon, cls) => el("button", { class: "today-chip" + (cls ? " " + cls : ""), onclick: () => setPage("progreso") },
+  el("b", {}, icon ? ico(icon) : null, String(n)), el("small", { text: label }));
 
 function renderHoy() {
   const root = $("page-hoy");
@@ -18,32 +21,33 @@ function renderHoy() {
 
   // Avisos: lo que conviene hacer ya
   const alerts = [
-    ses ? alertBtn(`🧗 Tienes una sesión en marcha (${fmtMins(sesSummary(ses).mins)})`, () => { SES.open = true; render(); }, "Abrir →") : null,
-    ...G.active.filter(a => !a.am_in).map(a => alertBtn(`🧗 ${a.starter} ha empezado una sesión en grupo en «${a.group_name}»`, () => joinGroupSession(a), "Unirme →")),
-    ...(G.pending || []).map(({ g, d }) => alertBtn(`⚔️ ${d.challenger_nick} te ha retado a un duelo en «${g.name}»`, () => { G.sel = g.id; G.tab = "retos"; setPage("grupos"); })),
-    wrappedPending() ? alertBtn(`🎁 Tu resumen de ${monthName(monthStart(1))} está listo`, () => openWrapped(1)) : null,
-    st.cur > 0 && !st.thisWeek ? alertBtn(`🔥 Encadena algo esta semana para no perder tu racha de ${st.cur} ${st.cur === 1 ? "semana" : "semanas"}.`, () => startSession(), "Empezar →") : null,
+    ses ? alertBtn("timer", `Tienes una sesión en marcha (${fmtMins(sesSummary(ses).mins)})`, () => { SES.open = true; render(); }, "Abrir") : null,
+    ...G.active.filter(a => !a.am_in).map(a => alertBtn("users", `${a.starter} ha empezado una sesión en grupo en «${a.group_name}»`, () => joinGroupSession(a), "Unirme")),
+    ...(G.pending || []).map(({ g, d }) => alertBtn("swords", `${d.challenger_nick} te ha retado a un duelo en «${g.name}»`, () => { G.sel = g.id; G.tab = "retos"; setPage("grupos"); })),
+    wrappedPending() ? alertBtn("gift", `Tu resumen de ${monthName(monthStart(1))} está listo`, () => openWrapped(1)) : null,
+    st.cur > 0 && !st.thisWeek ? alertBtn("flame", `Encadena algo esta semana para no perder tu racha de ${st.cur} ${st.cur === 1 ? "semana" : "semanas"}.`, () => startSession(), "Empezar") : null,
   ].filter(Boolean);
 
   root.replaceChildren(el("div", { class: "today" }, ...[
-    el("section", { class: "section" },
+    // El bloque héroe: un trozo de muro con el saludo, tu marcador y la acción principal
+    el("section", { class: "today-hero is-wall" },
+      el("span", { class: "today-kick", text: currentGym()?.name || "Xlp.Boulder" }),
       el("h2", { class: "today-hi", text: nick ? `${greeting()}, ${nick}` : greeting() }),
-      el("div", { class: "today-chips" },
-        el("button", { class: "today-chip", onclick: () => setPage("progreso") }, st.cur ? `🔥 ${st.cur} ${st.cur === 1 ? "semana" : "semanas"}` : "🔥 Sin racha"),
-        el("button", { class: "today-chip", onclick: () => setPage("progreso") }, `${c.monthPoints} puntos este mes`),
-        lvl != null ? el("button", { class: "today-chip", onclick: () => setPage("progreso") }, `Nivel ${lvl.toLocaleString("es-ES")}`) : null,
-        el("button", { class: "today-chip", onclick: () => setPage("progreso") }, `${c.sends.length} encadenados`))),
+      el("div", { class: "today-score" },
+        scoreChip(st.cur, st.cur === 1 ? "semana de racha" : "semanas de racha", "flame", "streak"),
+        scoreChip(c.monthPoints, "puntos este mes"),
+        scoreChip(c.sends.length, "encadenados"),
+        lvl != null ? scoreChip(lvl.toLocaleString("es-ES"), "nivel real") : null),
+      el("div", { class: "actions" },
+        el("button", { class: "btn primary", onclick: () => startSession() }, ico("play"), ses ? "Volver a la sesión" : "Empezar sesión"),
+        el("button", { class: "btn", onclick: () => setPage("mapa") }, ico("map"), "Mapa de la sala"))),
     alerts.length ? el("div", { class: "today-alerts" }, alerts) : null,
-    el("div", { class: "actions" },
-      el("button", { class: "btn primary", onclick: () => startSession() }, ses ? "🧗 Volver a la sesión" : "🧗 Empezar sesión"),
-      el("button", { class: "btn", onclick: () => setPage("mapa") }, "🗺️ Mapa de la sala"),
-      el("button", { class: "btn", onclick: () => setPage("bloques") }, "Todos los bloques")),
-    el("section", { class: "section" }, todayHead(fresh.length ? `Novedades · ${fresh.length}` : "Novedades", fresh.length > 4 ? "Ver todas →" : null, () => { S.view = "new"; store.set("lb-view", "new"); setPage("bloques"); }),
+    el("section", { class: "section" }, todayHead(fresh.length ? `Novedades · ${fresh.length}` : "Novedades", fresh.length > 4 ? "Ver todas" : null, () => { S.view = "new"; store.set("lb-view", "new"); setPage("bloques"); }),
       fresh.length ? el("div", { class: "grid" }, fresh.slice(0, 4).map(card)) : el("p", { class: "note", text: "Nada nuevo esta semana. Cuando se monten bloques, saldrán aquí." })),
-    plan ? el("section", { class: "section" }, todayHead(`Tu plan de la semana · ${plan.axis.toLowerCase()}`, "Mi progreso →", () => setPage("progreso")), el("div", { class: "grid" }, plan.blocks.map(card)))
+    plan ? el("section", { class: "section" }, todayHead(`Tu plan de la semana · ${plan.axis.toLowerCase()}`, "Mi progreso", () => setPage("progreso")), el("div", { class: "grid" }, plan.blocks.map(card)))
       : recs.length ? el("section", { class: "section" }, todayHead("Tu siguiente reto"), el("div", { class: "grid" }, recs.map(r => el("div", { class: "rec" }, el("span", { class: "rec-why", text: r.why }), card(r.b))))) : null,
     projects.length ? el("section", { class: "section" }, todayHead("Tus proyectos"), el("div", { class: "grid" }, projects.map(card))) : null,
-    G.groups.length ? el("section", { class: "section" }, todayHead("En tus grupos", "Grupos →", () => setPage("grupos")),
+    G.groups.length ? el("section", { class: "section" }, todayHead("En tus grupos", "Grupos", () => setPage("grupos")),
       (G.latest || []).length ? el("ul", { class: "g-feed" }, G.latest.slice(0, 4).map(f => el("li", { class: "g-item" },
         el("p", {}, el("strong", { text: f.nick }), f.flash ? " hizo flash a " : " encadenó ", blockLink(f), el("span", { class: "note", text: ` · ${ago(f.sent_at)}` })))))
         : el("p", { class: "note", text: "Sin novedades de tus amigos en los últimos días." }))
@@ -79,7 +83,7 @@ const WELCOME = [
           el("div", { class: "wl-card-tape", style: tapeStyle(y) }, el("span", { text: "AMARILLO" })),
           el("div", { class: "wl-card-body" },
             el("strong", { text: "El techo" }), el("span", { class: "wl-card-meta", text: "Sala 2 · La U" }),
-            el("div", { class: "wl-card-btns" }, el("span", { class: "wl-pill on", text: "Encadenado" }), el("span", { class: "wl-pill", text: "Flash" })),
+            el("div", { class: "wl-card-btns" }, el("span", { class: "wl-pill on" }, ico("check"), "Encadenado"), el("span", { class: "wl-pill" }, ico("zap"), "Flash")),
             el("div", { class: "wl-card-att" }, el("span", { class: "wl-key", text: "−" }), el("b", { text: "3" }), el("span", { class: "wl-key", text: "+" }), el("span", { class: "wl-card-meta", text: "intentos" })))));
     },
     kicker: "Paso a paso", title: "Apunta lo que escalas",
@@ -102,7 +106,7 @@ function openWelcome(i = 0) {
   const w = WELCOME[i], last = i === WELCOME.length - 1;
   let root = $("welcomeRoot");
   if (!root) {
-    root = el("div", { id: "welcomeRoot", class: "wl", role: "dialog", "aria-modal": "true", "aria-label": "Bienvenida", tabindex: "-1" });
+    root = el("div", { id: "welcomeRoot", class: "wl is-wall", role: "dialog", "aria-modal": "true", "aria-label": "Bienvenida", tabindex: "-1" });
     // Deslizar con el dedo para pasar de pantalla
     let x0 = null;
     root.addEventListener("pointerdown", e => { x0 = e.clientX; });
@@ -147,7 +151,7 @@ function openSettings() {
     el("div", { class: "field" }, el("span", { class: "label", text: "Idioma · Language" }),
       el("div", { class: "tabs", role: "group", "aria-label": "Idioma", translate: "no" }, [["es", "Español"], ["en", "English"]].map(([k, t]) =>
         el("button", { "aria-pressed": LANG === k ? "true" : "false", onclick: () => { if (k === LANG) return; try { localStorage.setItem("lb-lang", JSON.stringify(k)); } catch (e) {} location.reload(); } }, t)))),
-    tabs("Tema", store.get("lb-theme", "auto"), [["auto", "Como el móvil"], ["light", "☀️ Claro"], ["dark", "🌙 Oscuro"]], k => { store.set("lb-theme", k); applyLook(); }),
+    tabs("Tema", store.get("lb-theme", "auto"), [["auto", "Como el móvil"], ["light", [ico("sun", "sm"), "Claro"]], ["dark", [ico("moon", "sm"), "Oscuro"]]], k => { store.set("lb-theme", k); applyLook(); }),
     tabs("Tamaño de letra", store.get("lb-big", false) ? "big" : "normal", [["normal", "Normal"], ["big", "Grande"]], k => { store.set("lb-big", k === "big"); applyLook(); }),
     el("div", { class: "field" }, el("span", { class: "label", text: "Modo daltónico" }),
       el("div", { class: "tabs", role: "group", "aria-label": "Modo daltónico" },
@@ -156,11 +160,11 @@ function openSettings() {
       el("p", { class: "note", text: "Cada color de nivel y de presa lleva su abreviatura (Az, Ve, Na, Am…)." })),
     el("div", { class: "field" }, el("span", { class: "label", text: "Tu apodo" }),
       G.me ? el("div", { class: "row" }, el("span", {}, el("strong", { text: G.me.nick }), el("span", { class: "note", text: APODO.pin ? " · con PIN" : " · sin PIN" })),
-          el("button", { class: "btn small", onclick: openPinSheet }, APODO.pin ? "Cambiar PIN" : "Poner PIN"))
+          el("button", { class: "btn small", onclick: openPinSheet }, ico("lock", "sm"), APODO.pin ? "Cambiar PIN" : "Poner PIN"))
         : el("div", { class: "row" }, el("span", { class: "note", text: "Aún no tienes apodo en este móvil." }), el("button", { class: "btn small", onclick: openRecoverSheet }, "Recuperar mi apodo"))),
     el("div", { class: "field" }, el("span", { class: "label", text: "La app" }),
       el("div", { class: "row" },
-        el("button", { class: "btn", onclick: () => openInstall() }, "📲 Instalar · pasar mi progreso"),
+        el("button", { class: "btn", onclick: () => openInstall() }, ico("phone"), "Instalar · pasar mi progreso"),
         el("button", { class: "btn", onclick: () => { closeSheet(); openWelcome(); } }, "Ver la bienvenida otra vez")))));
 }
 

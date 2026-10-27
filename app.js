@@ -1,7 +1,7 @@
 // Circuito de dificultad del rocódromo, de fácil a difícil
 const LEVELS = [
   { k: "azul",     name: "Azul",     bg: "#1E63D6", fg: "#FFFFFF" },
-  { k: "verde",    name: "Verde",    bg: "#2E9D45", fg: "#FFFFFF" },
+  { k: "verde",    name: "Verde",    bg: "#2E9D45", fg: "#0B1A10" },
   { k: "naranja",  name: "Naranja",  bg: "#F07A1A", fg: "#1B120A" },
   { k: "amarillo", name: "Amarillo", bg: "#F5CE1B", fg: "#1B1A10" },
   { k: "morado",   name: "Morado",   bg: "#7B3FB8", fg: "#FFFFFF" },
@@ -174,9 +174,9 @@ const starStr = avg => { const r = Math.round(avg); return "★".repeat(r) + "�
 const fmtDate = d => { if (!d) return ""; const [y, m, dd] = d.slice(0, 10).split("-"); return `${dd}/${m}/${y.slice(2)}`; };
 const sectorNames = () => [...new Set([...S.sectors.map(s => s.name), ...S.blocks.map(b => b.sector).filter(Boolean)])].sort((a, b) => a.localeCompare(b, "es"));
 
-function tape(b) {
+function tape(b, short) {
   const l = LV[b.level] || { bg: "var(--line)", fg: "var(--ink)", name: "?" };
-  const inner = el("span", { class: "grade", text: l.name });
+  const inner = el("span", { class: "grade", text: short && LV[b.level] ? SHORT[b.level] : l.name });
   // En "Compe" el texto va sobre una pastilla clara para leerse encima de las rayas
   if (l.solid) inner.style.cssText = `background:${l.solid};padding:2px 5px;border-radius:3px`;
   return el("div", { class: "tape", style: `background:${l.bg};color:${l.fg}` }, inner);
@@ -198,20 +198,23 @@ const holdMeta = b => COLORS[b.hold_color] ? el("span", { class: "hold" }, color
 const starsLine = (st, long) => el("div", { class: "stars-line" },
   st.n ? [el("span", { class: "s", text: starStr(st.avg) }), el("span", { text: long ? `${st.avg.toFixed(1)} de 5 · ${st.n} ${st.n === 1 ? "voto" : "votos"}` : `${st.avg.toFixed(1)} · ${st.n}` })]
        : el("span", { text: long ? "Sin puntuar todavía" : "Sin puntuar" }));
-const emptyBox = (h, p, btn) => el("div", { class: "empty" }, el("h2", { text: h }), p ? el("p", { text: p }) : null, btn || null);
+const emptyBox = (h, p, btn, error) => el("div", { class: "empty" + (error ? " is-error" : ""), role: error ? "alert" : null }, el("h2", { text: h }), p ? el("p", { text: p }) : null, btn || null);
+// Esqueleto de la lista mientras llegan los bloques
+const skeleton = (n = 5) => el("div", { class: "skel", "aria-busy": "true" }, el("span", { class: "sr-only", text: "Cargando…" }),
+  Array.from({ length: n }, () => el("div", { class: "skel-row", "aria-hidden": "true" }, el("i"), el("span", {}, el("i"), el("i"), el("i")))));
 
 function card(b) {
   const fav = S.favs.includes(b.id), mine = S.mine[b.id] || {};
   const line = starsLine(statsFor(b.id));
-  if (mine.sent) line.append(el("span", { class: "sent-badge", text: mine.flash ? "· ⚡ Flash" : "· Encadenado" }));
-  else if (mine.project) line.append(el("span", { class: "proj-badge", text: "· Proyecto" }));
+  if (mine.sent) line.append(el("span", { class: "sent-badge" }, ico(mine.flash ? "zap" : "check"), mine.flash ? "Flash" : "Encadenado"));
+  else if (mine.project) line.append(el("span", { class: "proj-badge" }, ico("target"), "Proyecto"));
   return el("button", { class: "card" + (b.active ? "" : " off") + (b.photo_path ? " has-photo" : ""), onclick: () => openDetail(b.id), "aria-label": `Ver ${title(b)}` },
-    tape(b),
+    tape(b, true),
     el("div", { class: "card-body" },
       el("div", { class: "card-top" }, el("h3", { text: title(b) }),
         b.xlp ? xlpBadge() : null,
         isNew(b) ? el("span", { class: "new-badge", text: "Nuevo" }) : null,
-        fav ? el("span", { class: "fav-ind", title: "En favoritos", text: "♥" }) : null),
+        fav ? el("span", { class: "fav-ind", title: "En favoritos" }, ico("heart", "sm fill")) : null),
       el("div", { class: "meta" }, b.sector ? el("span", { text: b.sector }) : null, holdMeta(b), b.set_date ? el("span", { class: "mono", text: fmtDate(b.set_date) }) : null),
       (b.styles || []).length ? el("div", { class: "styles" }, b.styles.map(s => el("span", { class: "tag", text: s }))) : null,
       line),
@@ -277,7 +280,7 @@ function renderChips() {
   if (S.blocks.some(b => b.xlp)) cc.append(el("button", { class: "chip", "aria-pressed": S.xlp ? "true" : "false", onclick: () => { S.xlp = !S.xlp; render(); } },
     xlpBadge(true), "Equipados por Xlp"));
   if (S.sector) cc.append(el("span", { class: "label", text: "Sector" }),
-    el("button", { class: "chip", "aria-pressed": "true", onclick: () => { S.sector = null; render(); } }, S.sector + "  ×"));
+    el("button", { class: "chip", "aria-pressed": "true", "aria-label": `Quitar el filtro de sector ${S.sector}`, onclick: () => { S.sector = null; render(); } }, S.sector, ico("x", "sm")));
   const used = new Set(S.blocks.map(b => b.hold_color).filter(Boolean));
   if (used.size) cc.append(el("span", { class: "label", text: "Presa" }));
   Object.entries(COLORS).filter(([k]) => used.has(k)).forEach(([k, c]) => cc.append(el("button", { class: "chip", "aria-pressed": S.colors.has(k) ? "true" : "false",
@@ -292,18 +295,19 @@ function renderBloques() {
   renderBars(); renderChips();
   const list = $("list");
   if (!sb) return list.replaceChildren(emptyBox("Falta configurar", "Rellena config.js con la dirección y la clave pública de tu proyecto de Supabase."));
-  if (!S.loaded) return list.replaceChildren(emptyBox("Cargando…", "Trayendo los bloques de la sala."));
-  if (S.error) return list.replaceChildren(emptyBox("Sin conexión", S.error, el("button", { class: "btn", onclick: refresh }, "Reintentar")));
+  if (!S.loaded) return list.replaceChildren(skeleton());
+  if (S.error) return list.replaceChildren(emptyBox("Sin conexión", S.error, el("button", { class: "btn primary", onclick: refresh }, ico("refresh"), "Reintentar"), true));
   const items = visible();
   if (items.length) return list.replaceChildren(el("div", { class: "grid" }, items.map(card)));
   const none = S.blocks.length === 0;
   const [h, p] = none
     ? (S.isSetter ? ["La libreta está vacía", "Añade el primer bloque que hayas equipado: nivel, sector, estilo y la beta."] : ["Aún no hay bloques", "El equipador todavía no ha apuntado ningún bloque. Vuelve pronto."])
-    : S.view === "fav" ? ["Sin favoritos", "Abre un bloque y toca ♡ Guardar para tenerlo aquí."]
+    : S.view === "fav" ? ["Sin favoritos", "Abre un bloque y toca «Guardar» para tenerlo aquí."]
     : S.view === "proj" ? ["Sin proyectos", "Abre un bloque que estés probando y toca «Es mi proyecto». Cuando lo encadenes, sale de aquí."]
     : S.view === "new" ? ["Nada nuevo esta semana", `Aquí salen los bloques montados en los últimos ${NEW_DAYS} días.`]
     : ["Nada con estos filtros", "Prueba a quitar algún nivel, sector, estilo o color."];
-  list.replaceChildren(emptyBox(h, p, none && S.isSetter ? el("button", { class: "btn primary", onclick: () => openForm() }, "+ Nuevo bloque") : null));
+  list.replaceChildren(emptyBox(h, p, none && S.isSetter ? el("button", { class: "btn primary", onclick: () => openForm() }, ico("plus"), "Nuevo bloque")
+    : !none && S.view === "open" ? el("button", { class: "btn", onclick: () => { S.level = null; S.sector = null; S.xlp = false; S.styles.clear(); S.colors.clear(); S.q = ""; $("q").value = ""; render(); } }, "Quitar filtros") : null));
 }
 
 /* ---------- página: mapa ---------- */
@@ -368,7 +372,7 @@ function renderMapa() {
           el("span", { class: "note", text: `${list.length} ${list.length === 1 ? "bloque abierto" : "bloques abiertos"}` + (newBy[S.mapSel] ? ` · ${newBy[S.mapSel]} nuevos` : "") })),
         el("div", { class: "row" },
           list.length ? el("button", { class: "btn small", onclick: () => goSector(S.mapSel) }, "Ver en la lista") : null,
-          el("button", { class: "sector-close", "aria-label": "Cerrar sector", onclick: () => selectSector(S.mapSel) }, "×"))),
+          el("button", { class: "sector-close", "aria-label": "Cerrar sector", onclick: () => selectSector(S.mapSel) }, ico("x")))),
       list.length ? el("div", { class: "grid" }, list.map(card))
         : el("p", { class: "note", text: "Ahora mismo no hay bloques abiertos en este sector." })));
   }
@@ -496,6 +500,7 @@ function render() {
   renderGymPick();
   // Sin datos todavía, todas las secciones enseñan el estado de la lista (cargando, error, sin configurar)
   const page = !sb || !S.loaded || S.error ? "bloques" : S.page;
+  document.body.dataset.screen = page;
   document.querySelectorAll("[data-page]").forEach(b => b.setAttribute("aria-current", b.dataset.page === S.page ? "page" : "false"));
   document.querySelectorAll(".page").forEach(p => p.hidden = p.id !== "page-" + page);
   markWrapped(); markBuzon(); markInstall(); markSession(); markGroups();
@@ -531,7 +536,7 @@ function sheet(...kids) {
 document.addEventListener("keydown", e => { if (e.key === "Escape" && $("sheetRoot").firstChild) closeSheet(); });
 const head = (label, big) => el("div", { class: "sheet-head" },
   big ? el("h2", { class: "sheet-title", text: label }) : el("span", { class: "label", text: label }),
-  el("button", { class: "x", type: "button", "aria-label": "Cerrar", onclick: closeSheet }, "×"));
+  el("button", { class: "x", type: "button", "aria-label": "Cerrar", onclick: closeSheet }, ico("x")));
 
 async function shareBlock(b) {
   const url = location.origin + location.pathname + "#b-" + b.id;
@@ -576,10 +581,10 @@ function commentsSection(b) {
       : el("button", { class: "linkbtn", onclick: () => { confirm = true; drawDel(); } }, "Borrar"));
     drawDel();
     return el("li", { class: "comment" },
-      el("div", { class: "comment-head" }, el("strong", { text: c.author }), c.height ? el("span", { class: "h-tag" + (near(c) ? " near" : ""), text: `📏 ${(c.height / 100).toLocaleString("es-ES", { minimumFractionDigits: 2 })} m` }) : null,
+      el("div", { class: "comment-head" }, el("strong", { text: c.author }), c.height ? el("span", { class: "h-tag" + (near(c) ? " near" : "") }, ico("ruler"), `${(c.height / 100).toLocaleString("es-ES", { minimumFractionDigits: 2 })} m`) : null,
         el("span", { class: "mono note", text: fmtDate(c.created_at) }), del),
       el("p", { text: c.body }),
-      c.video ? el("a", { class: "link", href: c.video, target: "_blank", rel: "noopener" }, "▶ Ver su vídeo") : null);
+      c.video ? el("a", { class: "link", href: c.video, target: "_blank", rel: "noopener" }, ico("play", "sm"), " Ver su vídeo") : null);
   });
 
   return el("div", { class: "section" }, el("span", { class: "label", text: `Betas de la gente${list?.length ? " · " + list.length : ""}` }),
@@ -593,8 +598,8 @@ function commentsSection(b) {
       // La beta es opcional: sin texto, «Registrar» solo confirma lo marcado (encadenado, flash, intentos…) y vuelve a la lista
       if (!text && !vid) {
         const m = S.mine[id] || {};
-        if (!m.sent && !m.project && !m.attempts && !m.stars && m.feel == null) { err.textContent = "Marca «Encadenado» o «⚡ Flash» (o apunta un intento) antes de registrar."; err.hidden = false; return; }
-        toast(m.sent ? (m.flash ? "⚡ Flash registrado" : "Ascensión registrada") : "Guardado");
+        if (!m.sent && !m.project && !m.attempts && !m.stars && m.feel == null) { err.textContent = "Marca «Encadenado» o «Flash» (o apunta un intento) antes de registrar."; err.hidden = false; return; }
+        toast(m.sent ? (m.flash ? "Flash registrado" : "Ascensión registrada") : "Guardado");
         return backToOpen();
       }
       if (!text) { err.textContent = "Escribe tu beta para acompañar el vídeo."; err.hidden = false; return; }
@@ -672,15 +677,15 @@ function morphoSummary(st) {
   const total = st.mShort + st.mAny + st.mTall;
   if (!total) return null;
   const top = [[st.mShort, "va mejor si eres bajo"], [st.mTall, "va mejor si eres alto"], [st.mAny, "da igual la altura"]].sort((a, b) => b[0] - a[0])[0];
-  return el("p", { class: "note morpho-sum", text: `📏 ${Math.round(top[0] / total * 100)} % dice que ${top[1]} (${total} ${total === 1 ? "voto" : "votos"})` });
+  return el("p", { class: "note morpho-sum" }, ico("ruler", "sm"), `${Math.round(top[0] / total * 100)} % dice que ${top[1]} (${total} ${total === 1 ? "voto" : "votos"})`);
 }
 
 // «Primero en encadenarlo», solo entre quienes salen en el ranking con apodo
 function firstLine(b) {
   const f = S.firsts[b.id];
   if (!f) return null;
-  return el("div", { class: "first-line" }, "🥇 Primero en encadenarlo: ", el("strong", { text: f.is_me ? `${f.nick} (tú)` : f.nick }),
-    el("span", { class: "note", text: ` · ${fmtDate(f.sent_at)}${f.flash ? " · ⚡ flash" : ""}` }));
+  return el("div", { class: "first-line" }, el("span", { class: "first-sticker" }, ico("medal", "sm"), "Primero en encadenarlo"), el("strong", { text: f.is_me ? `${f.nick} (tú)` : f.nick }),
+    el("span", { class: "note", text: ` · ${fmtDate(f.sent_at)}${f.flash ? " · flash" : ""}` }));
 }
 
 function openDetail(id) {
@@ -720,24 +725,24 @@ function openDetail(id) {
         (b.styles || []).length ? el("div", { class: "styles" }, b.styles.map(s => el("span", { class: "tag", text: s }))) : null,
         starsLine(st, true),
         firstLine(b),
-        el("div", { class: "note", text: `${st.sends} ${st.sends === 1 ? "persona lo ha encadenado" : "personas lo han encadenado"}` + (st.flashes ? ` · ⚡ ${st.flashes} al flash` : "") + (st.projects ? ` · ${st.projects} lo ${st.projects === 1 ? "está" : "están"} probando` : "") + (st.attempts ? ` · de media en ${st.attempts.toLocaleString("es-ES")} intentos` : "") }))),
+        el("div", { class: "note", text: `${st.sends} ${st.sends === 1 ? "persona lo ha encadenado" : "personas lo han encadenado"}` + (st.flashes ? ` · ${st.flashes} al flash` : "") + (st.projects ? ` · ${st.projects} lo ${st.projects === 1 ? "está" : "están"} probando` : "") + (st.attempts ? ` · de media en ${st.attempts.toLocaleString("es-ES")} intentos` : "") }))),
     diffBox(b),
     el("div", { class: "section" }, el("span", { class: "label", text: "Beta del equipador" }),
       el("div", { class: "beta" + (b.beta ? "" : " none"), text: b.beta || "El equipador no ha escrito la beta de este bloque." }),
-      b.video ? el("a", { class: "link", href: b.video, target: "_blank", rel: "noopener" }, "▶ Ver vídeo de la beta") : null),
+      b.video ? el("a", { class: "link", href: b.video, target: "_blank", rel: "noopener" }, ico("play", "sm"), " Ver vídeo de la beta") : null),
     el("div", { class: "section" }, el("span", { class: "label", text: "Tu puntuación" }), rate,
       el("div", { class: "send-pick", role: "group", "aria-label": "¿Lo has encadenado?" },
-        el("button", { class: "btn" + (mine.sent && !mine.flash ? " primary" : ""), "aria-pressed": mine.sent && !mine.flash ? "true" : "false",
-          onclick: () => saveMine(id, mine.sent && !mine.flash ? { ...mine, sent: false, flash: false } : { ...mine, sent: true, flash: false, attempts: mine.attempts > 1 ? mine.attempts : null }) }, mine.sent && !mine.flash ? "✓ Encadenado" : "Encadenado"),
-        el("button", { class: "btn" + (mine.flash ? " primary" : ""), "aria-pressed": mine.flash ? "true" : "false",
-          onclick: () => saveMine(id, mine.flash ? { ...mine, sent: false, flash: false, attempts: null } : { ...mine, sent: true, flash: true, attempts: 1 }) }, "⚡ Flash")),
+        el("button", { class: "btn ok" + (mine.sent && !mine.flash ? " primary" : ""), "aria-pressed": mine.sent && !mine.flash ? "true" : "false",
+          onclick: () => saveMine(id, mine.sent && !mine.flash ? { ...mine, sent: false, flash: false } : { ...mine, sent: true, flash: false, attempts: mine.attempts > 1 ? mine.attempts : null }) }, ico("check"), "Encadenado"),
+        el("button", { class: "btn flash" + (mine.flash ? " primary" : ""), "aria-pressed": mine.flash ? "true" : "false",
+          onclick: () => saveMine(id, mine.flash ? { ...mine, sent: false, flash: false, attempts: null } : { ...mine, sent: true, flash: true, attempts: 1 }) }, ico("zap"), "Flash")),
       mine.sent ? el("div", { class: "note", text: `${mine.flash ? "Flash" : "Encadenado"}${mine.sent_at ? " el " + fmtDate(mine.sent_at) : ""}${!mine.flash && mine.attempts > 1 ? ` al ${mine.attempts}.º intento` : ""} · +${pointsFor(b, mine.flash)} puntos` }) : null,
       attemptsBox(id, mine), feelBox(id, b, mine),
       el("div", { class: "actions" },
-        mine.sent ? null : el("button", { class: "btn" + (mine.project ? " primary" : ""), onclick: () => saveMine(id, { ...mine, project: !mine.project }) }, mine.project ? "◎ Es mi proyecto" : "Es mi proyecto"),
-        el("button", { class: "btn" + (fav ? " primary" : ""), onclick: () => toggleFav(id) }, fav ? "♥ En favoritos" : "♡ Guardar"),
-        el("button", { class: "btn", onclick: () => shareBlock(b) }, "Compartir"),
-        mine.sent ? el("button", { class: "btn", onclick: () => storyBlock(b, mine) }, "📸 Historia") : null),
+        mine.sent ? null : el("button", { class: "btn" + (mine.project ? " primary" : ""), "aria-pressed": mine.project ? "true" : "false", onclick: () => saveMine(id, { ...mine, project: !mine.project }) }, ico("target"), "Es mi proyecto"),
+        el("button", { class: "btn" + (fav ? " primary" : ""), "aria-pressed": fav ? "true" : "false", onclick: () => toggleFav(id) }, ico("heart", fav ? "fill" : ""), fav ? "En favoritos" : "Guardar"),
+        el("button", { class: "btn", onclick: () => shareBlock(b) }, ico("share"), "Compartir"),
+        mine.sent ? el("button", { class: "btn", onclick: () => storyBlock(b, mine) }, ico("camera"), "Historia") : null),
       el("div", { class: "note", text: "Sin registro: tus votos, proyectos y favoritos se guardan en este móvil." })),
     friendsBox(b),
     commentsSection(b),
@@ -816,8 +821,8 @@ function openForm(b) {
     photoBox.replaceChildren(...[fileIn,
       src ? el("img", { class: "photo", src, alt: "Vista previa de la foto" }) : null,
       el("div", { class: "actions" },
-        el("button", { type: "button", class: "btn", onclick: () => fileIn.click() }, src ? "Cambiar foto" : "📷 Añadir foto"),
-        d.raw ? el("button", { type: "button", class: "btn", onclick: editPhoto }, "✎ Resaltar presas") : null,
+        el("button", { type: "button", class: "btn", onclick: () => fileIn.click() }, ico("camera"), src ? "Cambiar foto" : "Añadir foto"),
+        d.raw ? el("button", { type: "button", class: "btn", onclick: editPhoto }, ico("pencil"), "Resaltar presas") : null,
         src ? el("button", { type: "button", class: "btn danger", onclick: () => { d.file = null; d.raw = null; d.photo = ""; fileIn.value = ""; drawPhoto(); } }, "Quitar foto") : null)].filter(Boolean));
   };
   drawPhoto();
@@ -937,12 +942,12 @@ function saveMine(id, next) {
     if (!f.error) {
       const wasFirst = S.firsts[id]?.is_me;
       S.firsts = toFirsts(f.data);
-      if (next.sent && !prev?.sent && S.firsts[id]?.is_me && !wasFirst) setTimeout(() => toast("🥇 ¡Eres el primero en encadenarlo!"), 1800);
+      if (next.sent && !prev?.sent && S.firsts[id]?.is_me && !wasFirst) setTimeout(() => toast("¡Eres el primero en encadenarlo!"), 1800);
     }
     invalidateRanking(); invalidateGroups();
   }).catch(e => {
     // Sin cobertura: se queda apuntado en el móvil y se sube al volver la conexión
-    if (isNetErr(e)) { queueMine(id, next); toast("📴 Sin conexión: guardado en el móvil, se subirá solo"); return; }
+    if (isNetErr(e)) { queueMine(id, next); toast("Sin conexión: guardado en el móvil, se subirá solo"); return; }
     console.error(e);
     if (prev) S.mine[id] = prev; else delete S.mine[id];
     toast("No se pudo guardar");

@@ -48,7 +48,7 @@ function wrapLines(x, text, maxW) {
 function para(x, text, px, py, maxW, lh) { const ls = wrapLines(x, text, maxW); ls.forEach((l, i) => x.fillText(l, px, py + i * lh)); return py + ls.length * lh; }
 async function slideCanvas(bg, sub) {
   const [c, x] = await storyCanvas();
-  x.fillStyle = bg; x.fillRect(0, 0, STORY.w, STORY.h);
+  wallBg(x, bg);
   drawHeader(x, sub); drawFooter(x);
   return [c, x];
 }
@@ -62,8 +62,9 @@ async function buildSlides(d, rank, grp) {
   const add = (c, label) => out.push({ c, label });
 
   // 1 · Portada
-  { const [c, x] = await slideCanvas("#0D6B5B", gym);
-    LEVELS.forEach((l, i) => { x.save(); x.translate(-160 + i * 175, 1880); x.rotate(-Math.PI / 5); x.fillStyle = lvColor(l); x.beginPath(); x.roundRect(0, 0, 900, 110, 55); x.fill(); x.restore(); });
+  { const [c, x] = await slideCanvas("#0B6B5A", gym);
+    // Las cintas de los ocho niveles cruzando el póster, como en la bienvenida
+    LEVELS.forEach((l, i) => { x.save(); x.translate(-160 + i * 175, 1880); x.rotate(-Math.PI / 5); x.fillStyle = lvColor(l); x.fillRect(0, 0, 900, 96); x.restore(); });
     kicker(x, d.back ? "Tu resumen de" : "Tu mes hasta ahora", 560, "#BFE3DA");
     x.fillStyle = STORY.ink; fitText(x, M.toUpperCase(), 920, 260); x.fillText(M.toUpperCase(), 76, 790);
     x.fillStyle = "#BFE3DA"; x.font = `700 56px ${BODY}`; x.fillText(String(d.year), 80, 880);
@@ -75,20 +76,22 @@ async function buildSlides(d, rank, grp) {
     x.fillStyle = STORY.accent; x.font = `900 440px ${DISPLAY}`; x.fillText(String(d.sends.length), 64, 920);
     x.fillStyle = STORY.ink; x.font = `900 96px ${DISPLAY}`; x.fillText(d.sends.length === 1 ? "BLOQUE" : "BLOQUES", 80, 1040);
     const diff = d.sends.length - d.prevN;
-    const cmp = !d.prevN ? "¡Un gran comienzo!" : diff > 0 ? `${diff} más que en ${d.prevMonth} 📈` : diff < 0 ? `${-diff} menos que en ${d.prevMonth}. ¡A por el siguiente!` : `Los mismos que en ${d.prevMonth}`;
+    const cmp = !d.prevN ? "¡Un gran comienzo!" : diff > 0 ? `${diff} más que en ${d.prevMonth}` : diff < 0 ? `${-diff} menos que en ${d.prevMonth}. ¡A por el siguiente!` : `Los mismos que en ${d.prevMonth}`;
     x.fillStyle = STORY.muted; x.font = `600 50px ${BODY}`; let y = para(x, cmp, 80, 1160, 920, 66);
-    x.fillStyle = "#F5CE1B"; x.font = `800 64px ${BODY}`; x.fillText(`⚡ ${d.flashes} al flash`, 80, y + 110);
+    drawIco(x, "zap", 112, y + 88, 64, STORY.tape, 2.8); x.fillStyle = STORY.tape; x.font = `800 64px ${BODY}`; x.fillText(`${d.flashes} al flash`, 160, y + 110);
     x.fillStyle = STORY.ink; x.fillText(`+${d.points} puntos`, 80, y + 210);
     add(c, `Encadenaste ${d.sends.length} bloques, ${d.flashes} al flash, ${d.points} puntos. ${cmp}`); }
 
   // 3 · Evolución por semanas
-  { const [c, x] = await slideCanvas("#17222E", gym);
+  { const [c, x] = await slideCanvas("#101B18", gym);
     kicker(x, "Tu evolución", 420); x.fillStyle = STORY.ink; fitText(x, "SEMANA A SEMANA", 920, 120); x.fillText("SEMANA A SEMANA", 76, 540);
     const max = Math.max(1, ...d.weeks.map(w => w.n)), n = d.weeks.length, gap = 30, bw = (920 - gap * (n - 1)) / n, base = 1330, hmax = 620;
     const bestW = d.weeks.reduce((a, w) => w.n > a.n ? w : a, d.weeks[0]);
     d.weeks.forEach((w, i) => {
       const h = Math.max(14, w.n / max * hmax), bx = 80 + i * (bw + gap);
-      x.fillStyle = w === bestW && w.n ? STORY.accent : w.n ? "#5B7A8E" : "#2A3644"; x.beginPath(); x.roundRect(bx, base - h, bw, h, 18); x.fill();
+      // Cada semana es una tira de cinta, cortada en V arriba; la mejor, amarilla
+      x.fillStyle = w === bestW && w.n ? STORY.tape : w.n ? STORY.accent : "#22302B";
+      x.beginPath(); x.moveTo(bx, base - h); x.lineTo(bx + bw / 2, base - h + Math.min(18, h / 3)); x.lineTo(bx + bw, base - h); x.lineTo(bx + bw, base); x.lineTo(bx, base); x.fill();
       x.textAlign = "center"; x.fillStyle = STORY.ink; x.font = `900 64px ${DISPLAY}`; if (w.n) x.fillText(String(w.n), bx + bw / 2, base - h - 24);
       x.fillStyle = STORY.muted; x.font = `700 34px ${BODY}`; x.fillText(`${w.from.getDate()}/${w.from.getMonth() + 1}`, bx + bw / 2, base + 56); x.textAlign = "left";
     });
@@ -114,23 +117,23 @@ async function buildSlides(d, rank, grp) {
     if (d.hardest) {
       kicker(x, "Tu bloque más difícil", y); const l = LV[d.hardest.b.level];
       const pw = levelPill(x, l, 80, y + 40, 72);
-      if (d.hardest.m.flash) { x.fillStyle = "#F5CE1B"; x.font = `900 56px ${DISPLAY}`; x.fillText("⚡ FLASH", 80 + pw + 24, y + 96); }
+      if (d.hardest.m.flash) { drawIco(x, "zap", 80 + pw + 52, y + 76, 52, STORY.tape, 2.8); x.fillStyle = STORY.tape; x.font = `900 56px ${DISPLAY}`; x.fillText("FLASH", 80 + pw + 90, y + 96); }
       x.fillStyle = STORY.ink; fitText(x, title(d.hardest.b).toUpperCase(), 920, 110); x.fillText(title(d.hardest.b).toUpperCase(), 80, y + 230);
       y += 300;
     }
-    if (d.newColors.length) { x.fillStyle = STORY.accent; x.font = `800 52px ${BODY}`; para(x, `🎉 Estrenaste ${andList(d.newColors.map(l => l.name.toLowerCase()))}`, 80, y + 20, 920, 66); }
+    if (d.newColors.length) { x.fillStyle = STORY.accent; x.font = `800 52px ${BODY}`; para(x, `Estrenaste ${andList(d.newColors.map(l => l.name.toLowerCase()))}`, 80, y + 20, 920, 66); }
     add(c, `Por colores: ${used.map(([l, n]) => `${l.name} ${n}`).join(", ")}.` + (d.hardest ? ` Tu bloque más difícil: ${title(d.hardest.b)} (${lvName(d.hardest.b)}).` : "") + (d.newColors.length ? ` Estrenaste ${andList(d.newColors.map(l => l.name))}.` : "")); }
 
   // 5 · Estilo
   if (d.styles.length) {
-    const [c, x] = await slideCanvas("#2B1F3F", gym);
+    const [c, x] = await slideCanvas("#0B6B5A", gym);
     const [st] = d.styles[0];
-    kicker(x, `Este ${d.back ? "mes fuiste" : "mes estás siendo"}`, 560, "#CBB8E8");
-    x.fillStyle = "#CBB8E8"; x.font = `900 110px ${DISPLAY}`; x.fillText("DE", 76, 690);
+    kicker(x, `Este ${d.back ? "mes fuiste" : "mes estás siendo"}`, 560, "#BFE3DA");
+    x.fillStyle = "#BFE3DA"; x.font = `900 110px ${DISPLAY}`; x.fillText("DE", 76, 690);
     x.fillStyle = STORY.ink; fitText(x, st.toUpperCase(), 920, 250); x.fillText(st.toUpperCase(), 72, 920);
     let y = 1120;
     d.styles.slice(0, 4).forEach(([s, n], i) => {
-      x.fillStyle = i ? STORY.muted : "#F5CE1B"; x.font = `800 56px ${BODY}`; x.fillText(`${i + 1}. ${s}`, 80, y);
+      x.fillStyle = i ? "#BFE3DA" : STORY.tape; x.font = `800 56px ${BODY}`; x.fillText(`${i + 1}. ${s}`, 80, y);
       x.textAlign = "right"; x.fillText(`${n} ${n === 1 ? "bloque" : "bloques"}`, 1000, y); x.textAlign = "left"; y += 100;
     });
     add(c, `Tu estilo del mes: ${st}. ${d.styles.slice(0, 4).map(([s, n]) => `${s} ${n}`).join(", ")}.`);
@@ -138,18 +141,18 @@ async function buildSlides(d, rank, grp) {
 
   // 6 · Datos curiosos
   const facts = [
-    d.sector && d.sector[1] > 1 ? ["📍", "Tu sector", d.sector[0], `${d.sector[1]} bloques`] : null,
-    d.weekday && d.sends.length >= 3 ? ["📅", "Tu día", `${WEEKDAYS[d.weekday[0]]} son lo tuyo`, `${d.weekday[1]} bloques`] : null,
-    d.best ? ["⭐", "El mejor valorado que encadenaste", title(d.best.b), `★ ${nf(statsFor(d.best.b.id).avg)} · ${lvName(d.best.b)}`] : null,
-    d.activeWeeks ? ["🔥", "Constancia", `${d.activeWeeks} de ${d.weeks.length} semanas`, d.activeWeeks === d.weeks.length ? "¡Todas!" : "con algún encadenado"] : null,
+    d.sector && d.sector[1] > 1 ? ["pin", "Tu sector", d.sector[0], `${d.sector[1]} bloques`] : null,
+    d.weekday && d.sends.length >= 3 ? ["calendar", "Tu día", `${WEEKDAYS[d.weekday[0]]} son lo tuyo`, `${d.weekday[1]} bloques`] : null,
+    d.best ? ["star", "El mejor valorado que encadenaste", title(d.best.b), `★ ${nf(statsFor(d.best.b.id).avg)} · ${lvName(d.best.b)}`] : null,
+    d.activeWeeks ? ["flame", "Constancia", `${d.activeWeeks} de ${d.weeks.length} semanas`, d.activeWeeks === d.weeks.length ? "¡Todas!" : "con algún encadenado"] : null,
   ].filter(Boolean);
   if (facts.length >= 2) {
-    const [c, x] = await slideCanvas("#33231A", gym);
-    kicker(x, "Datos curiosos", 420, "#E8C9A8");
+    const [c, x] = await slideCanvas(STORY.bg, gym);
+    kicker(x, "Datos curiosos", 420, STORY.tape);
     let y = 560;
     facts.forEach(([icon, label, value, extra]) => {
-      x.font = `80px ${BODY}`; x.fillText(icon, 80, y + 70);
-      x.fillStyle = "#E8C9A8"; x.font = `700 38px ${BODY}`; x.fillText(label.toUpperCase(), 210, y + 10);
+      drawIco(x, icon, 122, y + 46, 84, STORY.accent, 2.2);
+      x.fillStyle = STORY.muted; x.font = `800 36px ${BODY}`; x.fillText(label.toUpperCase(), 210, y + 10);
       x.fillStyle = STORY.ink; fitText(x, value, 790, 76, 800, BODY); x.fillText(value, 210, y + 95);
       x.fillStyle = STORY.muted; x.font = `600 40px ${BODY}`; x.fillText(extra, 210, y + 150);
       y += 290;
@@ -159,26 +162,27 @@ async function buildSlides(d, rank, grp) {
 
   // 7 · Ranking
   if (rank) {
-    const [c, x] = await slideCanvas("#12302A", gym);
+    const [c, x] = await slideCanvas("#101B18", gym);
     const l = LV[rank.league];
     kicker(x, d.back ? `Terminaste ${d.month}` : "Ahora mismo vas", 520, "#A7D9CC");
     x.fillStyle = rank.pos <= 3 ? "#F5CE1B" : STORY.ink; x.font = `900 460px ${DISPLAY}`; x.fillText(`${rank.pos}.º`, 64, 940);
     x.fillStyle = STORY.ink; x.font = `700 56px ${BODY}`; x.fillText(`de ${rank.total} en la liga`, 80, 1060);
     levelPill(x, l, 80, 1110, 90);
-    x.fillStyle = "#A7D9CC"; x.font = `800 64px ${BODY}`; x.fillText(`${rank.points} puntos${["", " · 🥇", " · 🥈", " · 🥉"][rank.pos] || ""}`, 80, 1320);
+    x.fillStyle = "#A7D9CC"; x.font = `800 64px ${BODY}`; x.fillText(`${rank.points} puntos`, 80, 1320);
+    if (rank.pos <= 3) tapeLabel(x, ["", "ORO", "PLATA", "BRONCE"][rank.pos], 80, 1380, 70, ["", STORY.tape, "#C3CEC9", "#D58A4F"][rank.pos], "#1C1A10");
     add(c, `${d.back ? "Terminaste" : "Vas"} ${rank.pos}.º de ${rank.total} en la liga ${l.name} con ${rank.points} puntos.`);
   }
 
   // 7b · Tu grupo de amigos: premios del mes
   if (grp && grp.awards.length) {
-    const [c, x] = await slideCanvas("#2A2140", gym);
-    kicker(x, d.back ? `${cap(d.month)} en tu grupo` : "Este mes en tu grupo", 420, "#CBB8E8");
+    const [c, x] = await slideCanvas("#0B6B5A", gym);
+    kicker(x, d.back ? `${cap(d.month)} en tu grupo` : "Este mes en tu grupo", 420, "#BFE3DA");
     x.fillStyle = STORY.ink; fitText(x, grp.name.toUpperCase(), 920, 120); x.fillText(grp.name.toUpperCase(), 76, 540);
     let y = 650;
     grp.awards.forEach(a => {
-      x.font = `80px ${BODY}`; x.fillText(a.icon, 80, y + 70);
-      x.fillStyle = "#CBB8E8"; x.font = `700 38px ${BODY}`; x.fillText(a.title.toUpperCase(), 210, y + 10);
-      x.fillStyle = a.me ? "#F5CE1B" : STORY.ink; fitText(x, a.nick + (a.me ? " (tú)" : ""), 790, 76, 800, BODY); x.fillText(a.nick + (a.me ? " (tú)" : ""), 210, y + 95);
+      drawIco(x, a.icon, 122, y + 46, 84, a.me ? STORY.tape : STORY.ink, 2.2);
+      x.fillStyle = "#BFE3DA"; x.font = `800 36px ${BODY}`; x.fillText(a.title.toUpperCase(), 210, y + 10);
+      x.fillStyle = a.me ? STORY.tape : STORY.ink; fitText(x, a.nick + (a.me ? " (tú)" : ""), 790, 76, 800, BODY); x.fillText(a.nick + (a.me ? " (tú)" : ""), 210, y + 95);
       x.fillStyle = STORY.muted; x.font = `600 40px ${BODY}`; x.fillText(a.value, 210, y + 150);
       y += 250;
     });
@@ -193,12 +197,7 @@ async function buildSlides(d, rank, grp) {
     const top = d.hardest ? LV[d.hardest.b.level] : null;
     const tiles = [[d.sends.length, d.sends.length === 1 ? "bloque" : "bloques"], [d.points, "puntos"], [d.flashes, "al flash"],
       rank ? [`${rank.pos}.º`, `liga ${LV[rank.league].name.toLowerCase()}`] : [d.activeWeeks, d.activeWeeks === 1 ? "semana activa" : "semanas activas"]];
-    tiles.forEach(([n, label], i) => {
-      const cx = 80 + (i % 2) * 470, cy = 620 + Math.floor(i / 2) * 290;
-      x.fillStyle = "#222B28"; x.beginPath(); x.roundRect(cx, cy, 450, 260, 32); x.fill();
-      x.fillStyle = i === 1 ? STORY.accent : STORY.ink; x.font = `900 150px ${DISPLAY}`; x.fillText(String(n), cx + 36, cy + 160);
-      x.fillStyle = STORY.muted; x.font = `600 38px ${BODY}`; x.fillText(label, cx + 40, cy + 220);
-    });
+    scoreboard(x, tiles, 620);
     let y = 1280;
     if (top) { kicker(x, "Color más difícil", y); levelPill(x, top, 80, y + 36, 80); y += 190; }
     if (d.styles.length) { kicker(x, "Estilo del mes", y); x.fillStyle = STORY.ink; x.font = `900 92px ${DISPLAY}`; x.fillText(d.styles[0][0].toUpperCase(), 80, y + 100); }
@@ -237,7 +236,7 @@ async function openWrapped(back) {
   const d = wrappedData(back);
   if (!d.sends.length) return toast("Todavía no hay encadenados ese mes");
   if (back) { store.set("lb-wrapped-seen", [...new Set([...seenWrapped(), wrappedId(back)])].slice(-24)); render(); }
-  const loading = el("div", { class: "wrapped", role: "dialog", "aria-modal": "true", "aria-label": "Tu resumen del mes" }, el("p", { class: "wr-loading", text: "Preparando tu resumen…" }));
+  const loading = el("div", { class: "wrapped is-wall", role: "dialog", "aria-modal": "true", "aria-label": "Tu resumen del mes" }, el("p", { class: "wr-loading", text: "Preparando tu resumen…" }));
   document.body.append(loading); document.body.style.overflow = "hidden";
   const [rank, grp] = await Promise.all([myRankFor(back), wrappedGroup(back).catch(() => null)]);
   const slides = await buildSlides(d, rank, grp);
@@ -251,20 +250,20 @@ function wrappedViewer(slides, name) {
   const bars = slides.map(() => el("span", { class: "wr-bar" }, el("i")));
   const stage = el("div", { class: "wr-stage" });
   const live = el("p", { class: "sr-only", "aria-live": "polite" });
-  const shareBtn = el("button", { class: "btn primary", onclick: () => shareSlide(slides[i], name) }, "📸 Compartir");
-  const root = el("div", { class: "wrapped", role: "dialog", "aria-modal": "true", "aria-label": name },
+  const shareBtn = el("button", { class: "btn primary", onclick: () => shareSlide(slides[i], name) });
+  const root = el("div", { class: "wrapped is-wall", role: "dialog", "aria-modal": "true", "aria-label": name },
     el("div", { class: "wr-bars" }, bars),
-    el("button", { class: "wr-x", "aria-label": "Cerrar", onclick: close }, "×"),
+    el("button", { class: "wr-x", "aria-label": "Cerrar", onclick: close }, ico("x")),
     stage, live,
     el("div", { class: "wr-actions" },
-      el("button", { class: "btn", "aria-label": "Anterior", onclick: () => go(i - 1) }, "‹"), shareBtn,
-      el("button", { class: "btn", "aria-label": "Siguiente", onclick: () => go(i + 1) }, "›")));
+      el("button", { class: "btn", "aria-label": "Anterior", onclick: () => go(i - 1) }, ico("chevron", "flip")), shareBtn,
+      el("button", { class: "btn", "aria-label": "Siguiente", onclick: () => go(i + 1) }, ico("chevron"))));
   function show() {
     const s = slides[i];
     s.c.className = "wr-slide" + (reduce ? "" : " in"); s.c.setAttribute("role", "img"); s.c.setAttribute("aria-label", s.label);
     stage.replaceChildren(s.c); live.textContent = `${i + 1} de ${slides.length}. ${s.label}`;
     bars.forEach((b, k) => b.firstChild.style.width = k < i ? "100%" : "0%");
-    shareBtn.textContent = i === slides.length - 1 ? "📸 Compartir resumen" : "📸 Compartir";
+    shareBtn.replaceChildren(ico("camera"), i === slides.length - 1 ? "Compartir resumen" : "Compartir");
     t = 0;
   }
   function go(n) { if (n < 0) n = 0; if (n >= slides.length) return; i = n; show(); }
@@ -298,6 +297,6 @@ function markWrapped() {
   document.querySelector('[data-page="progreso"]')?.classList.toggle("has-new", pending);
   if (pending && store.get("lb-wrapped-toast", "") !== wrappedId(1)) {
     store.set("lb-wrapped-toast", wrappedId(1));
-    setTimeout(() => toast(`🎁 Tu resumen de ${monthName(monthStart(1))} está listo en «Mi progreso»`), 600);
+    setTimeout(() => toast(`Tu resumen de ${monthName(monthStart(1))} está listo en «Mi progreso»`), 600);
   }
 }

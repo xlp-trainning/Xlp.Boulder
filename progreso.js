@@ -44,31 +44,42 @@ function progressCtx() {
 }
 
 const MEDALS = [
-  ...LEVELS.map(l => ({ id: "first-" + l.k, icon: "🎯", color: l.bg, name: `Primer ${l.name.toLowerCase()}`, desc: `Encadena un bloque ${l.name.toLowerCase()}`,
+  ...LEVELS.map(l => ({ id: "first-" + l.k, icon: "target", color: l.solid ? "#8A8F8C" : l.bg, name: `Primer ${l.name.toLowerCase()}`, desc: `Encadena un bloque ${l.name.toLowerCase()}`,
     test: c => c.sends.some(x => x.b.level === l.k) })),
-  { id: "flash1", icon: "⚡", name: "Primer flash", desc: "Haz un bloque a la primera", test: c => c.flashes >= 1 },
-  { id: "flash10", icon: "⚡", name: "10 flashes", desc: "Diez bloques a la primera", goal: c => [c.flashes, 10] },
-  { id: "sends10", icon: "🧗", name: "10 encadenados", desc: "Encadena diez bloques", goal: c => [c.sends.length, 10] },
-  { id: "sends50", icon: "🧗", name: "50 encadenados", desc: "Encadena cincuenta bloques", goal: c => [c.sends.length, 50] },
-  { id: "pts100", icon: "💯", name: "100 puntos", desc: "Suma cien puntos", goal: c => [c.points, 100] },
-  { id: "fresh", icon: "🆕", name: "Recién montado", desc: "Encadena un bloque en su primera semana",
+  { id: "flash1", icon: "zap", name: "Primer flash", desc: "Haz un bloque a la primera", test: c => c.flashes >= 1 },
+  { id: "flash10", icon: "zap", name: "10 flashes", desc: "Diez bloques a la primera", goal: c => [c.flashes, 10] },
+  { id: "sends10", icon: "mountain", name: "10 encadenados", desc: "Encadena diez bloques", goal: c => [c.sends.length, 10] },
+  { id: "sends50", icon: "mountain", name: "50 encadenados", desc: "Encadena cincuenta bloques", goal: c => [c.sends.length, 50] },
+  { id: "pts100", icon: "hash", name: "100 puntos", desc: "Suma cien puntos", goal: c => [c.points, 100] },
+  { id: "fresh", icon: "sparkles", name: "Recién montado", desc: "Encadena un bloque en su primera semana",
     test: c => c.sends.some(x => x.m.sent_at && x.b.set_date && (new Date(x.m.sent_at) - new Date(x.b.set_date + "T00:00:00")) / 864e5 < 7) },
-  { id: "sector", icon: "🗺️", name: "Sector completo", desc: "Encadena todos los bloques abiertos de un sector (mínimo 3)", test: c => c.fullSector },
-  { id: "styles", icon: "🎨", name: "Todoterreno", desc: "Encadena bloques de 6 estilos distintos", goal: c => [c.styles, 6] },
-  { id: "streak4", icon: "🔥", name: "Racha de 4 semanas", desc: "Encadena algo 4 semanas seguidas", goal: c => [c.streak.best, 4] },
-  { id: "streak12", icon: "🔥", name: "Racha de 12 semanas", desc: "Encadena algo 12 semanas seguidas", goal: c => [c.streak.best, 12] },
+  { id: "sector", icon: "map", name: "Sector completo", desc: "Encadena todos los bloques abiertos de un sector (mínimo 3)", test: c => c.fullSector },
+  { id: "styles", icon: "palette", name: "Todoterreno", desc: "Encadena bloques de 6 estilos distintos", goal: c => [c.styles, 6] },
+  { id: "streak4", icon: "flame", name: "Racha de 4 semanas", desc: "Encadena algo 4 semanas seguidas", goal: c => [c.streak.best, 4] },
+  { id: "streak12", icon: "flame", name: "Racha de 12 semanas", desc: "Encadena algo 12 semanas seguidas", goal: c => [c.streak.best, 12] },
 ];
 const medalDone = (m, c) => m.test ? m.test(c) : (([v, g]) => v >= g)(m.goal(c));
 const earnedMedals = () => { const c = progressCtx(); return new Set(MEDALS.filter(m => medalDone(m, c)).map(m => m.id)); };
 
-// Al encadenar: puntos ganados y medallas nuevas
+// Al encadenar: una tira de cinta cruza la pantalla con los puntos, el móvil vibra y, si hay, aviso de liga y medallas
+function cheer(b, flash) {
+  try { navigator.vibrate?.(flash ? [20, 40, 20, 40, 60] : [30, 50, 60]); } catch (e) {}
+  document.querySelector(".cheer")?.remove();
+  const c = el("div", { class: "cheer", "aria-hidden": "true" },
+    el("div", { class: "cheer-tape " + (flash ? "flash" : "send") },
+      el("b", {}, ico(flash ? "zap" : "check"), flash ? "Flash" : "Encadenado"),
+      el("span", { text: `${title(b)} · +${pointsFor(b, flash)} puntos` })));
+  document.body.append(c);
+  setTimeout(() => c.remove(), 1600);
+}
 function celebrate(id, next, before) {
   const b = S.blocks.find(x => x.id === id); if (!b) return;
   const fresh = [...earnedMedals()].filter(m => !before.medals.has(m)).map(m => MEDALS.find(x => x.id === m));
   const lg = myLeague();
-  toast([`+${pointsFor(b, next.flash)} puntos${next.flash ? " ⚡" : ""}`,
-    lg.ord > before.league ? `⬆️ ¡Subes a la liga ${lg.l.name}!` : null,
-    fresh.length ? `🏅 ${fresh.map(m => m.name).join(", ")}` : null].filter(Boolean).join(" · "));
+  cheer(b, next.flash);
+  const extra = [lg.ord > before.league ? `¡Subes a la liga ${lg.l.name}!` : null, fresh.length ? `Medalla: ${fresh.map(m => m.name).join(", ")}` : null].filter(Boolean);
+  // Los puntos ya salen en la cinta; el aviso, si sube de liga o gana medallas (o si no hay animación)
+  if (extra.length || matchMedia("(prefers-reduced-motion: reduce)").matches) toast([`+${pointsFor(b, next.flash)} puntos`, ...extra].join(" · "));
 }
 
 // «Tu siguiente reto»: bloques abiertos sin encadenar, cerca de tu nivel, de estilos que tocas poco
@@ -97,9 +108,9 @@ function wrappedSection() {
   const prevN = wrappedData(1).sends.length, curN = wrappedData(0).sends.length;
   const pending = wrappedPending(), prev = monthName(monthStart(1)), cur = monthName(monthStart(0));
   return el("section", { class: "section" + (pending ? " wr-new" : "") }, el("span", { class: "label", text: "Tu mes" }),
-    pending ? el("p", { class: "wr-ready", text: `🎁 Tu resumen de ${prev} está listo` }) : null,
+    pending ? el("p", { class: "wr-ready" }, ico("gift"), `Tu resumen de ${prev} está listo`) : null,
     el("div", { class: "actions" },
-      prevN ? el("button", { class: "btn" + (pending ? " primary" : ""), onclick: () => openWrapped(1) }, `🎁 Resumen de ${prev}`) : null,
+      prevN ? el("button", { class: "btn" + (pending ? " primary" : ""), onclick: () => openWrapped(1) }, ico("gift"), `Resumen de ${prev}`) : null,
       el("button", { class: "btn" + (pending ? "" : " primary"), disabled: !curN, onclick: () => openWrapped(0) }, `Tu ${cur} hasta ahora`)),
     el("p", { class: "note", text: "Tus bloques, tu evolución semana a semana, colores, estilo, datos curiosos y tu puesto en el ranking. Cada pantalla se puede compartir en historias." }));
 }
@@ -111,12 +122,12 @@ function renderProgreso() {
   const sentOpen = open.filter(b => S.mine[b.id]?.sent);
   const projects = S.blocks.filter(b => b.active && S.mine[b.id]?.project && !S.mine[b.id]?.sent);
   const recs = recommendations();
-  const kpi = (n, l, extra) => el("div", { class: "kpi" }, el("span", { class: "kpi-n", text: n }), el("span", { class: "note", text: l }), extra || null);
+  const kpi = (n, l, extra) => el("div", { class: "kpi" }, el("span", { class: "kpi-n" }, n), el("span", { class: "kpi-l", text: l }), extra || null);
   const earned = MEDALS.filter(m => medalDone(m, c)), pending = MEDALS.filter(m => !medalDone(m, c));
   const medal = (m, done) => {
     const g = m.goal ? m.goal(c) : null;
     return el("div", { class: "medal" + (done ? " done" : ""), title: m.desc },
-      el("span", { class: "medal-icon", style: m.color ? `--medal:${m.color}` : null, text: m.icon }),
+      el("span", { class: "medal-icon", style: m.color ? `--medal:${m.color};--medal-ink:${inkOn(m.color)}` : null }, ico(m.icon)),
       el("span", { class: "medal-name", text: m.name }),
       done ? el("span", { class: "note", text: "Conseguida" })
         : g ? el("span", { class: "medal-bar" }, el("span", { style: `width:${Math.min(100, g[0] / g[1] * 100)}%` }), el("em", { text: `${Math.min(g[0], g[1])}/${g[1]}` }))
@@ -126,10 +137,10 @@ function renderProgreso() {
   root.replaceChildren(...[
     el("div", { class: "kpis" },
       kpi(c.points, "puntos", el("span", { class: "note", text: `${c.monthPoints} este mes` })),
-      kpi(st.cur ? `🔥 ${st.cur}` : "0", st.cur === 1 ? "semana seguida" : "semanas seguidas", el("span", { class: "note", text: `Mejor racha: ${st.best}` })),
-      kpi(c.sends.length, "encadenados", el("span", { class: "note", text: `⚡ ${c.flashes} al flash` })),
+      kpi(st.cur ? [ico("flame"), String(st.cur)] : "0", st.cur === 1 ? "semana seguida" : "semanas seguidas", el("span", { class: "note", text: `Mejor racha: ${st.best}` })),
+      kpi(c.sends.length, "encadenados", el("span", { class: "note", text: `${c.flashes} al flash` })),
       kpi(c.top ? c.top.name : "—", "nivel más alto", c.top ? el("span", { class: "kpi-tape", style: `background:${c.top.bg}` }) : null)),
-    st.cur > 0 && !st.thisWeek ? el("div", { class: "banner" }, `🔥 Encadena algo esta semana para no perder tu racha de ${st.cur} ${st.cur === 1 ? "semana" : "semanas"}.`) : null,
+    st.cur > 0 && !st.thisWeek ? el("div", { class: "banner" }, `Encadena algo esta semana para no perder tu racha de ${st.cur} ${st.cur === 1 ? "semana" : "semanas"}.`) : null,
     wrappedSection(),
     levelSection(),
 
