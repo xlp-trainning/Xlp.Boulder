@@ -28,11 +28,13 @@
   - Dentro de cada liga gana quien más puntos sume en el mes. Se reinicia el día 1 y se puede ver el mes pasado.
   - Es voluntario: cada uno se apunta con un apodo (sin email). El equipador puede quitar a alguien del ranking.
   - La fecha de cada encadenado la pone el servidor, así que no se puede trampear con fechas, y no cuentan los bloques marcados después de desmontarse.
+- **Buzón de sugerencias** («💬 Buzón de sugerencias», al pie de todas las páginas): cualquiera escribe al equipador sin registrarse (idea, bloques, algo falla u otro) con un contacto opcional, y ve sus mensajes con su estado y la respuesta; un punto y un aviso le indican que tiene respuesta. Como mucho 5 mensajes por persona y hora.
 - **El equipador** entra con email y contraseña ("Acceso equipador", al pie de la página) y puede:
   - crear, editar, desmontar o borrar bloques, con foto;
   - **resaltar presas** en la foto, en tres pasos: 1) marcas la zona a analizar rodeando el muro con el dedo (o arrastrando en diagonal para un rectángulo, o «Analizar toda la foto»); 2) eliges el color de las presas y la web deja en color solo esas, oscureciendo el resto; 3) tocas las presas para marcar la **salida** y el **top**, añadir las que falten o quitar las que sobren. Los **volúmenes estructurales** (madera, negro o gris, del color del muro) se marcan rodeándolos con «◇ Volumen» y funcionan como una presa más;
   - gestionar el plano y los sectores (renombrarlos, añadirlos y dibujar su zona en el plano);
   - borrar comentarios;
+  - leer el **buzón** en su pestaña «Buzón» (con el número de mensajes nuevos): responder, marcar como hecho o borrar;
   - ver **Estadísticas** de **todos los bloques** o **solo de los suyos** (sello Xlp):
     - **por zona**, agrupando por **rocódromo** (con el total de los dos), por **sala** (la parte del sector antes del «·», p. ej. «Sala 2») o por **sector**: bloques abiertos, mezcla de niveles, media de estrellas, encadenados, encadenados por bloque y desmontados;
     - con «Solo los míos», qué parte de los bloques abiertos son suyos y cómo puntúan frente a los demás;
@@ -84,6 +86,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `ranking.js` | ranking mensual por ligas de color |
 | `historias.js` | tarjeta para historias de Instagram de un bloque |
 | `estadisticas.js` | estadísticas del equipador: todos o solo los suyos, por rocódromo, sala y sector |
+| `buzon.js` | buzón de sugerencias: formulario, mensajes propios y pestaña del equipador |
 | `wrapped.js` | «Tu mes»: el resumen del mes tipo Wrapped |
 | `editor.js` | editor de la foto del bloque: resaltar presas por color, salida y top |
 | `config.js` | dirección y clave pública de Supabase |
@@ -95,6 +98,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `supabase/003-progreso.sql` | añade flash y fecha de encadenado a los votos (ejecutar una vez) |
 | `supabase/004-ranking.sql` | ranking por ligas: apodos y cálculo del ranking (ejecutar una vez) |
 | `supabase/005-sello.sql` | añade el sello Xlp a los bloques (ejecutar una vez) |
+| `supabase/007-buzon.sql` | buzón de sugerencias (ejecutar una vez) |
 | `supabase/006-sensaciones.sql` | sensación de dificultad, intentos y «primero en encadenarlo» (ejecutar una vez, después de 004) |
 
 ## Añadir otro rocódromo

@@ -125,7 +125,8 @@ async function loadSession() {
   }
   $("addBtn").hidden = !S.isSetter;
   document.querySelector('[data-page="stats"]').hidden = !S.isSetter;
-  if (!S.isSetter && S.page === "stats") S.page = "bloques";
+  document.querySelector('[data-page="buzon"]').hidden = !S.isSetter;
+  if (!S.isSetter && (S.page === "stats" || S.page === "buzon")) S.page = "bloques";
   $("who").textContent = S.isSetter ? "Modo equipador" : "";
   $("loginBtn").textContent = S.session && !S.session.user.is_anonymous ? "Cerrar sesión de equipador" : "Acceso equipador";
 }
@@ -135,6 +136,7 @@ async function refresh() {
     await Promise.all([loadAll(), loadMine()]);
     S.comments = {}; invalidateRanking(); ST.all = null;
     if (S.isSetter) await loadAllComments();
+    await loadSuggestions();
     S.error = null;
   } catch (e) {
     console.error(e);
@@ -479,12 +481,13 @@ function render() {
   const page = !sb || !S.loaded || S.error ? "bloques" : S.page;
   document.querySelectorAll("[data-page]").forEach(b => b.setAttribute("aria-current", b.dataset.page === S.page ? "page" : "false"));
   document.querySelectorAll(".page").forEach(p => p.hidden = p.id !== "page-" + page);
-  markWrapped();
+  markWrapped(); markBuzon();
   if (page === "bloques") return renderBloques();
   if (S.page === "mapa") renderMapa();
   if (S.page === "ranking") renderRanking();
   if (S.page === "progreso") renderProgreso();
   if (S.page === "stats") renderStats();
+  if (S.page === "buzon") renderBuzon();
 }
 
 /* ---------- hoja lateral ---------- */
@@ -899,6 +902,7 @@ document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click"
 $("q").addEventListener("input", e => { S.q = e.target.value.trim(); render(); });
 $("sort").addEventListener("change", e => { S.sort = e.target.value; render(); });
 $("addBtn").addEventListener("click", () => openForm());
+$("buzonBtn").addEventListener("click", () => sb ? openBuzon() : toast("Falta configurar Supabase"));
 $("loginBtn").addEventListener("click", async () => {
   if (!sb) return;
   if (S.session && !S.session.user.is_anonymous) { await sb.auth.signOut(); await refresh(); toast("Sesión cerrada"); }
