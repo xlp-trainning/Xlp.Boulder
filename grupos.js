@@ -45,10 +45,11 @@ async function loadGroupData() {
 async function groupNews() {
   const seen = store.get("lb-g-seen", new Date(Date.now() - 3 * 864e5).toISOString());
   const posKey = "lb-g-pos-" + S.session.user.id, pos = store.get(posKey, {});
-  const msgs = []; let count = 0;
+  const msgs = []; let count = 0; const pending = [], latest = [];
   for (const g of G.groups.slice(0, 4)) {
     const [feed, du, rk] = await Promise.all([sb.rpc("group_feed", { p_group: g.id, p_limit: 40 }), sb.rpc("group_duels", { p_group: g.id }), sb.rpc("group_ranking", { p_group: g.id, p_period: "month" })]);
-    (du.data || []).filter(d => d.i_am_rival && d.status === "pending").forEach(d => { count++; msgs.push([1, `⚔️ ${d.challenger_nick} te ha retado a un duelo en «${g.name}»`]); });
+    (du.data || []).filter(d => d.i_am_rival && d.status === "pending").forEach(d => { count++; pending.push({ g, d }); msgs.push([1, `⚔️ ${d.challenger_nick} te ha retado a un duelo en «${g.name}»`]); });
+    (feed.data || []).filter(f => !f.is_me && !latest.some(x => x.user_id === f.user_id && x.block_id === f.block_id)).slice(0, 4).forEach(f => latest.push(f));
     const fresh = (feed.data || []).filter(f => !f.is_me && f.sent_at > seen);
     count += fresh.length;
     const byBlock = {};
@@ -66,7 +67,8 @@ async function groupNews() {
   }
   store.set(posKey, pos);
   G.active.filter(s => !s.am_in).forEach(s => msgs.push([2, `🧗 ${s.starter} ha empezado una sesión en grupo en «${s.group_name}»`]));
-  G.news = count;
+  G.news = count; G.pending = pending; G.latest = latest.sort((a, b) => b.sent_at.localeCompare(a.sent_at));
+  if (S.page === "hoy") renderHoy();
   markGroups();
   msgs.sort((a, b) => a[0] - b[0]);
   const key = msgs[0]?.[1];

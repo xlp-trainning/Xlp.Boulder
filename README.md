@@ -7,8 +7,11 @@
   - puntuarlos, marcarlos como encadenados o como proyecto, y guardar favoritos (los votos se guardan por dispositivo);
   - contar su propia beta con un apodo, con enlace a vídeo opcional.
 - **Sello Xlp**: los bloques equipados por el dueño de la web llevan el distintivo Xlp (la X del logo) en la lista, en la ficha y en la tarjeta para historias, y se pueden filtrar con «Equipados por Xlp». Se marca con la casilla «Equipado por mí» al crear o editar un bloque (al crear, recuerda la última elección).
+- **Hoy** (la pestaña de inicio): un resumen de un vistazo con saludo, racha, puntos del mes, nivel, avisos que piden hacer algo (sesión en marcha, duelos, sesiones en grupo, resumen del mes listo, racha a punto de perderse), botones para empezar sesión o ver el mapa, novedades, el plan de la semana (o el siguiente reto), tus proyectos y lo último de tus grupos.
+- **Bienvenida**: la primera vez, tres pantallas explican qué es la app, cómo apuntar y lo que hay para picarse con los amigos, con botón para instalarla y para leerla en inglés. Se puede volver a ver desde Ajustes.
+- **Ajustes** («⚙️ Ajustes», arriba): idioma, tema (como el móvil, claro u oscuro), tamaño de letra (normal o grande) y modo daltónico.
 - **Idioma**: español e inglés, con el botón «🌐 EN / ES» arriba. Sale en el idioma del móvil y recuerda la elección. Se traduce todo al mostrarse (`i18n.js`): textos, avisos, ventanas, tarjetas para historias y fechas.
-- **Modo daltónico** («👁 Daltónico», arriba): cada punto de color de nivel o de presa lleva su abreviatura (Az, Ve, Na, Am, Mo, Ro, Ne, Co…).
+- **Modo daltónico** (en Ajustes): cada punto de color de nivel o de presa lleva su abreviatura (Az, Ve, Na, Am, Mo, Ro, Ne, Co…).
 - **Sin cobertura**: la web se abre sin conexión con la última copia guardada (bloques, estadísticas y lo tuyo) y lo que apuntas (encadenados, intentos, votos) se guarda en el móvil y se sube solo al volver la conexión. Un aviso arriba lo indica.
 - **Grado real del bloque**: con la sensación de la gente, los intentos, los flashes y cuántos lo sacan, cada bloque muestra dónde cae dentro de su color (de los más fáciles … de los más duros). Sale con 3 personas que lo hayan probado o votado.
 - **Tu nivel real** (en «Mi progreso»): un número tipo Elo (azul ≈ 1000 … compe ≈ 2050) que sale de tus 10 mejores encadenados de los últimos 90 días, según el color, la dificultad real de cada bloque y los intentos, con la variación del mes.
@@ -117,6 +120,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `nivel.js` | grado real de cada bloque, nivel real, perfil por estilos y plan de la semana |
 | `i18n.js` | traducción al inglés y botón de idioma |
 | `offline.js` | copia local de los datos y cola de lo apuntado sin conexión |
+| `hoy.js` | pantalla «Hoy», bienvenida y Ajustes (tema, letra, idioma, daltónico) |
 | `wrapped.js` | «Tu mes»: el resumen del mes tipo Wrapped |
 | `editor.js` | editor de la foto del bloque: resaltar presas por color, salida y top |
 | `config.js` | dirección y clave pública de Supabase |

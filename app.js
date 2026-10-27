@@ -70,7 +70,7 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
 };
 S.view = store.get("lb-view", "open");
-S.page = store.get("lb-page", "bloques");
+S.page = store.get("lb-page", "hoy");
 S.favs = store.get("lb-favs", []);
 S.gym = store.get("lb-gym", null);
 // Enlace directo a un rocódromo: …/#patraix, …/#benimaclet
@@ -495,6 +495,7 @@ function render() {
   markWrapped(); markBuzon(); markInstall(); markSession(); markGroups();
   if (page === "bloques") return renderBloques();
   if (S.page === "mapa") renderMapa();
+  if (S.page === "hoy") renderHoy();
   if (S.page === "ranking") renderRanking();
   if (S.page === "grupos") renderGrupos();
   if (S.page === "progreso") renderProgreso();
@@ -945,7 +946,6 @@ document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click"
 $("q").addEventListener("input", e => { S.q = e.target.value.trim(); render(); });
 $("sort").addEventListener("change", e => { S.sort = e.target.value; render(); });
 $("addBtn").addEventListener("click", () => openForm());
-$("cbBtn").addEventListener("click", () => { setColorBlind(!document.body.classList.contains("cb")); render(); toast(document.body.classList.contains("cb") ? "Modo daltónico activado: los colores llevan su nombre" : "Modo daltónico desactivado"); });
 setColorBlind(store.get("lb-cb", false));
 $("buzonBtn").addEventListener("click", () => sb ? openBuzon() : toast("Falta configurar Supabase"));
 $("installLink").addEventListener("click", () => openInstall());

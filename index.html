@@ -23,6 +23,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
 <link rel="stylesheet" href="styles.css">
+<script>/* tema y letra elegidos en Ajustes, antes de pintar */ try { var t = JSON.parse(localStorage.getItem("lb-theme")); if (t && t !== "auto") document.documentElement.dataset.theme = t; if (JSON.parse(localStorage.getItem("lb-big"))) document.documentElement.classList.add("big-text"); } catch (e) {}</script>
 </head>
 <body>
 <div class="wrap">
@@ -38,7 +39,7 @@
     </div>
     <div class="row">
       <button class="btn small tool-btn" id="langBtn" aria-label="Change language to English">🌐 EN</button>
-      <button class="btn small tool-btn" id="cbBtn" aria-pressed="false" aria-label="Modo daltónico" title="Modo daltónico">👁 Daltónico</button>
+      <button class="btn small tool-btn" id="settingsBtn" aria-label="Ajustes: idioma, tema, letra y modo daltónico">⚙️ Ajustes</button>
       <span class="status" id="who"></span>
       <button class="btn" id="sessionBtn" hidden>🧗 Empezar sesión</button>
       <button class="btn primary" id="addBtn" hidden>+ Nuevo bloque</button>
@@ -52,6 +53,7 @@
   </div>
 
   <nav class="mainnav" aria-label="Secciones">
+    <button data-page="hoy">Hoy</button>
     <button data-page="bloques" aria-current="page">Bloques</button>
     <button data-page="mapa">Mapa</button>
     <button data-page="ranking">Ranking</button>
@@ -96,6 +98,7 @@
     <main id="list"></main>
   </div>
 
+  <div id="page-hoy" class="page" hidden></div>
   <div id="page-mapa" class="page" hidden></div>
   <div id="page-ranking" class="page" hidden></div>
   <div id="page-grupos" class="page" hidden></div>
@@ -132,5 +135,6 @@
 <script src="instalar.js"></script>
 <script src="sesion.js"></script>
 <script src="grupos.js"></script>
+<script src="hoy.js"></script>
 </body>
 </html>

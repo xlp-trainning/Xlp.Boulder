@@ -204,6 +204,21 @@ const I18N = {
 
   // Sin conexión
   "Sin nivel": "No grade", "Bloque": "Problem",
+
+  // Hoy, bienvenida y ajustes
+  "Hoy": "Today", "Buenos días": "Good morning", "Buenas tardes": "Good afternoon", "Buenas noches": "Good evening",
+  "⚙️ Ajustes": "⚙️ Settings", "Ajustes": "Settings", "Ajustes: idioma, tema, letra y modo daltónico": "Settings: language, theme, text size and colour-blind mode",
+  "Ver →": "View →", "Abrir →": "Open →", "Unirme →": "Join →", "Empezar →": "Start →", "🔥 Sin racha": "🔥 No streak", "🗺️ Mapa de la sala": "🗺️ Gym map", "Ver todas →": "See all →",
+  "Nada nuevo esta semana. Cuando se monten bloques, saldrán aquí.": "Nothing new this week. New problems will show up here.", "Mi progreso →": "My progress →", "Tus proyectos": "Your projects",
+  "En tus grupos": "In your groups", "Grupos →": "Groups →", "Sin novedades de tus amigos en los últimos días.": "No news from your friends in the last few days.",
+  "Crea un grupo con tu gente: ranking propio, duelos, retos y sesiones juntos.": "Create a group with your crew: your own ranking, duels, challenges and sessions together.", "Crear o unirme a un grupo": "Create or join a group",
+  "Bienvenida": "Welcome", "Bienvenido a Xlp.Boulder": "Welcome to Xlp.Boulder", "Todos los bloques de Natural Patraix y Natural Benimaclet: con su foto, la beta del equipador y el mapa de la sala. Sin registro.": "Every problem at Natural Patraix and Natural Benimaclet: with its photo, the setter's beta and the gym map. No sign-up.",
+  "Apunta lo que escalas": "Log what you climb", "Abre un bloque y marca «Encadenado» o «⚡ Flash» (a la primera).": "Open a problem and tap “Sent” or “⚡ Flash” (first go).", "Mientras lo pruebas, suma intentos con «+».": "While you're working it, add attempts with “+”.",
+  "En la sala, «🧗 Empezar sesión» lo hace en dos toques.": "At the gym, “🧗 Start session” does it in two taps.", "Vota si te parece blando, justo o duro y cuenta tu beta.": "Vote whether it feels soft, fair or hard, and share your beta.",
+  "Y pica a tus amigos": "And challenge your friends", "Ranking del mes por ligas de color.": "Monthly ranking by colour leagues.", "Grupos con tus amigos: duelos, retos y sesiones juntos.": "Groups with your friends: duels, challenges and sessions together.",
+  "Medallas, rachas, tu nivel real y tu resumen del mes.": "Badges, streaks, your real level and your monthly recap.", "📲 Instálala en tu móvil": "📲 Install it on your phone", "Saltar": "Skip", "¡Empezar!": "Let's go!",
+  "Idioma": "Language", "Tema": "Theme", "Como el móvil": "Like my phone", "☀️ Claro": "☀️ Light", "🌙 Oscuro": "🌙 Dark", "Tamaño de letra": "Text size", "Normal": "Normal", "Grande": "Large", "No": "No", "Sí": "Yes",
+  "Cada color de nivel y de presa lleva su abreviatura (Az, Ve, Na, Am…).": "Each grade and hold colour shows its abbreviation (Bl, Gr, Or, Ye…).", "La app": "The app", "📲 Instalar · pasar mi progreso": "📲 Install · move my progress", "Ver la bienvenida otra vez": "Show the welcome again",
 };
 
 // Textos con números: los números se escriben como {n} y se respetan en el mismo orden
@@ -238,6 +253,8 @@ const I18N_N = {
   "Encadenaste {n} bloques, {n} al flash, {n} puntos.": "You sent {n} problems, {n} flashed, {n} points.", "Resumen: {n} bloques, {n} puntos, {n} al flash.": "Recap: {n} problems, {n} points, {n} flashed.",
   "Escalaste {n} de {n} semanas": "You climbed {n} of {n} weeks", "+{n} vs {x}": "+{n} vs {x}", "{n} de {n}. {x}": "{n} of {n}. {x}", "{n} estrellas": "{n} stars",
   "{n} presas · {n} de salida · {n} de top": "{n} holds · {n} start · {n} top", "{n} presa · {n} de salida · {n} de top": "{n} hold · {n} start · {n} top", "{n} abiertos": "{n} open",
+  "🔥 {n} semanas": "🔥 {n} weeks", "🔥 {n} semana": "🔥 {n} week", "{n} puntos este mes": "{n} points this month", "Nivel {n}": "Level {n}", "Pantalla {n} de {n}": "Screen {n} of {n}",
+  "🧗 Tienes una sesión en marcha ({n} min)": "🧗 You have a session going ({n} min)", "🧗 Tienes una sesión en marcha ({n} h {n} min)": "🧗 You have a session going ({n} h {n} min)",
   "{n} amigos han hecho «{x}»; ¿y tú?": "{n} friends have sent “{x}”; what about you?",
 };
 
@@ -248,6 +265,7 @@ const I18N_NX = Object.entries(I18N_N).filter(([k]) => k.includes("{x}")).map(([
 const tw = s => I18N[s] || I18N[cap1(s)]?.toLowerCase() || s;      // traduce una palabra suelta (nivel, estilo, mes)
 const cap1 = s => s ? s[0].toUpperCase() + s.slice(1) : s;
 const I18N_RX = [
+  [/^(Buenos días|Buenas tardes|Buenas noches), (.+)$/, m => `${I18N[m[1]]}, ${m[2]}`],
   [/^Dificultad para ser (.+)$/, m => `Difficulty for a ${tw(m[1])}`],
   [/^Para ser (.+), te parece…$/, m => `For a ${tw(m[1])}, it feels…`],
   [/^Liga (.+) · (.+)$/, m => `${tw(m[1])} league · ${m[2]}`],

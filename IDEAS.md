@@ -2,6 +2,8 @@
 
 Ideas que el equipador ha aprobado o le han parecido interesantes y quedan para más adelante.
 
+> 28/10/2026: el equipador da por terminado el desarrollo por ahora. Toca probar la app con gente real; estas ideas quedan guardadas por si se retoma.
+
 ## Aprobadas para más adelante
 - **Generador de entrenamientos con bloques reales** (idea 11, 28/10/2026): «4×4 de hoy: estos 4 bloques de tu nivel», «Pirámide: 4 verdes, 3 naranjas, 2 amarillos, 1 morado»… elegidos entre los bloques abiertos de la sala.
 - **Premio del mes** (27/10/2026): aviso editable por el equipador («Este mes, el 1.º de cada liga se lleva un café / una camiseta»). Hay que acordarlo con el rocódromo.
@@ -19,13 +21,10 @@ Ideas que el equipador ha aprobado o le han parecido interesantes y quedan para 
 - Avisos de presas sueltas o giradas, con lista de pendientes para el equipador.
 - Códigos QR por sector para pegar en la pared.
 - Valenciano (el inglés ya está).
-- Pantalla «Hoy» al abrir la app: bloques nuevos, tu plan, duelos, racha y grupo, todo en un vistazo (28/10/2026).
-- Bienvenida de 3 pantallas para quien entra por primera vez (qué es, cómo apuntar, instalar).
 - Estadísticas de uso para el equipador: personas activas por semana, instalaciones, sesiones, retención.
 - Dónde está cada bloque: punto en el plano dentro del sector y flecha «está aquí» en la ficha.
 - Encuesta de remontaje: la gente vota qué estilo o zona quiere en el próximo remontaje.
 - Notas privadas por bloque (libreta personal).
 - Notas privadas del equipador por bloque (presas usadas, ideas, qué cambiar).
 - Eventos temáticos de temporada (Halloween, Navidad…) con medalla especial.
-- Modo oscuro/claro manual y tamaño de letra más grande.
 - Copias de seguridad de la base de datos y exportar a Excel.
