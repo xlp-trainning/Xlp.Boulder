@@ -39,6 +39,7 @@
   - Dentro de cada liga gana quien más puntos sume en el mes. Se reinicia el día 1 y se puede ver el mes pasado.
   - Es voluntario: cada uno se apunta con un apodo (sin email). El equipador puede quitar a alguien del ranking.
   - La fecha de cada encadenado la pone el servidor, así que no se puede trampear con fechas, y no cuentan los bloques marcados después de desmontarse.
+- **Apodo con PIN**: al ponerse apodo se elige un PIN; si se cambia de móvil o navegador, o se borran los datos, «Recupéralo con tu PIN» devuelve el apodo, los grupos y el progreso a ese móvil. El equipador puede poner un PIN a un apodo antiguo (Estadísticas → Apodos). Al entrar y salir como equipador, el móvil conserva su identidad de escalador.
 - **Grupos de amigos** (pestaña «Grupos»; hace falta un apodo, que no obliga a salir en el ranking público):
   - crear un grupo o **unirse con su código** o con el enlace de invitación (`…/#g-CODIGO`), que se comparte por WhatsApp;
   - **ranking del grupo** por semana, mes o desde siempre, todos contra todos y con los dos rocódromos;
@@ -120,6 +121,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `nivel.js` | grado real de cada bloque, nivel real, perfil por estilos y plan de la semana |
 | `i18n.js` | traducción al inglés y botón de idioma |
 | `offline.js` | copia local de los datos y cola de lo apuntado sin conexión |
+| `apodo.js` | apodo con PIN: crearlo, recuperarlo en otro móvil y PIN puesto por el equipador |
 | `hoy.js` | pantalla «Hoy», bienvenida y Ajustes (tema, letra, idioma, daltónico) |
 | `wrapped.js` | «Tu mes»: el resumen del mes tipo Wrapped |
 | `editor.js` | editor de la foto del bloque: resaltar presas por color, salida y top |
@@ -134,6 +136,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `supabase/005-sello.sql` | añade el sello Xlp a los bloques (ejecutar una vez) |
 | `supabase/007-buzon.sql` | buzón de sugerencias (ejecutar una vez) |
 | `supabase/008-grupos.sql` | grupos de amigos (ejecutar una vez, después de 004, 006 y 007) |
+| `supabase/010-apodos.sql` | PIN para recuperar el apodo (con sus grupos y su progreso) en otro móvil (ejecutar una vez, después de 008) |
 | `supabase/009-altura.sql` | altura en las betas y voto «morfo» (ejecutar una vez, después de 006) |
 | `supabase/006-sensaciones.sql` | sensación de dificultad, intentos y «primero en encadenarlo» (ejecutar una vez, después de 004) |
 

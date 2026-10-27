@@ -211,6 +211,16 @@ const I18N = {
   "No se pudieron generar las miniaturas. Comprueba la conexión e inténtalo de nuevo.": "Couldn't generate the thumbnails. Check your connection and try again.",
 
   // Hoy, bienvenida y ajustes
+  "PIN (4 a 8 cifras)": "PIN (4 to 8 digits)", "PIN del apodo": "Nickname PIN", "Recuperar": "Restore", "¿Ya tienes apodo? Recupéralo con tu PIN": "Already have a nickname? Restore it with your PIN", "Crear un apodo nuevo": "Create a new nickname",
+  "Recupera tu apodo en este móvil: escribe el apodo y su PIN. Vuelven tus grupos, tu ranking y tu progreso.": "Restore your nickname on this phone: type the nickname and its PIN. Your groups, ranking and progress come back.",
+  "Con el PIN podrás recuperar tu apodo, tus grupos y tu progreso si cambias de móvil o se borran los datos de la app. Apúntalo.": "With the PIN you can restore your nickname, groups and progress if you change phones or the app data is deleted. Write it down.",
+  "El PIN tiene que tener de 4 a 8 cifras": "The PIN must have 4 to 8 digits", "No existe ningún apodo así": "There's no such nickname", "Ese apodo no tiene PIN. Pide al equipador que le ponga uno.": "That nickname has no PIN. Ask the setter to add one.",
+  "Demasiados intentos. Prueba dentro de una hora.": "Too many attempts. Try again in an hour.", "No se pudo recuperar. Inténtalo de nuevo.": "Couldn't restore it. Try again.", "PIN incorrecto": "Wrong PIN",
+  "Cambiar el PIN": "Change PIN", "Proteger tu apodo": "Protect your nickname", "Guardar PIN": "Save PIN", "No se pudo guardar el PIN": "Couldn't save the PIN", "PIN guardado. Apúntalo en algún sitio": "PIN saved. Write it down somewhere",
+  "Para recuperarlo: en Grupos, Ranking o Ajustes, «¿Ya tienes apodo? Recupéralo con tu PIN».": "To restore it: in Groups, Ranking or Settings, “Already have a nickname? Restore it with your PIN”.",
+  "Recuperar tu apodo": "Restore your nickname", "Recuperar mi apodo": "Restore my nickname", "Poner PIN": "Set PIN", "Cambiar PIN": "Change PIN", "Tu apodo": "Your nickname", "Aún no tienes apodo en este móvil.": "You don't have a nickname on this phone yet.",
+  "· con PIN": "· with PIN", "· sin PIN": "· no PIN", "Apodos": "Nicknames", "No se pudo poner el PIN": "Couldn't set the PIN",
+  "Si alguien ha perdido su apodo (otro móvil, datos borrados…) y no tenía PIN, ponle uno aquí y díselo: lo recupera desde Grupos, Ranking o Ajustes con «¿Ya tienes apodo? Recupéralo con tu PIN».": "If someone lost their nickname (new phone, deleted data…) and had no PIN, set one here and tell them: they restore it from Groups, Ranking or Settings with “Already have a nickname? Restore it with your PIN”.",
   "Registrar": "Log it", "Cuenta tu beta (opcional)": "Share your beta (optional)", "Ascensión registrada": "Ascent logged", "⚡ Flash registrado": "⚡ Flash logged", "Guardado": "Saved",
   "Ascensión registrada con tu beta": "Ascent logged with your beta", "Marca «Encadenado» o «⚡ Flash» (o apunta un intento) antes de registrar.": "Tap “Sent” or “⚡ Flash” (or log an attempt) before logging.",
   "Escribe tu beta para acompañar el vídeo.": "Write your beta to go with the video.",
@@ -282,6 +292,11 @@ const tw = s => I18N[s] || I18N[cap1(s)]?.toLowerCase() || s;      // traduce un
 const cap1 = s => s ? s[0].toUpperCase() + s.slice(1) : s;
 const I18N_RX = [
   [/^(Buenos días|Buenas tardes|Buenas noches), (.+)$/, m => `${I18N[m[1]]}, ${m[2]}`],
+  [/^«(.+)» ya existe\. Si es tuyo, escribe su PIN para recuperarlo en este móvil\.$/, m => `“${m[1]}” already exists. If it's yours, type its PIN to restore it on this phone.`],
+  [/^Has recuperado «(.+)»: tus grupos y tu progreso ya están en este móvil$/, m => `You've restored “${m[1]}”: your groups and progress are now on this phone`],
+  [/^PIN puesto a «(.+)»$/, m => `PIN set for “${m[1]}”`],
+  [/^Protege «(.+)» con un PIN para no perder tus grupos si cambias de móvil\.$/, m => `Protect “${m[1]}” with a PIN so you don't lose your groups if you change phones.`],
+  [/^Con el PIN podrás recuperar «(.+)», tus grupos y tu progreso en otro móvil, en otro navegador o si se borran los datos de la app\.$/, m => `With the PIN you can restore “${m[1]}”, your groups and progress on another phone, another browser or if the app data is deleted.`],
   [/^Dificultad para ser (.+)$/, m => `Difficulty for a ${tw(m[1])}`],
   [/^Para ser (.+), te parece…$/, m => `For a ${tw(m[1])}, it feels…`],
   [/^Liga (.+) · (.+)$/, m => `${tw(m[1])} league · ${m[2]}`],

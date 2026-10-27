@@ -22,6 +22,7 @@ async function loadGroups() {
     sb.from("climbers").select("nick, in_ranking").eq("user_id", S.session.user.id).maybeSingle(),
     sb.rpc("my_groups"), sb.rpc("group_active_sessions")]);
   G.me = me.data || null;
+  await loadPinState();
   G.groups = gs.data || [];
   G.active = act.data || [];
   if (G.groups.length && !G.groups.some(g => g.id === G.sel)) G.sel = G.groups[0].id;
@@ -83,15 +84,6 @@ function markGroups() {
 }
 
 /* ---------- acciones ---------- */
-async function ensureNick(nick) {
-  if (G.me) return true;
-  nick = (nick || "").trim().replace(/\s+/g, " ");
-  if (nick.length < 2 || nick.length > 20) { toast("El apodo tiene que tener entre 2 y 20 letras"); return false; }
-  if (!(await ensureVoter())) return false;
-  const { error } = await sb.from("climbers").insert({ nick, in_ranking: false });
-  if (error) { toast(error.code === "23505" ? "Ese apodo ya lo usa otra persona" : "No se pudo guardar el apodo"); return false; }
-  store.set("lb-nick", nick); G.me = { nick, in_ranking: false }; return true;
-}
 async function createGroup(name) {
   name = name.trim();
   if (name.length < 2) return toast("Ponle un nombre al grupo");
@@ -255,13 +247,11 @@ function renderGrupos() {
 
   // Sin apodo: lo primero es ponerse uno
   if (!G.me) {
-    const input = el("input", { value: store.get("lb-nick", ""), maxlength: "20", placeholder: "Tu apodo", "aria-label": "Apodo" });
     return root.replaceChildren(...[inviteBox,
       el("section", { class: "join" },
         el("span", { class: "label", text: "Grupos de amigos" }),
         el("p", { class: "intro-txt", text: "Crea un grupo con tu gente (o únete con un código) y tendréis vuestro ranking, lo que va encadenando cada uno, duelos, retos y sesiones juntos." }),
-        el("form", { class: "row", onsubmit: async e => { e.preventDefault(); if (await ensureNick(input.value)) { if (G.invite) await joinGroup(G.invite); else render(); } } },
-          input, el("button", { class: "btn primary", type: "submit" }, G.invite ? "Guardar y unirme" : "Empezar")),
+        nickForm({ submitText: G.invite ? "Guardar y unirme" : "Empezar", onDone: async recovered => { if (G.invite && !G.groups.some(x => x.code === G.invite)) await joinGroup(G.invite); else render(); } }),
         el("p", { class: "note", text: "Solo tus amigos de grupo ven tu apodo y lo que encadenas. No sales en el ranking público salvo que te apuntes en «Ranking»." }))].filter(Boolean));
   }
 
@@ -278,7 +268,7 @@ function renderGrupos() {
       el("button", { class: "chip", onclick: () => { G.form = G.form === "join" ? null : "join"; renderGrupos(); } }, "Unirme con código")),
     G.form && forms[G.form] ? forms[G.form]() : null);
 
-  if (!g) return root.replaceChildren(...[inviteBox, top, el("p", { class: "note", text: "Aún no estás en ningún grupo. Crea uno e invita a tus amigos por WhatsApp, o únete con el código que te pasen." })].filter(Boolean));
+  if (!g) return root.replaceChildren(...[inviteBox, pinNudge(), top, el("p", { class: "note", text: "Aún no estás en ningún grupo. Crea uno e invita a tus amigos por WhatsApp, o únete con el código que te pasen." })].filter(Boolean));
 
   const act = G.active.find(a => a.group_id === g.id);
   const D = G.data;
@@ -299,7 +289,7 @@ function renderGrupos() {
   else if (G.tab === "actividad") body = groupFeedView();
   else if (G.tab === "retos") body = groupChallengesView(g);
   else body = groupPeopleView(g);
-  root.replaceChildren(...[inviteBox, top, head_, actBox, tabs, body].filter(Boolean));
+  root.replaceChildren(...[inviteBox, pinNudge(), top, head_, actBox, tabs, body].filter(Boolean));
 }
 
 function groupRankingView(g) {

@@ -154,6 +154,10 @@ function openSettings() {
         el("button", { "aria-pressed": cb ? "false" : "true", onclick: () => { setColorBlind(false); render(); openSettings(); } }, "No"),
         el("button", { id: "cbBtn", "aria-pressed": cb ? "true" : "false", onclick: () => { setColorBlind(true); render(); openSettings(); } }, "Sí")),
       el("p", { class: "note", text: "Cada color de nivel y de presa lleva su abreviatura (Az, Ve, Na, Am…)." })),
+    el("div", { class: "field" }, el("span", { class: "label", text: "Tu apodo" }),
+      G.me ? el("div", { class: "row" }, el("span", {}, el("strong", { text: G.me.nick }), el("span", { class: "note", text: APODO.pin ? " · con PIN" : " · sin PIN" })),
+          el("button", { class: "btn small", onclick: openPinSheet }, APODO.pin ? "Cambiar PIN" : "Poner PIN"))
+        : el("div", { class: "row" }, el("span", { class: "note", text: "Aún no tienes apodo en este móvil." }), el("button", { class: "btn small", onclick: openRecoverSheet }, "Recuperar mi apodo"))),
     el("div", { class: "field" }, el("span", { class: "label", text: "La app" }),
       el("div", { class: "row" },
         el("button", { class: "btn", onclick: () => openInstall() }, "📲 Instalar · pasar mi progreso"),

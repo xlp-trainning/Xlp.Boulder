@@ -616,3 +616,9 @@ button.today-chip { cursor: pointer; }
 .wl-bar span { display: block; height: 100%; border-radius: 4px; }
 @media (max-height: 640px) { .wl-art-1 { height: 30vh; } .wl-main { gap: 18px; } .wl-card, .wl-board { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .wl-main, .wl-tapes span { animation: none; } }
+
+/* ---------- apodo con PIN ---------- */
+.nick-form { display: flex; flex-direction: column; gap: 8px; }
+.nick-form .linkbtn { align-self: flex-start; padding: 0; color: var(--accent); font-weight: 700; font-size: 14px; }
+.nick-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+.nick-grid input { flex: 1 1 130px; min-width: 0; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 8px 12px; font-size: 16px; }

@@ -134,6 +134,7 @@ function renderStats() {
     ranking("Poco encadenados (montados hace 14 días o más)", fewSends, b => `${st(b.id).sends} encad.`, "Ningún bloque lleva 14 días montado."),
     ranking("Más proyectados", projected, b => `${st(b.id).projects} probando`, "Nadie lo ha marcado como proyecto todavía."),
     ranking("Con más comentarios", talked, b => `${commentsBy[b.id]} coment.`, "Sin comentarios todavía."),
+    adminPinSection(),
     el("section", { class: "section" }, el("span", { class: "label", text: "Fotos" }),
       el("p", { class: "note", text: "La lista y el mapa usan miniaturas de ~400 px para gastar menos datos de Supabase y cargar antes. Las fotos subidas antes de las miniaturas no la tienen: créalas aquí (basta con hacerlo una vez)." }),
       el("div", { class: "actions" }, el("button", { class: "btn", disabled: THUMBS.busy, onclick: generateThumbs }, THUMBS.busy ? "Generando…" : "Generar miniaturas que faltan")),

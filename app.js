@@ -893,6 +893,8 @@ function openLogin() {
     el("p", { class: "note", text: "Solo para el equipo que monta los bloques. Para puntuar y guardar favoritos no hace falta cuenta." }),
     el("form", { class: "f", onsubmit: async e => {
       e.preventDefault(); go.disabled = true; errBox.hidden = true;
+      // La identidad anónima de este móvil (apodo, grupos, encadenados) se guarda para volver a ella al salir
+      if (S.session?.user.is_anonymous) store.set("lb-anon-rt", S.session.refresh_token);
       const { error } = await sb.auth.signInWithPassword({ email: email.value.trim(), password: pass.value });
       go.disabled = false;
       if (error) { errBox.textContent = "Email o contraseña incorrectos."; errBox.hidden = false; return; }
@@ -982,7 +984,13 @@ $("sessionBtn").addEventListener("click", () => startSession());
 $("sessionBar").addEventListener("click", () => { SES.open = true; render(); });
 $("loginBtn").addEventListener("click", async () => {
   if (!sb) return;
-  if (S.session && !S.session.user.is_anonymous) { await sb.auth.signOut(); await refresh(); toast("Sesión cerrada"); }
+  if (S.session && !S.session.user.is_anonymous) {
+    await sb.auth.signOut({ scope: "local" });
+    // Vuelve la identidad anónima que tenía este móvil antes de entrar como equipador
+    const rt = store.get("lb-anon-rt", null);
+    if (rt) { const r = await sb.auth.refreshSession({ refresh_token: rt }); if (!r.error) S.session = r.data.session; store.set("lb-anon-rt", null); }
+    await refresh(); toast("Sesión cerrada");
+  }
   else openLogin();
 });
 // Al volver a la app, traer cambios; si hay un formulario abierto, no tocar nada para no perder lo escrito

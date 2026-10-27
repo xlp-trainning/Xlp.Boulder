@@ -113,7 +113,11 @@ function renderRanking() {
 
   // Apuntarse con un apodo
   let joinBox = null;
-  if (RK.me === null || RK.editing) {
+  if (RK.me === null && !RK.editing && !(RK.nick || G.me)) {
+    joinBox = el("section", { class: "join" }, el("span", { class: "label", text: "Apúntate al ranking" }),
+      nickForm({ inRanking: true, submitText: "Apuntarme", onDone: () => { invalidateRanking(); renderRanking(); } }),
+      el("p", { class: "note", text: "Solo se verá tu apodo, tu liga y tus puntos del mes. Sin email ni contraseña." }));
+  } else if (RK.me === null || RK.editing) {
     const input = el("input", { value: RK.me || store.get("lb-nick", ""), maxlength: "20", placeholder: "Tu apodo", autocomplete: "nickname", "aria-label": "Apodo para el ranking" });
     joinBox = el("form", { class: "join", onsubmit: e => { e.preventDefault(); joinRanking(input.value); } },
       el("span", { class: "label", text: RK.me ? "Cambiar apodo" : "Apúntate al ranking" }),
@@ -125,9 +129,10 @@ function renderRanking() {
       el("button", { class: "linkbtn", onclick: () => { RK.editing = true; renderRanking(); } }, "Cambiar apodo"), " · ",
       el("button", { class: "linkbtn", onclick: leaveRanking }, "Salir del ranking"));
   }
+  const nudge = pinNudge();
 
   root.replaceChildren(...[
-    myCard, joinBox,
+    myCard, joinBox, nudge,
     el("section", { class: "section" },
       el("div", { class: "rk-top" },
         el("div", { class: "tabs", role: "group", "aria-label": "Mes" },
