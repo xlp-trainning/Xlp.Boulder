@@ -12,7 +12,7 @@ const LEVELS = [
 const SHORT = { azul: "Azul", verde: "Verde", naranja: "Nar", amarillo: "Ama", morado: "Mor", rojo: "Rojo", negro: "Neg", compe: "Comp" };
 const LV = Object.fromEntries(LEVELS.map(l => [l.k, l]));
 // Etiquetas de cada bloque: estilo de escalada (cómo es el bloque) y tipo de agarre (con qué presas)
-const CLIMB_STYLES = ["Placa","Vertical","Desplome","Techo","Diedro","Arista","Dinámico","Coordinación","Compresión","Talonajes","Equilibrio"];
+const CLIMB_STYLES = ["Placa","Vertical","Desplome","Techo","Diedro","Arista","Físico","Técnico","Estático","Dinámico","Coordinación","Compresión","Talonajes","Equilibrio"];
 const GRIPS = ["Regletas","Romos","Pinzas","Bidedos","Cazos","Volúmenes"];
 const STYLES = [...CLIMB_STYLES, ...GRIPS];
 const COLORS = {

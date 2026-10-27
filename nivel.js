@@ -56,8 +56,8 @@ const levelColor = v => [...LEVELS].reverse().find(l => v >= BASE[l.k] - 75) || 
 
 /* ---------- perfil: estilos de escalada y tipos de agarre ---------- */
 // Dos arañas de 6 ejes cada una. Cada eje junta las etiquetas del bloque que se parecen
-const STYLE_AXES = [["Placa", ["Placa", "Equilibrio"]], ["Vertical", ["Vertical", "Diedro", "Arista"]], ["Desplome", ["Desplome"]],
-  ["Techo", ["Techo", "Talonajes"]], ["Dinámico", ["Dinámico", "Coordinación"]], ["Compresión", ["Compresión"]]];
+const STYLE_AXES = [["Placa", ["Placa", "Equilibrio"]], ["Desplome", ["Desplome", "Techo"]], ["Físico", ["Físico", "Compresión"]],
+  ["Técnico", ["Técnico", "Vertical", "Diedro", "Arista", "Talonajes"]], ["Estático", ["Estático"]], ["Dinámico", ["Dinámico", "Coordinación"]]];
 const GRIP_AXES = GRIPS.map(g => [g, [g]]);
 const AXES = [...STYLE_AXES, ...GRIP_AXES];
 const inAxis = (b, ax) => (b.styles || []).some(s => ax[1].includes(s));

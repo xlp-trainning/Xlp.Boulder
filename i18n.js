@@ -399,7 +399,7 @@ I18N_RX.unshift(...I18N_RX.map(([rx, f]) => {
 }).filter(Boolean));
 I18N_RX.unshift([/^Apuntarme como «(.+)»$/, m => `Join as “${m[1]}”`]);
 I18N_RX.unshift([/^Fuerte: (.+)$/, m => `Strength: ${tw(m[1])}`]);
-Object.assign(I18N, { "Agarre": "Grip", "Agarres": "Grips", "Cazos": "Jugs", "Volúmenes": "Volumes", "cazos": "jugs", "volúmenes": "volumes", "Estilos": "Styles",
+Object.assign(I18N, { "Físico": "Physical", "Técnico": "Technical", "Estático": "Static", "físico": "physical", "técnico": "technical", "estático": "static", "Agarre": "Grip", "Agarres": "Grips", "Cazos": "Jugs", "Volúmenes": "Volumes", "cazos": "jugs", "volúmenes": "volumes", "Estilos": "Styles",
   "Estilos de escalada": "Climbing styles", "Tipos de agarre": "Grip types",
   "Cada eje sale de tus mejores encadenados con esa etiqueta. Los ejes sin bloques abiertos no cuentan para el punto débil.": "Each axis comes from your best sends with that tag. Axes with no open problems don't count for your weak spot." });
 Object.assign(I18N, {
