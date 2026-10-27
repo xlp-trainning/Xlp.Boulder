@@ -71,8 +71,14 @@ function renderStats() {
     return el("tr", {}, el("td", {}, el("span", { class: "hold" }, levelDot(l.k), l.name)),
       el("td", { class: "num", text: bl.length }),
       el("td", { class: "num", text: avg ? avg.toFixed(1) + " ★" : "—" }),
-      el("td", { class: "num", text: bl.length ? (sum(bl, b => st(b.id).sends) / bl.length).toFixed(1) : "—" }));
+      el("td", { class: "num", text: bl.length ? (sum(bl, b => st(b.id).sends) / bl.length).toFixed(1) : "—" }),
+      el("td", { class: "num", text: (a => a.length ? (sum(a, b => st(b.id).attempts) / a.length).toFixed(1) : "—")(bl.filter(b => st(b.id).attempts)) }));
   });
+  // Graduación según la gente: bloques con 3 votos o más donde la mitad o más dice blando o duro
+  const feelN = b => st(b.id).soft + st(b.id).fair + st(b.id).hard;
+  const offGrade = open.filter(b => feelN(b) >= 3 && (st(b.id).hard * 2 >= feelN(b) || st(b.id).soft * 2 >= feelN(b)))
+    .map(b => ({ b, hard: st(b.id).hard / feelN(b), soft: st(b.id).soft / feelN(b) }))
+    .sort((x, y) => Math.max(y.hard, y.soft) - Math.max(x.hard, x.soft));
   const styleCounts = STYLES.map(s => [s, open.filter(b => (b.styles || []).includes(s)).length]).filter(([, n]) => n).sort((a, b) => b[1] - a[1]);
   const maxStyle = Math.max(1, ...styleCounts.map(([, n]) => n));
 
@@ -113,7 +119,12 @@ function renderStats() {
       el("p", { class: "note", text: ST.group === "gym" ? "Comparación entre rocódromos. Toca el otro para cambiar a él."
         : `${currentGym()?.name || ""}. La sala es la parte del nombre del sector antes del «·» (p. ej. «Sala 2» en «Sala 2 · La U»).` + (ST.group === "sector" ? " Toca un sector para ver sus bloques." : "") })),
     el("section", { class: "section" }, el("span", { class: "label", text: "Por nivel (abiertos)" }),
-      table(["Nivel", "Bloques", "Media", "Encad."], byLevel)),
+      table(["Nivel", "Bloques", "Media", "Encad.", "Intentos"], byLevel)),
+    el("section", { class: "section" }, el("span", { class: "label", text: "Graduación según la gente" }),
+      offGrade.length ? table(["Bloque", "Le parece", "Votos"], offGrade.map(({ b, hard, soft }) => el("tr", {}, blockCell(b),
+        el("td", { class: hard >= soft ? "feel-hard" : "feel-soft", text: hard >= soft ? `Duro ${Math.round(hard * 100)} %` : `Blando ${Math.round(soft * 100)} %` }),
+        el("td", { class: "num", text: feelN(b) }))))
+        : el("p", { class: "note", text: "Ningún bloque parece mal graduado (con 3 votos o más, la mitad dice blando o duro)." })),
     el("section", { class: "section" }, el("span", { class: "label", text: "Estilos (abiertos)" }),
       styleCounts.length ? el("div", { class: "hbars" }, styleCounts.map(([s, n]) => el("div", { class: "hbar" },
         el("span", { text: s }), el("span", { class: "hbar-track" }, el("span", { class: "hbar-fill", style: `width:${n / maxStyle * 100}%` })), el("span", { class: "mono", text: n }))))

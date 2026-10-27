@@ -7,6 +7,10 @@
   - puntuarlos, marcarlos como encadenados o como proyecto, y guardar favoritos (los votos se guardan por dispositivo);
   - contar su propia beta con un apodo, con enlace a vídeo opcional.
 - **Sello Xlp**: los bloques equipados por el dueño de la web llevan el distintivo Xlp (la X del logo) en la lista, en la ficha y en la tarjeta para historias, y se pueden filtrar con «Equipados por Xlp». Se marca con la casilla «Equipado por mí» al crear o editar un bloque (al crear, recuerda la última elección).
+- **En cada bloque**, además:
+  - **Intentos**: un contador (− / +) para apuntar cada pegue; al encadenar queda «encadenado al 4.º intento» (1 intento = flash). La ficha muestra los intentos medios de la gente.
+  - **Sensación de dificultad**: quien lo ha probado vota si, para su color, le parece **blando, justo o duro**; todo el mundo ve el reparto («20 % blando · 50 % justo · 30 % duro»).
+  - **Primero en encadenarlo**: el apodo de la primera persona del ranking que lo encadenó, con la fecha. Quien lo consigue recibe el aviso «🥇 ¡Eres el primero en encadenarlo!».
 - **Novedades**: los bloques montados en los últimos 7 días llevan la marca «Nuevo» y tienen su pestaña.
 - **Mapa**: el plano de cada rocódromo dividido en **sectores que se pueden tocar** (uno por muro, con su nombre y el número de bloques abiertos). Al tocar un sector se resalta y salen debajo sus bloques, de fácil a difícil; «Ver en la lista» lo lleva a la lista filtrada. El equipador puede redibujar la zona de cada sector con el dedo.
 - **Mi progreso**, pensado para que la gente vuelva:
@@ -32,6 +36,7 @@
   - ver **Estadísticas** de **todos los bloques** o **solo de los suyos** (sello Xlp):
     - **por zona**, agrupando por **rocódromo** (con el total de los dos), por **sala** (la parte del sector antes del «·», p. ej. «Sala 2») o por **sector**: bloques abiertos, mezcla de niveles, media de estrellas, encadenados, encadenados por bloque y desmontados;
     - con «Solo los míos», qué parte de los bloques abiertos son suyos y cómo puntúan frente a los demás;
+    - **graduación según la gente**: los bloques que la mayoría ve blandos o duros para su color (con 3 votos o más), e intentos medios por nivel;
     - bloques por nivel y estilo, los que más y menos gustan, los poco encadenados, los más proyectados y los más comentados.
 - Cada rocódromo tiene sus bloques, sectores, plano y estadísticas. La web recuerda el rocódromo elegido en cada móvil.
 - Enlaces directos: `…/#patraix` y `…/#benimaclet` abren cada rocódromo. Cada bloque tiene su enlace (`…/#b-<id>`) y un botón **Compartir**, útil para historias de Instagram; si el bloque es del otro rocódromo, la web cambia sola.
@@ -90,6 +95,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `supabase/003-progreso.sql` | añade flash y fecha de encadenado a los votos (ejecutar una vez) |
 | `supabase/004-ranking.sql` | ranking por ligas: apodos y cálculo del ranking (ejecutar una vez) |
 | `supabase/005-sello.sql` | añade el sello Xlp a los bloques (ejecutar una vez) |
+| `supabase/006-sensaciones.sql` | sensación de dificultad, intentos y «primero en encadenarlo» (ejecutar una vez, después de 004) |
 
 ## Añadir otro rocódromo
 

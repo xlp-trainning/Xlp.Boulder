@@ -42,7 +42,7 @@ const isStatic = path => /^(mapas\/|https?:)/.test(path);
 const photoUrl = path => !path ? "" : isStatic(path) ? path : sb.storage.from("fotos").getPublicUrl(path).data.publicUrl;
 
 const S = {
-  gyms: [], gym: null, blocks: [], stats: {}, mine: {}, favs: [], sectors: [], mapPath: "",
+  gyms: [], gym: null, blocks: [], stats: {}, firsts: {}, mine: {}, favs: [], sectors: [], mapPath: "",
   comments: {}, drafts: {},
   session: null, isSetter: false,
   page: "bloques", view: "open", level: null, sector: null, styles: new Set(), colors: new Set(), q: "", sort: "new",
@@ -85,29 +85,35 @@ function setGym(id) {
 }
 
 /* ---------- datos ---------- */
+// Primero en encadenar cada bloque (entre los apuntados al ranking)
+const toFirsts = rows => Object.fromEntries((rows || []).map(r => [r.block_id, r]));
 const toStats = rows => Object.fromEntries((rows || []).map(r => [r.block_id,
-  { avg: Number(r.avg_stars) || 0, n: Number(r.votes), sends: Number(r.sends), projects: Number(r.projects) || 0, flashes: Number(r.flashes) || 0 }]));
+  { avg: Number(r.avg_stars) || 0, n: Number(r.votes), sends: Number(r.sends), projects: Number(r.projects) || 0, flashes: Number(r.flashes) || 0,
+    soft: Number(r.soft) || 0, fair: Number(r.fair) || 0, hard: Number(r.hard) || 0, attempts: Number(r.avg_attempts) || 0 }]));
 async function loadAll() {
   const g = await sb.from("gyms").select("*").order("sort");
   if (g.error) throw g.error;
   S.gyms = g.data || [];
   if (!S.gyms.some(x => x.id === S.gym)) S.gym = S.gyms[0]?.id || null;
-  const [b, s, sec] = await Promise.all([
+  const [b, s, sec, fst] = await Promise.all([
     sb.from("blocks").select("*").eq("gym_id", S.gym).order("created_at", { ascending: false }),
     sb.rpc("block_stats"),
     sb.from("sectors").select("*").eq("gym_id", S.gym).order("name"),
+    sb.rpc("first_sends", { p_gym: S.gym }),
   ]);
   if (b.error) throw b.error;
   S.blocks = b.data;
   S.stats = toStats(s.data);
   S.sectors = sec.data || [];
+  S.firsts = toFirsts(fst.data);
   S.mapPath = currentGym()?.map_path || "";
 }
 async function loadMine() {
   S.mine = {};
   if (!S.session) return;
-  const { data } = await sb.from("ratings").select("block_id, stars, sent, project, flash, sent_at");
-  (data || []).forEach(r => S.mine[r.block_id] = { stars: r.stars || 0, sent: r.sent, project: r.project, flash: !!r.flash, sent_at: r.sent_at || null });
+  const { data } = await sb.from("ratings").select("block_id, stars, sent, project, flash, sent_at, feel, attempts");
+  (data || []).forEach(r => S.mine[r.block_id] = { stars: r.stars || 0, sent: r.sent, project: r.project, flash: !!r.flash, sent_at: r.sent_at || null,
+    feel: r.feel ?? null, attempts: r.attempts || null });
 }
 async function loadSession() {
   const { data } = await sb.auth.getSession();
@@ -149,7 +155,7 @@ async function loadAllComments() {
 }
 
 /* ---------- utilidades de pintado ---------- */
-const statsFor = id => S.stats[id] || { avg: 0, n: 0, sends: 0, projects: 0, flashes: 0 };
+const statsFor = id => S.stats[id] || { avg: 0, n: 0, sends: 0, projects: 0, flashes: 0, soft: 0, fair: 0, hard: 0, attempts: 0 };
 const starStr = avg => { const r = Math.round(avg); return "★".repeat(r) + "☆".repeat(5 - r); };
 const fmtDate = d => { if (!d) return ""; const [y, m, dd] = d.slice(0, 10).split("-"); return `${dd}/${m}/${y.slice(2)}`; };
 const sectorNames = () => [...new Set([...S.sectors.map(s => s.name), ...S.blocks.map(b => b.sector).filter(Boolean)])].sort((a, b) => a.localeCompare(b, "es"));
@@ -569,12 +575,59 @@ function commentsSection(b) {
       err, el("div", { class: "actions" }, send)));
 }
 
+// Intentos: + y − en la ficha. Encadenar con 1 intento es flash, y al revés
+function attemptsBox(id, mine) {
+  const n = mine.attempts || 0;
+  const set = v => {
+    v = Math.max(0, Math.min(999, v));
+    const next = { ...mine, attempts: v || null };
+    if (mine.sent) next.flash = v === 1;
+    saveMine(id, next);
+  };
+  return el("div", { class: "attempts" },
+    el("span", { class: "label", text: "Intentos" }),
+    el("button", { class: "btn small", "aria-label": "Un intento menos", disabled: !n, onclick: () => set(n - 1) }, "−"),
+    el("span", { class: "attempts-n", "aria-live": "polite", text: n ? String(n) : "—" }),
+    el("button", { class: "btn small", "aria-label": "Un intento más", onclick: () => set(n + 1) }, "+"),
+    el("span", { class: "note", text: mine.sent ? (n ? (n === 1 ? "a la primera" : "") : "¿cuántos te costó?") : n ? `llevas ${n}` : "apunta cada pegue" }));
+}
+
+// Sensación de dificultad para su color: la vota quien lo ha probado y la ve todo el mundo
+const FEELS = [[-1, "Blando"], [0, "Justo"], [1, "Duro"]];
+function feelSummary(st) {
+  const total = st.soft + st.fair + st.hard;
+  if (!total) return null;
+  const pct = n => Math.round(n / total * 100);
+  return el("div", { class: "feel-sum" },
+    el("span", { class: "feel-bar", "aria-hidden": "true" },
+      st.soft ? el("span", { class: "soft", style: `flex:${st.soft}` }) : null, st.fair ? el("span", { class: "fair", style: `flex:${st.fair}` }) : null, st.hard ? el("span", { class: "hard", style: `flex:${st.hard}` }) : null),
+    el("span", { class: "note", text: `${pct(st.soft)} % blando · ${pct(st.fair)} % justo · ${pct(st.hard)} % duro (${total} ${total === 1 ? "voto" : "votos"})` }));
+}
+function feelBox(id, b, mine) {
+  const tried = mine.sent || mine.project || mine.attempts;
+  return el("div", { class: "feel" },
+    el("span", { class: "label", text: `Para ser ${lvName(b).toLowerCase()}, te parece…` }),
+    tried ? el("div", { class: "send-pick", role: "group", "aria-label": "Sensación de dificultad" }, FEELS.map(([v, t]) =>
+      el("button", { class: "btn" + (mine.feel === v ? " primary" : ""), "aria-pressed": mine.feel === v ? "true" : "false",
+        onclick: () => saveMine(id, { ...mine, feel: mine.feel === v ? null : v }) }, t)))
+      : el("p", { class: "note", text: "Pruébalo (o apunta un intento) para votar si es blando, justo o duro." }),
+    feelSummary(statsFor(id)));
+}
+
+// «Primero en encadenarlo», solo entre quienes salen en el ranking con apodo
+function firstLine(b) {
+  const f = S.firsts[b.id];
+  if (!f) return null;
+  return el("div", { class: "first-line" }, "🥇 Primero en encadenarlo: ", el("strong", { text: f.is_me ? `${f.nick} (tú)` : f.nick }),
+    el("span", { class: "note", text: ` · ${fmtDate(f.sent_at)}${f.flash ? " · ⚡ flash" : ""}` }));
+}
+
 function openDetail(id) {
   const b = S.blocks.find(x => x.id === id); if (!b) return closeSheet();
   openId = id;
   if (location.hash !== "#b-" + id) history.replaceState(null, "", "#b-" + id);
   const st = statsFor(id);
-  const mine = { stars: 0, sent: false, project: false, flash: false, sent_at: null, ...S.mine[id] };
+  const mine = { stars: 0, sent: false, project: false, flash: false, sent_at: null, feel: null, attempts: null, ...S.mine[id] };
   const fav = S.favs.includes(id);
 
   const rate = el("div", { class: "rate", role: "group", "aria-label": "Tu puntuación" },
@@ -605,17 +658,19 @@ function openDetail(id) {
           !b.active && b.removed_date ? el("span", { class: "mono", text: "Desmontado " + fmtDate(b.removed_date) }) : null),
         (b.styles || []).length ? el("div", { class: "styles" }, b.styles.map(s => el("span", { class: "tag", text: s }))) : null,
         starsLine(st, true),
-        el("div", { class: "note", text: `${st.sends} ${st.sends === 1 ? "persona lo ha encadenado" : "personas lo han encadenado"}` + (st.flashes ? ` · ⚡ ${st.flashes} al flash` : "") + (st.projects ? ` · ${st.projects} lo ${st.projects === 1 ? "está" : "están"} probando` : "") }))),
+        firstLine(b),
+        el("div", { class: "note", text: `${st.sends} ${st.sends === 1 ? "persona lo ha encadenado" : "personas lo han encadenado"}` + (st.flashes ? ` · ⚡ ${st.flashes} al flash` : "") + (st.projects ? ` · ${st.projects} lo ${st.projects === 1 ? "está" : "están"} probando` : "") + (st.attempts ? ` · de media en ${st.attempts.toLocaleString("es-ES")} intentos` : "") }))),
     el("div", { class: "section" }, el("span", { class: "label", text: "Beta del equipador" }),
       el("div", { class: "beta" + (b.beta ? "" : " none"), text: b.beta || "El equipador no ha escrito la beta de este bloque." }),
       b.video ? el("a", { class: "link", href: b.video, target: "_blank", rel: "noopener" }, "▶ Ver vídeo de la beta") : null),
     el("div", { class: "section" }, el("span", { class: "label", text: "Tu puntuación" }), rate,
       el("div", { class: "send-pick", role: "group", "aria-label": "¿Lo has encadenado?" },
         el("button", { class: "btn" + (mine.sent && !mine.flash ? " primary" : ""), "aria-pressed": mine.sent && !mine.flash ? "true" : "false",
-          onclick: () => saveMine(id, mine.sent && !mine.flash ? { ...mine, sent: false, flash: false } : { ...mine, sent: true, flash: false }) }, mine.sent && !mine.flash ? "✓ Encadenado" : "Encadenado"),
+          onclick: () => saveMine(id, mine.sent && !mine.flash ? { ...mine, sent: false, flash: false } : { ...mine, sent: true, flash: false, attempts: mine.attempts > 1 ? mine.attempts : null }) }, mine.sent && !mine.flash ? "✓ Encadenado" : "Encadenado"),
         el("button", { class: "btn" + (mine.flash ? " primary" : ""), "aria-pressed": mine.flash ? "true" : "false",
-          onclick: () => saveMine(id, mine.flash ? { ...mine, sent: false, flash: false } : { ...mine, sent: true, flash: true }) }, "⚡ Flash")),
-      mine.sent ? el("div", { class: "note", text: `${mine.flash ? "Flash" : "Encadenado"}${mine.sent_at ? " el " + fmtDate(mine.sent_at) : ""} · +${pointsFor(b, mine.flash)} puntos` }) : null,
+          onclick: () => saveMine(id, mine.flash ? { ...mine, sent: false, flash: false, attempts: null } : { ...mine, sent: true, flash: true, attempts: 1 }) }, "⚡ Flash")),
+      mine.sent ? el("div", { class: "note", text: `${mine.flash ? "Flash" : "Encadenado"}${mine.sent_at ? " el " + fmtDate(mine.sent_at) : ""}${!mine.flash && mine.attempts > 1 ? ` al ${mine.attempts}.º intento` : ""} · +${pointsFor(b, mine.flash)} puntos` }) : null,
+      attemptsBox(id, mine), feelBox(id, b, mine),
       el("div", { class: "actions" },
         mine.sent ? null : el("button", { class: "btn" + (mine.project ? " primary" : ""), onclick: () => saveMine(id, { ...mine, project: !mine.project }) }, mine.project ? "◎ Es mi proyecto" : "Es mi proyecto"),
         el("button", { class: "btn" + (fav ? " primary" : ""), onclick: () => toggleFav(id) }, fav ? "♥ En favoritos" : "♡ Guardar"),
@@ -801,10 +856,15 @@ function saveMine(id, next) {
   mineBusy = mineBusy.then(async () => {
     if (!(await ensureVoter())) throw new Error("sin sesión");
     const { error } = await sb.from("ratings").upsert({ user_id: S.session.user.id, block_id: id, stars: next.stars || null, sent: next.sent, project: next.project,
-      flash: !!next.flash, sent_at: next.sent_at, updated_at: new Date().toISOString() });
+      flash: !!next.flash, sent_at: next.sent_at, feel: next.feel ?? null, attempts: next.attempts || null, updated_at: new Date().toISOString() });
     if (error) throw error;
-    const s = await sb.rpc("block_stats");
+    const [s, f] = await Promise.all([sb.rpc("block_stats"), sb.rpc("first_sends", { p_gym: S.gym })]);
     if (!s.error) S.stats = toStats(s.data);
+    if (!f.error) {
+      const wasFirst = S.firsts[id]?.is_me;
+      S.firsts = toFirsts(f.data);
+      if (next.sent && !prev?.sent && S.firsts[id]?.is_me && !wasFirst) setTimeout(() => toast("🥇 ¡Eres el primero en encadenarlo!"), 1800);
+    }
     invalidateRanking();
   }).catch(e => {
     console.error(e);
