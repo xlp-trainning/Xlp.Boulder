@@ -397,6 +397,7 @@ I18N_RX.unshift(...I18N_RX.map(([rx, f]) => {
   const src = rx.source.replace(/^\^(?:\p{Extended_Pictographic}|[✓⚡◎♡♥▶✎◇⬆])\uFE0F?\s/u, "^");
   return src === rx.source ? null : [new RegExp(src, rx.flags.includes("u") ? rx.flags : rx.flags + "u"), m => { const r = f(m); return r == null ? r : r.replace(EMOJI_HEAD, ""); }];
 }).filter(Boolean));
+I18N_RX.unshift([/^Apuntarme como «(.+)»$/, m => `Join as “${m[1]}”`]);
 Object.assign(I18N, {
   "Pídeles la beta.": "Ask them for the beta.", "Encadenados": "Sent", "abiertos sin encadenar": "open, not sent yet", "encadenados abiertos": "sent, still open", "encadenado abierto": "sent, still open",
   "Aún no has encadenado nada": "You haven't sent anything yet", "Cuando marques un bloque como encadenado o flash, sale de «Abiertos» y lo tienes aquí.": "When you mark a problem as sent or flashed, it leaves “Open” and shows up here.",

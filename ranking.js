@@ -52,7 +52,7 @@ async function joinRanking(nick) {
   const { error } = await q;
   if (error) return toast(error.code === "23505" ? "Ese apodo ya lo usa otra persona" : "No se pudo guardar");
   toast(RK.me ? "Apodo cambiado" : "¡Ya estás en el ranking!");
-  G.me = { nick, in_ranking: true };
+  G.me = { nick, in_ranking: true }; RK.me = RK.nick = nick;   // el recuadro de apuntarse se va ya, sin esperar a recargar
   RK.editing = false; invalidateRanking(); renderRanking();
 }
 async function leaveRanking() {
@@ -116,10 +116,16 @@ function renderRanking() {
   let joinBox = null;
   if (RK.me === null && !RK.editing && !(RK.nick || G.me)) {
     joinBox = el("section", { class: "join" }, el("span", { class: "label", text: "Apúntate al ranking" }),
-      nickForm({ inRanking: true, submitText: "Apuntarme", onDone: () => { invalidateRanking(); renderRanking(); } }),
+      nickForm({ inRanking: true, submitText: "Apuntarme", onDone: () => { if (G.me?.in_ranking !== false) RK.me = RK.nick = G.me?.nick ?? null; invalidateRanking(); renderRanking(); } }),
       el("p", { class: "note", text: "Solo se verá tu apodo, tu liga y tus puntos del mes. Sin email ni contraseña." }));
-  } else if (RK.me === null || RK.editing) {
-    const input = el("input", { value: RK.me || store.get("lb-nick", ""), maxlength: "20", placeholder: "Tu apodo", autocomplete: "nickname", "aria-label": "Apodo para el ranking" });
+  } else if (RK.me === null && !RK.editing) {
+    // Ya tienes apodo (de Grupos, de Ajustes o recuperado con el PIN): apuntarse es un toque, sin volver a escribirlo
+    const nick = RK.nick || G.me?.nick;
+    joinBox = el("section", { class: "join" }, el("span", { class: "label", text: "Apúntate al ranking" }),
+      el("div", { class: "row" }, el("button", { class: "btn primary", onclick: () => joinRanking(nick) }, `Apuntarme como «${nick}»`)),
+      el("p", { class: "note", text: "Solo se verá tu apodo, tu liga y tus puntos del mes. Sin email ni contraseña." }));
+  } else if (RK.editing) {
+    const input = el("input", { value: RK.me || RK.nick || G.me?.nick || store.get("lb-nick", ""), maxlength: "20", placeholder: "Tu apodo", autocomplete: "nickname", "aria-label": "Apodo para el ranking" });
     joinBox = el("form", { class: "join", onsubmit: e => { e.preventDefault(); joinRanking(input.value); } },
       el("span", { class: "label", text: RK.me ? "Cambiar apodo" : "Apúntate al ranking" }),
       el("div", { class: "row" }, input, el("button", { class: "btn primary", type: "submit" }, RK.me ? "Guardar" : "Apuntarme"),
