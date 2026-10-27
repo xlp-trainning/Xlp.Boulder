@@ -51,7 +51,7 @@ const S = {
   gyms: [], gym: null, blocks: [], stats: {}, firsts: {}, mine: {}, favs: [], sectors: [], mapPath: "",
   comments: {}, drafts: {},
   session: null, isSetter: false,
-  page: "bloques", view: "open", level: null, sector: null, styles: new Set(), colors: new Set(), q: "", sort: "new",
+  page: "bloques", view: "new", level: null, sector: null, styles: new Set(), colors: new Set(), q: "", sort: "new",
   xlp: false, drawingSector: null, mapSel: null, loaded: false, error: null,
 };
 const $ = id => document.getElementById(id);
@@ -75,8 +75,7 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
 };
-S.view = store.get("lb-view", "open");
-if (!["new", "open", "proj", "sent", "fav"].includes(S.view)) S.view = "open";   // «Desmontados» ya no existe
+S.view = "new";   // al abrir la app, Bloques empieza siempre en «Novedades»
 S.page = store.get("lb-page", "hoy");
 S.favs = store.get("lb-favs", []);
 S.gym = store.get("lb-gym", null);
