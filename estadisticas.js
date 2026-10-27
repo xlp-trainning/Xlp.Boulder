@@ -134,5 +134,48 @@ function renderStats() {
     ranking("Poco encadenados (montados hace 14 días o más)", fewSends, b => `${st(b.id).sends} encad.`, "Ningún bloque lleva 14 días montado."),
     ranking("Más proyectados", projected, b => `${st(b.id).projects} probando`, "Nadie lo ha marcado como proyecto todavía."),
     ranking("Con más comentarios", talked, b => `${commentsBy[b.id]} coment.`, "Sin comentarios todavía."),
+    el("section", { class: "section" }, el("span", { class: "label", text: "Fotos" }),
+      el("p", { class: "note", text: "La lista y el mapa usan miniaturas de ~400 px para gastar menos datos de Supabase y cargar antes. Las fotos subidas antes de las miniaturas no la tienen: créalas aquí (basta con hacerlo una vez)." }),
+      el("div", { class: "actions" }, el("button", { class: "btn", disabled: THUMBS.busy, onclick: generateThumbs }, THUMBS.busy ? "Generando…" : "Generar miniaturas que faltan")),
+      el("p", { id: "thumbsMsg", class: "note", "aria-live": "polite", text: THUMBS.msg })),
   ].filter(Boolean));
+}
+
+/* ---------- miniaturas que faltan (fotos subidas antes de que existieran) ---------- */
+const THUMBS = { busy: false, msg: "" };
+const thumbsMsg = m => { THUMBS.msg = m; const n = $("thumbsMsg"); if (n) n.textContent = m; };
+async function listThumbs() {
+  const names = new Set();
+  for (let off = 0; ; off += 1000) {
+    const { data, error } = await sb.storage.from("fotos").list("miniaturas", { limit: 1000, offset: off });
+    if (error) throw error;
+    (data || []).forEach(f => names.add("miniaturas/" + f.name));
+    if (!data || data.length < 1000) return names;
+  }
+}
+async function generateThumbs() {
+  if (THUMBS.busy) return;
+  THUMBS.busy = true; renderStats(); thumbsMsg("Buscando fotos sin miniatura…");
+  try {
+    const { data, error } = await sb.from("blocks").select("photo_path");   // de los dos rocódromos
+    if (error) throw error;
+    const paths = [...new Set((data || []).map(b => b.photo_path).filter(thumbPath))];
+    const have = await listThumbs();
+    const missing = paths.filter(p => !have.has(thumbPath(p)));
+    if (!missing.length) return thumbsMsg(`Todas las fotos (${paths.length}) tienen ya su miniatura.`);
+    let done = 0, failed = 0;
+    for (const [i, p] of missing.entries()) {
+      thumbsMsg(`Generando miniaturas… ${i + 1} de ${missing.length}`);
+      try {
+        const r = await fetch(photoUrl(p), { mode: "cors" });
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        await uploadThumb(await r.blob(), p); done++;
+      } catch (e) { console.warn("miniatura", p, e); failed++; }
+    }
+    thumbsMsg(`Hecho: ${done} ${done === 1 ? "miniatura creada" : "miniaturas creadas"}` + (failed ? ` · ${failed} no se ${failed === 1 ? "pudo" : "pudieron"} crear (¿foto borrada?)` : "") + ".");
+  } catch (e) {
+    console.error(e); thumbsMsg("No se pudieron generar las miniaturas. Comprueba la conexión e inténtalo de nuevo.");
+  } finally {
+    THUMBS.busy = false; if (S.page === "stats") renderStats();
+  }
 }

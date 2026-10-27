@@ -69,7 +69,7 @@
 - Enlaces directos: `…/#patraix` y `…/#benimaclet` abren cada rocódromo. Cada bloque tiene su enlace (`…/#b-<id>`) y un botón **Compartir**, útil para historias de Instagram; si el bloque es del otro rocódromo, la web cambia sola.
 - Se puede añadir a la pantalla de inicio del móvil como una app.
 
-Las fotos se reducen en el propio móvil antes de subirlas (máximo 1600 px). Cada persona puede publicar como mucho 10 comentarios por hora.
+Las fotos se reducen en el propio móvil antes de subirlas (máximo 1600 px). **Miniaturas y caché de fotos:** cada foto de bloque se sube también como miniatura de ~400 px (`miniaturas/<uuid>.jpg`, mismo nombre que `bloques/<uuid>.jpg`), que es la que usan la lista, el mapa y la pantalla «Hoy»; la ficha y las tarjetas para historias usan la grande, y si un bloque antiguo no tiene miniatura se usa la grande sin que se note (el equipador puede crearlas con «Generar miniaturas que faltan», en Estadísticas). Además, el service worker guarda en el móvil las fotos ya vistas (caché aparte `xlp-fotos-v1`, máximo ~30 MB, primero se borran las menos usadas, y se quitan las de bloques que ya no están abiertos), así que no se vuelven a descargar y se ven sin conexión. Cada persona puede publicar como mucho 10 comentarios por hora.
 
 Es HTML, CSS y JavaScript sin compilar. Los datos viven en Supabase y la web se sirve con GitHub Pages.
 

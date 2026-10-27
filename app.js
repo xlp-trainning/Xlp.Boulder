@@ -40,6 +40,12 @@ const sb = configured && window.supabase ? window.supabase.createClient(CFG.supa
 // Los planos que vienen con la web (mapas/...) se sirven tal cual; el resto son fotos subidas a Supabase
 const isStatic = path => /^(mapas\/|https?:)/.test(path);
 const photoUrl = path => !path ? "" : isStatic(path) ? path : sb.storage.from("fotos").getPublicUrl(path).data.publicUrl;
+// Miniatura (~400 px) de la foto de un bloque: mismo nombre en la carpeta «miniaturas/» (bloques/<uuid>.jpg → miniaturas/<uuid>.jpg)
+const THUMB_PX = 400;
+const thumbPath = path => /^bloques\//.test(path || "") ? path.replace(/^bloques\//, "miniaturas/") : null;
+const thumbUrl = path => thumbPath(path) ? photoUrl(thumbPath(path)) : photoUrl(path);
+// Foto pequeña: la miniatura y, si no existe (bloques antiguos), la grande sin que se note
+const thumbImg = (path, attrs = {}) => el("img", { ...attrs, onerror: e => { const i = e.target; if (!i.dataset.full) { i.dataset.full = "1"; i.src = photoUrl(path); } }, src: thumbUrl(path) });
 
 const S = {
   gyms: [], gym: null, blocks: [], stats: {}, firsts: {}, mine: {}, favs: [], sectors: [], mapPath: "",
@@ -140,7 +146,7 @@ async function refresh() {
     if (S.isSetter) await loadAllComments();
     await loadSuggestions();
     S.error = null; S.offline = false;
-    saveSnapshot(); flushOutbox();
+    saveSnapshot(); flushOutbox(); sendPhotosInUse();
   } catch (e) {
     console.error(e);
     // Sin cobertura: se abre con la última copia guardada en el móvil
@@ -209,7 +215,7 @@ function card(b) {
       el("div", { class: "meta" }, b.sector ? el("span", { text: b.sector }) : null, holdMeta(b), b.set_date ? el("span", { class: "mono", text: fmtDate(b.set_date) }) : null),
       (b.styles || []).length ? el("div", { class: "styles" }, b.styles.map(s => el("span", { class: "tag", text: s }))) : null,
       line),
-    b.photo_path ? el("img", { class: "thumb", src: photoUrl(b.photo_path), alt: "", loading: "lazy" }) : null);
+    b.photo_path ? thumbImg(b.photo_path, { class: "thumb", alt: "", loading: "lazy" }) : null);
 }
 
 /* ---------- página: bloques ---------- */
@@ -745,9 +751,16 @@ async function uploadPhoto(file, folder, max = 1600) {
   const path = `${folder}/${crypto.randomUUID()}.${png ? "png" : "jpg"}`;
   const { error } = await sb.storage.from("fotos").upload(path, blob, { contentType: type, cacheControl: "31536000" });
   if (error) throw error;
+  // Las fotos de bloques llevan además su miniatura; si falla, la lista usa la grande
+  if (thumbPath(path)) await uploadThumb(blob, path).catch(e => console.warn("miniatura", e));
   return path;
 }
-function removePhoto(path) { if (path && !isStatic(path)) sb.storage.from("fotos").remove([path]); }
+async function uploadThumb(blob, path) {
+  const small = await resizeImage(blob, THUMB_PX);
+  const { error } = await sb.storage.from("fotos").upload(thumbPath(path), small, { contentType: "image/jpeg", cacheControl: "31536000", upsert: true });
+  if (error) throw error;
+}
+function removePhoto(path) { if (path && !isStatic(path)) sb.storage.from("fotos").remove([path, thumbPath(path)].filter(Boolean)); }
 
 /* ---------- formulario del equipador ---------- */
 function openForm(b) {

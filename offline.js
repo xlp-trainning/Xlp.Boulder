@@ -69,3 +69,16 @@ function markNet() {
 }
 addEventListener("online", () => { S.offline = false; markNet(); if (sb) refresh(); });
 addEventListener("offline", markNet);
+
+// Fotos guardadas en el móvil (sw.js): cada 12 h, la web le pasa las fotos que siguen en uso
+// (bloques abiertos de los dos rocódromos, con sus miniaturas, y los planos) y el resto se borra
+async function sendPhotosInUse(force) {
+  const sw = navigator.serviceWorker?.controller;
+  if (!sw || (!force && Date.now() - store.get("lb-photo-gc", 0) < 12 * 36e5)) return;
+  const { data, error } = await sb.from("blocks").select("photo_path").eq("active", true);
+  if (error) return;
+  const paths = [...(data || []).map(b => b.photo_path), ...S.gyms.map(g => g.map_path)].filter(p => p && !isStatic(p));
+  const urls = paths.flatMap(p => [photoUrl(p), thumbPath(p) ? photoUrl(thumbPath(p)) : null]).filter(Boolean);
+  sw.postMessage({ type: "fotos-en-uso", urls });
+  store.set("lb-photo-gc", Date.now());
+}

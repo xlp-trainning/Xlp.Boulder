@@ -205,6 +205,11 @@ const I18N = {
   // Sin conexión
   "Sin nivel": "No grade", "Bloque": "Problem",
 
+  // Miniaturas (Estadísticas)
+  "Fotos": "Photos", "Generar miniaturas que faltan": "Generate missing thumbnails", "Generando…": "Generating…", "Buscando fotos sin miniatura…": "Looking for photos without a thumbnail…",
+  "La lista y el mapa usan miniaturas de ~400 px para gastar menos datos de Supabase y cargar antes. Las fotos subidas antes de las miniaturas no la tienen: créalas aquí (basta con hacerlo una vez).": "The list and the map use ~400 px thumbnails to use less Supabase data and load faster. Photos uploaded before thumbnails existed don't have one: create them here (once is enough).",
+  "No se pudieron generar las miniaturas. Comprueba la conexión e inténtalo de nuevo.": "Couldn't generate the thumbnails. Check your connection and try again.",
+
   // Hoy, bienvenida y ajustes
   "Hoy": "Today", "Buenos días": "Good morning", "Buenas tardes": "Good afternoon", "Buenas noches": "Good evening",
   "⚙️ Ajustes": "⚙️ Settings", "Ajustes": "Settings", "Ajustes: idioma, tema, letra y modo daltónico": "Settings: language, theme, text size and colour-blind mode",
@@ -253,6 +258,7 @@ const I18N_N = {
   "Encadenaste {n} bloques, {n} al flash, {n} puntos.": "You sent {n} problems, {n} flashed, {n} points.", "Resumen: {n} bloques, {n} puntos, {n} al flash.": "Recap: {n} problems, {n} points, {n} flashed.",
   "Escalaste {n} de {n} semanas": "You climbed {n} of {n} weeks", "+{n} vs {x}": "+{n} vs {x}", "{n} de {n}. {x}": "{n} of {n}. {x}", "{n} estrellas": "{n} stars",
   "{n} presas · {n} de salida · {n} de top": "{n} holds · {n} start · {n} top", "{n} presa · {n} de salida · {n} de top": "{n} hold · {n} start · {n} top", "{n} abiertos": "{n} open",
+  "Generando miniaturas… {n} de {n}": "Generating thumbnails… {n} of {n}", "Todas las fotos ({n}) tienen ya su miniatura.": "All photos ({n}) already have a thumbnail.", "Hecho: {n} miniaturas creadas.": "Done: {n} thumbnails created.", "Hecho: {n} miniatura creada.": "Done: {n} thumbnail created.", "Hecho: {n} miniaturas creadas": "Done: {n} thumbnails created", "Hecho: {n} miniatura creada": "Done: {n} thumbnail created", "{n} no se pudieron crear (¿foto borrada?).": "{n} couldn't be created (photo deleted?).", "{n} no se pudo crear (¿foto borrada?).": "{n} couldn't be created (photo deleted?).",
   "🔥 {n} semanas": "🔥 {n} weeks", "🔥 {n} semana": "🔥 {n} week", "{n} puntos este mes": "{n} points this month", "Nivel {n}": "Level {n}", "Pantalla {n} de {n}": "Screen {n} of {n}",
   "🧗 Tienes una sesión en marcha ({n} min)": "🧗 You have a session going ({n} min)", "🧗 Tienes una sesión en marcha ({n} h {n} min)": "🧗 You have a session going ({n} h {n} min)",
   "{n} amigos han hecho «{x}»; ¿y tú?": "{n} friends have sent “{x}”; what about you?",
