@@ -211,6 +211,13 @@ const I18N = {
   "No se pudieron generar las miniaturas. Comprueba la conexión e inténtalo de nuevo.": "Couldn't generate the thumbnails. Check your connection and try again.",
 
   // Hoy, bienvenida y ajustes
+  "Bienvenido": "Welcome", "Todos los bloques de Natural Climb Patraix y Natural Climb Benimaclet.": "Every problem at Natural Climb Patraix and Natural Climb Benimaclet.",
+  "Paso a paso": "Step by step", "Encadenado o flash": "Sent or flash", "Abre el bloque y márcalo con un toque.": "Open the problem and mark it with one tap.", "Cuenta tus intentos": "Count your attempts",
+  "Suma uno cada vez que lo pruebes.": "Add one every time you try it.", "Modo sesión": "Session mode", "En la sala, todo en dos toques y sin abrir fichas.": "At the gym, everything in two taps without opening any problem.",
+  "Con tu gente": "With your crew", "Ligas por color": "Colour leagues", "Cada mes compites con los de tu nivel.": "Every month you compete with climbers at your level.", "Grupos y duelos": "Groups and duels",
+  "Ranking propio, retos y sesiones juntos.": "Your own ranking, challenges and sessions together.", "Medallas, rachas y el resumen de tu mes.": "Badges, streaks and your monthly recap.",
+  "Empezar": "Start", "Instalar la app en el móvil": "Install the app on your phone", "AMARILLO": "YELLOW", "LIGA NARANJA": "ORANGE LEAGUE", "este mes": "this month", "El techo": "The Roof",
+  "7 de 10 amarillos para subir de liga": "7 of 10 yellows to move up a league",
   "Hoy": "Today", "Buenos días": "Good morning", "Buenas tardes": "Good afternoon", "Buenas noches": "Good evening",
   "⚙️ Ajustes": "⚙️ Settings", "Ajustes": "Settings", "Ajustes: idioma, tema, letra y modo daltónico": "Settings: language, theme, text size and colour-blind mode",
   "Ver →": "View →", "Abrir →": "Open →", "Unirme →": "Join →", "Empezar →": "Start →", "🔥 Sin racha": "🔥 No streak", "🗺️ Mapa de la sala": "🗺️ Gym map", "Ver todas →": "See all →",

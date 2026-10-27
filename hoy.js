@@ -53,36 +53,81 @@ function renderHoy() {
 }
 
 /* ---------- Bienvenida ---------- */
+// Tres pantallas con la estética de la marca: fondo oscuro, cintas de los colores del circuito y
+// pequeñas ilustraciones hechas con la propia interfaz (una ficha de bloque, una clasificación).
+const lvl = k => LEVELS.find(l => l.k === k);
+const tapeStyle = l => l.solid ? "background:repeating-linear-gradient(135deg,#1C1C1E 0 9px,#F4F4F2 9px 18px)" : `background:${l.bg}`;
+const wlSteps = steps => el("ol", { class: "wl-steps" }, steps.map(([t, d], n) =>
+  el("li", {}, el("span", { class: "wl-n", text: String(n + 1).padStart(2, "0") }), el("span", {}, el("strong", { text: t }), el("span", { text: d })))));
+
 const WELCOME = [
-  { icon: "🧗", title: "Bienvenido a Xlp.Boulder", body: [el => el("p", { text: "Todos los bloques de Natural Patraix y Natural Benimaclet: con su foto, la beta del equipador y el mapa de la sala. Sin registro." })] },
-  { icon: "✅", title: "Apunta lo que escalas", body: [el => el("ul", {},
-      el("li", { text: "Abre un bloque y marca «Encadenado» o «⚡ Flash» (a la primera)." }),
-      el("li", { text: "Mientras lo pruebas, suma intentos con «+»." }),
-      el("li", { text: "En la sala, «🧗 Empezar sesión» lo hace en dos toques." }),
-      el("li", { text: "Vota si te parece blando, justo o duro y cuenta tu beta." }))] },
-  { icon: "🏆", title: "Y pica a tus amigos", body: [el => el("ul", {},
-      el("li", { text: "Ranking del mes por ligas de color." }),
-      el("li", { text: "Grupos con tus amigos: duelos, retos y sesiones juntos." }),
-      el("li", { text: "Medallas, rachas, tu nivel real y tu resumen del mes." })),
-    el => el("button", { class: "btn", onclick: () => { closeWelcome(); openInstall(); } }, "📲 Instálala en tu móvil")] },
+  { art: () => {
+      // Cintas de salida de los ocho colores cruzando la pantalla, y el logo encima
+      const tapes = el("div", { class: "wl-tapes", "aria-hidden": "true" },
+        LEVELS.map((l, i) => el("span", { style: `${tapeStyle(l)};--i:${i}` })));
+      const mark = document.querySelector(".wordmark .mark")?.cloneNode(true);
+      return el("div", { class: "wl-art wl-art-1" }, tapes,
+        el("div", { class: "wl-logo" }, mark, el("span", {}, "XLP", el("i", { text: "." }), "BOULDER")));
+    },
+    kicker: "Bienvenido", title: null,
+    body: () => el("p", { class: "wl-lead", text: "Todos los bloques de Natural Climb Patraix y Natural Climb Benimaclet." }) },
+  { art: () => {
+      // Una ficha de bloque de mentira: así se apunta
+      const y = lvl("amarillo");
+      return el("div", { class: "wl-art wl-art-2", "aria-hidden": "true" },
+        el("div", { class: "wl-card" },
+          el("div", { class: "wl-card-tape", style: tapeStyle(y) }, el("span", { text: "AMARILLO" })),
+          el("div", { class: "wl-card-body" },
+            el("strong", { text: "El techo" }), el("span", { class: "wl-card-meta", text: "Sala 2 · La U" }),
+            el("div", { class: "wl-card-btns" }, el("span", { class: "wl-pill on", text: "Encadenado" }), el("span", { class: "wl-pill", text: "Flash" })),
+            el("div", { class: "wl-card-att" }, el("span", { class: "wl-key", text: "−" }), el("b", { text: "3" }), el("span", { class: "wl-key", text: "+" }), el("span", { class: "wl-card-meta", text: "intentos" })))));
+    },
+    kicker: "Paso a paso", title: "Apunta lo que escalas",
+    body: () => wlSteps([["Encadenado o flash", "Abre el bloque y márcalo con un toque."], ["Cuenta tus intentos", "Suma uno cada vez que lo pruebes."], ["Modo sesión", "En la sala, todo en dos toques y sin abrir fichas."]]) },
+  { art: () => {
+      // Una clasificación de liga de mentira
+      const o = lvl("naranja"), y = lvl("amarillo");
+      const row = (pos, name, pts, me) => el("div", { class: "wl-row" + (me ? " me" : "") }, el("span", { class: "wl-pos", text: pos }), el("span", { class: "wl-name", text: name }), el("b", { text: pts }));
+      return el("div", { class: "wl-art wl-art-3", "aria-hidden": "true" },
+        el("div", { class: "wl-board" },
+          el("div", { class: "wl-board-head" }, el("span", { class: "wl-chip", style: tapeStyle(o) + `;color:${o.fg}`, text: "LIGA NARANJA" }), el("span", { class: "wl-card-meta", text: "este mes" })),
+          row("1", "Bea", "42"), row("2", "Tú", "38", true), row("3", "Dani", "31"),
+          el("div", { class: "wl-up" }, el("span", { class: "wl-card-meta", text: "7 de 10 amarillos para subir de liga" }), el("span", { class: "wl-bar" }, el("span", { style: `width:70%;background:${y.bg}` })))));
+    },
+    kicker: "Con tu gente", title: "Y pica a tus amigos",
+    body: () => wlSteps([["Ligas por color", "Cada mes compites con los de tu nivel."], ["Grupos y duelos", "Ranking propio, retos y sesiones juntos."], ["Tu nivel real", "Medallas, rachas y el resumen de tu mes."]]) },
 ];
+
 function openWelcome(i = 0) {
   const w = WELCOME[i], last = i === WELCOME.length - 1;
   let root = $("welcomeRoot");
-  if (!root) { root = el("div", { id: "welcomeRoot", class: "welcome", role: "dialog", "aria-modal": "true", "aria-label": "Bienvenida" }); document.body.append(root); }
+  if (!root) {
+    root = el("div", { id: "welcomeRoot", class: "wl", role: "dialog", "aria-modal": "true", "aria-label": "Bienvenida", tabindex: "-1" });
+    // Deslizar con el dedo para pasar de pantalla
+    let x0 = null;
+    root.addEventListener("pointerdown", e => { x0 = e.clientX; });
+    root.addEventListener("pointerup", e => { if (x0 == null) return; const dx = e.clientX - x0; x0 = null;
+      const cur = +root.dataset.i; if (Math.abs(dx) > 60) { if (dx < 0 && cur < WELCOME.length - 1) openWelcome(cur + 1); if (dx > 0 && cur > 0) openWelcome(cur - 1); } });
+    document.body.append(root);
+  }
+  root.dataset.i = i;
   document.body.style.overflow = "hidden";
-  root.replaceChildren(el("div", { class: "welcome-card" },
-    el("div", { class: "welcome-emoji", "aria-hidden": "true", text: w.icon }),
-    el("h2", { text: w.title }),
-    ...w.body.map(f => f(el)),
-    i === 0 ? el("button", { class: "linkbtn", translate: "no", onclick: () => { try { localStorage.setItem("lb-lang", JSON.stringify(LANG === "es" ? "en" : "es")); } catch (e) {} location.reload(); } },
-      LANG === "es" ? "🌐 Read it in English" : "🌐 Leer en español") : null,
-    el("div", { class: "welcome-actions" },
-      el("div", { class: "welcome-dots", "aria-label": `Pantalla ${i + 1} de ${WELCOME.length}` }, WELCOME.map((_, k) => el("span", { class: k === i ? "on" : "" }))),
-      el("div", { class: "row" },
-        last ? null : el("button", { class: "btn", onclick: closeWelcome }, "Saltar"),
-        el("button", { class: "btn primary", onclick: () => last ? closeWelcome() : openWelcome(i + 1) }, last ? "¡Empezar!" : "Siguiente")))));
-  root.querySelector(".btn.primary").focus();
+  root.replaceChildren(
+    el("div", { class: "wl-top" },
+      el("div", { class: "wl-progress", "aria-label": `Pantalla ${i + 1} de ${WELCOME.length}` }, WELCOME.map((_, k) => el("span", { class: k <= i ? "on" : "" }))),
+      last ? el("span") : el("button", { class: "wl-skip", onclick: closeWelcome }, "Saltar")),
+    el("div", { class: "wl-main" },
+      w.art(),
+      el("div", { class: "wl-text" },
+        el("span", { class: "wl-kicker", text: w.kicker }),
+        w.title ? el("h2", { class: "wl-title", text: w.title }) : null,
+        w.body())),
+    el("div", { class: "wl-bottom" },
+      el("button", { class: "wl-next", onclick: () => last ? closeWelcome() : openWelcome(i + 1) }, last ? "Empezar" : "Siguiente"),
+      i === 0 ? el("button", { class: "wl-link", translate: "no", onclick: () => { try { localStorage.setItem("lb-lang", JSON.stringify(LANG === "es" ? "en" : "es")); } catch (e) {} location.reload(); } },
+          LANG === "es" ? "Read it in English" : "Leer en español")
+        : last ? el("button", { class: "wl-link", onclick: () => { closeWelcome(); openInstall(); } }, "Instalar la app en el móvil") : el("span", { class: "wl-link-space" })));
+  root.focus({ preventScroll: true });
 }
 function closeWelcome() { store.set("lb-welcome", 1); $("welcomeRoot")?.remove(); document.body.style.overflow = ""; }
 
