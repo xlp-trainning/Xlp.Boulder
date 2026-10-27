@@ -28,6 +28,9 @@
   - Dentro de cada liga gana quien más puntos sume en el mes. Se reinicia el día 1 y se puede ver el mes pasado.
   - Es voluntario: cada uno se apunta con un apodo (sin email). El equipador puede quitar a alguien del ranking.
   - La fecha de cada encadenado la pone el servidor, así que no se puede trampear con fechas, y no cuentan los bloques marcados después de desmontarse.
+- **Modo sesión** («🧗 Empezar sesión», arriba): una vista rápida para apuntar entre pegue y pegue, con filtros por sector y color y tres botones por bloque: **+1** (un pegue sin encadenar), **✓** (encadenado en este pegue; se deshace tocando otra vez) y **⚡** (a la primera). Arriba, el marcador de la sesión (encadenados, flashes, intentos y puntos). Se puede minimizar (queda una barra «Sesión en curso») y sigue aunque se cierre la web. Al terminar, resumen con lo encadenado y tarjeta para historias.
+- **Instalar la app**: a partir de la 2.ª visita o tras el primer encadenado, un aviso invita a instalarla; los pasos para **iPhone** (Safari → Compartir → «Añadir a pantalla de inicio») y **Android** (Chrome → ⋮ → «Instalar aplicación») salen según el móvil, con botón de instalar directo cuando el navegador lo permite. También desde «📲 Instalar la app», al pie.
+- **Pasar el progreso**: como en iPhone la app instalada no comparte datos con Safari (ni Safari con el navegador de Instagram), «Copiar mi código» y «Recuperar» llevan los votos, encadenados y apodo de un sitio a otro.
 - **Buzón de sugerencias** («💬 Buzón de sugerencias», al pie de todas las páginas): cualquiera escribe al equipador sin registrarse (idea, bloques, algo falla u otro), con su nombre si quiere. **Sin respuesta ni confirmación de lectura**: quien escribe no ve sus mensajes ni sabe si se han leído. Como mucho 5 mensajes por persona y hora.
 - **El equipador** entra con email y contraseña ("Acceso equipador", al pie de la página) y puede:
   - crear, editar, desmontar o borrar bloques, con foto;
@@ -87,6 +90,9 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `historias.js` | tarjeta para historias de Instagram de un bloque |
 | `estadisticas.js` | estadísticas del equipador: todos o solo los suyos, por rocódromo, sala y sector |
 | `buzon.js` | buzón de sugerencias: formulario y pestaña del equipador |
+| `sesion.js` | modo sesión: apuntar rápido en la sala y resumen de la sesión |
+| `instalar.js` | invitación e instrucciones para instalar la app, y código para pasar el progreso |
+| `sw.js` | service worker mínimo para poder instalar la web (no guarda caché) |
 | `wrapped.js` | «Tu mes»: el resumen del mes tipo Wrapped |
 | `editor.js` | editor de la foto del bloque: resaltar presas por color, salida y top |
 | `config.js` | dirección y clave pública de Supabase |

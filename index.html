@@ -38,9 +38,15 @@
     </div>
     <div class="row">
       <span class="status" id="who"></span>
+      <button class="btn" id="sessionBtn" hidden>🧗 Empezar sesión</button>
       <button class="btn primary" id="addBtn" hidden>+ Nuevo bloque</button>
     </div>
   </header>
+
+  <div class="banner install-banner" id="installBanner" hidden>
+    <span>📲 Instala Xlp.Boulder en tu móvil: icono en la pantalla de inicio y a pantalla completa.</span>
+    <span class="row"><button class="btn primary small" id="installGo">Cómo instalarla</button><button class="linkbtn" id="installNo">Ahora no</button></span>
+  </div>
 
   <nav class="mainnav" aria-label="Secciones">
     <button data-page="bloques" aria-current="page">Bloques</button>
@@ -95,11 +101,14 @@
   <footer class="foot">
     <span class="foot-brand">Xlp.Boulder · bloques equipados en Natural Patraix y Natural Benimaclet</span>
     <button class="btn buzon-btn" id="buzonBtn">💬 Buzón de sugerencias</button>
+    <button class="linkbtn" id="installLink">📲 Instalar la app · pasar mi progreso</button>
     <button class="linkbtn" id="loginBtn">Acceso equipador</button>
   </footer>
 </div>
 
 <div id="sheetRoot"></div>
+<div id="sessionRoot"></div>
+<button class="session-bar" id="sessionBar" hidden><span class="sb-dot" aria-hidden="true"></span><span class="sb-txt">Sesión</span><span class="sb-go">Abrir</span></button>
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script src="config.js"></script>
@@ -112,5 +121,7 @@
 <script src="wrapped.js"></script>
 <script src="estadisticas.js"></script>
 <script src="buzon.js"></script>
+<script src="instalar.js"></script>
+<script src="sesion.js"></script>
 </body>
 </html>

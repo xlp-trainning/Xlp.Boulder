@@ -481,7 +481,7 @@ function render() {
   const page = !sb || !S.loaded || S.error ? "bloques" : S.page;
   document.querySelectorAll("[data-page]").forEach(b => b.setAttribute("aria-current", b.dataset.page === S.page ? "page" : "false"));
   document.querySelectorAll(".page").forEach(p => p.hidden = p.id !== "page-" + page);
-  markWrapped(); markBuzon();
+  markWrapped(); markBuzon(); markInstall(); markSession();
   if (page === "bloques") return renderBloques();
   if (S.page === "mapa") renderMapa();
   if (S.page === "ranking") renderRanking();
@@ -903,6 +903,11 @@ $("q").addEventListener("input", e => { S.q = e.target.value.trim(); render(); }
 $("sort").addEventListener("change", e => { S.sort = e.target.value; render(); });
 $("addBtn").addEventListener("click", () => openForm());
 $("buzonBtn").addEventListener("click", () => sb ? openBuzon() : toast("Falta configurar Supabase"));
+$("installLink").addEventListener("click", () => openInstall());
+$("installGo").addEventListener("click", () => openInstall());
+$("installNo").addEventListener("click", () => { store.set("lb-install-snooze", Date.now() + 14 * 864e5); markInstall(); });
+$("sessionBtn").addEventListener("click", () => startSession());
+$("sessionBar").addEventListener("click", () => { SES.open = true; render(); });
 $("loginBtn").addEventListener("click", async () => {
   if (!sb) return;
   if (S.session && !S.session.user.is_anonymous) { await sb.auth.signOut(); await refresh(); toast("Sesión cerrada"); }
