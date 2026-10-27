@@ -76,6 +76,7 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
 };
 S.view = store.get("lb-view", "open");
+if (!["new", "open", "proj", "sent", "fav"].includes(S.view)) S.view = "open";   // «Desmontados» ya no existe
 S.page = store.get("lb-page", "hoy");
 S.favs = store.get("lb-favs", []);
 S.gym = store.get("lb-gym", null);
@@ -230,7 +231,6 @@ function visible() {
     if (v === "open" && S.mine[b.id]?.sent) return false;
     if (v === "sent" && !S.mine[b.id]?.sent) return false;
     if (v === "new" && !isNew(b)) return false;
-    if (v === "old" && b.active) return false;
     if (v === "fav" && !S.favs.includes(b.id)) return false;
     if (v === "proj" && !(S.mine[b.id]?.project && !S.mine[b.id]?.sent)) return false;
     if (S.level && b.level !== S.level) return false;
@@ -254,12 +254,12 @@ function visible() {
 }
 
 function renderBars() {
-  const pool = S.blocks.filter(b => S.view === "old" ? !b.active : b.active && (S.view === "open" ? !S.mine[b.id]?.sent : S.view === "sent" ? S.mine[b.id]?.sent : true));
+  const pool = S.blocks.filter(b => b.active && (S.view === "open" ? !S.mine[b.id]?.sent : S.view === "sent" ? S.mine[b.id]?.sent : true));
   const counts = Object.fromEntries(LEVELS.map(l => [l.k, 0]));
   pool.forEach(b => { if (b.level in counts) counts[b.level]++; });
   const max = Math.max(1, ...Object.values(counts));
   $("totalN").textContent = pool.length;
-  $("totalLbl").textContent = S.view === "old" ? "bloques desmontados" : S.view === "open" ? "abiertos sin encadenar"
+  $("totalLbl").textContent = S.view === "open" ? "abiertos sin encadenar"
     : S.view === "sent" ? (pool.length === 1 ? "encadenado abierto" : "encadenados abiertos") : (pool.length === 1 ? "bloque abierto" : "bloques abiertos");
   $("bars").replaceChildren(...LEVELS.map(l => {
     const c = counts[l.k];
