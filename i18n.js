@@ -398,6 +398,9 @@ I18N_RX.unshift(...I18N_RX.map(([rx, f]) => {
   return src === rx.source ? null : [new RegExp(src, rx.flags.includes("u") ? rx.flags : rx.flags + "u"), m => { const r = f(m); return r == null ? r : r.replace(EMOJI_HEAD, ""); }];
 }).filter(Boolean));
 I18N_RX.unshift([/^Apuntarme como «(.+)»$/, m => `Join as “${m[1]}”`]);
+I18N_RX.unshift([/^desde el (\d\d\/\d\d\/\d\d)$/, m => `since ${m[1]}`], [/^Abierto desde el (\S+): (.+)$/, m => `Open since ${m[1]}: ${m[2].replace("Hoy", "today").replace(/días?/, x => x === "día" ? "day" : "days").replace("meses", "months")}`]);
+Object.assign(I18N, { "días abierto": "days open", "día abierto": "day open", "Hoy": "Today" });
+for (const [k, v] of [["{n} meses", "{n} months"], ["{n} días", "{n} days"], ["{n} día", "{n} day"]]) I18N_N[k] ??= v;
 I18N_RX.unshift([/^Fuerte: (.+)$/, m => `Strength: ${tw(m[1])}`]);
 Object.assign(I18N, { "Físico": "Physical", "Técnico": "Technical", "Estático": "Static", "físico": "physical", "técnico": "technical", "estático": "static", "Agarre": "Grip", "Agarres": "Grips", "Cazos": "Jugs", "Volúmenes": "Volumes", "cazos": "jugs", "volúmenes": "volumes", "Estilos": "Styles",
   "Estilos de escalada": "Climbing styles", "Tipos de agarre": "Grip types",

@@ -328,6 +328,13 @@ function selectSector(name, scroll) {
 }
 const svgEl = (tag, attrs) => { const n = document.createElementNS("http://www.w3.org/2000/svg", tag); for (const k in attrs) n.setAttribute(k, attrs[k]); return n; };
 
+// Cuánto lleva abierto un sector: desde el montaje del bloque abierto más antiguo que tiene
+// (al remontarlo entero, los viejos se desmontan y la fecha pasa a ser la del remontaje)
+function sectorAge(name) {
+  const dates = S.blocks.filter(b => b.active && b.sector === name && b.set_date).map(b => b.set_date.slice(0, 10)).sort();
+  return dates.length ? { since: dates[0], days: daysSince(dates[0]) } : null;
+}
+const ageText = d => d <= 0 ? "Hoy" : d === 1 ? "1 día" : d < 60 ? `${d} días` : `${Math.floor(d / 30)} meses`;
 function renderMapa() {
   const root = $("page-mapa");
   const openBy = {}, newBy = {};
@@ -377,7 +384,11 @@ function renderMapa() {
     kids.push(el("section", { class: "section sector-panel" },
       el("div", { class: "sector-panel-head" },
         el("div", {}, el("span", { class: "label", text: "Sector" }), el("h2", { class: "sector-title", text: S.mapSel }),
-          el("span", { class: "note", text: `${list.length} ${list.length === 1 ? "bloque abierto" : "bloques abiertos"}` + (newBy[S.mapSel] ? ` · ${newBy[S.mapSel]} nuevos` : "") })),
+          el("span", { class: "note", text: `${list.length} ${list.length === 1 ? "bloque abierto" : "bloques abiertos"}` + (newBy[S.mapSel] ? ` · ${newBy[S.mapSel]} nuevos` : "") }),
+          (age => age ? el("div", { class: "sector-age", "aria-label": `Abierto desde el ${fmtDate(age.since)}: ${ageText(age.days)}` },
+            el("b", { text: age.days <= 0 ? "0" : String(age.days) }),
+            el("span", {}, el("strong", { text: age.days === 1 ? "día abierto" : "días abierto" }), el("span", { class: "note", text: `desde el ${fmtDate(age.since)}` })))
+            : null)(sectorAge(S.mapSel))),
         el("div", { class: "row" },
           list.length ? el("button", { class: "btn small", onclick: () => goSector(S.mapSel) }, "Ver en la lista") : null,
           el("button", { class: "sector-close", "aria-label": "Cerrar sector", onclick: () => selectSector(S.mapSel) }, ico("x")))),
@@ -389,7 +400,7 @@ function renderMapa() {
     kids.push(el("div", { class: "section" }, el("span", { class: "label", text: "Sectores" }),
       el("div", { class: "sector-grid" }, names.map(n => el("button", { class: "sector-btn" + (n === S.mapSel ? " sel" : ""), onclick: () => selectSector(n, true) },
         el("span", { class: "sector-name", text: n }),
-        el("span", { class: "note", text: `${openBy[n] || 0} abiertos` + (newBy[n] ? ` · ${newBy[n]} nuevos` : "") }))))));
+        el("span", { class: "note", text: `${openBy[n] || 0} abiertos` + (newBy[n] ? ` · ${newBy[n]} nuevos` : "") + (sectorAge(n) ? ` · ${ageText(sectorAge(n).days)}` : "") }))))));
   } else if (!S.isSetter) kids.push(emptyBox("Sin sectores todavía", "Cuando el equipador apunte los sectores de la sala, aparecerán aquí."));
 
   if (S.isSetter) kids.push(mapEditor());
