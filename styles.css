@@ -831,3 +831,4 @@ html.big-text .wordmark .mark { width: clamp(33px, 8vw, 42px); }
 .sector-age b { font-family: var(--f-display); font-weight: 900; font-size: var(--fd-3); line-height: .9; font-variant-numeric: tabular-nums; }
 .sector-age > span { display: flex; flex-direction: column; line-height: 1.2; }
 .sector-age strong { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.off-badge { flex: none; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line-2); padding: 1px 6px; border-radius: var(--r-1); }

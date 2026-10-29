@@ -217,6 +217,7 @@ function card(b) {
       el("div", { class: "card-top" }, el("h3", { text: title(b) }),
         b.xlp ? xlpBadge() : null,
         isNew(b) ? el("span", { class: "new-badge", text: "Nuevo" }) : null,
+        b.active ? null : el("span", { class: "off-badge", text: "Desmontado" }),
         fav ? el("span", { class: "fav-ind", title: "En favoritos" }, ico("heart", "sm fill")) : null),
       el("div", { class: "meta" }, b.sector ? el("span", { text: b.sector }) : null, holdMeta(b), b.set_date ? el("span", { class: "mono", text: fmtDate(b.set_date) }) : null),
       (b.styles || []).length ? el("div", { class: "styles" }, b.styles.map(s => el("span", { class: "tag", text: s }))) : null,
@@ -228,7 +229,7 @@ function card(b) {
 function visible() {
   const list = S.blocks.filter(b => {
     const v = S.view;
-    if ((v === "open" || v === "new" || v === "sent") && !b.active) return false;
+    if ((v === "open" || v === "new") && !b.active) return false;   // «Encadenados» guarda también los ya desmontados
     // «Abiertos» son los que te quedan por encadenar; los que ya tienes, en «Encadenados»
     if (v === "open" && S.mine[b.id]?.sent) return false;
     if (v === "sent" && !S.mine[b.id]?.sent) return false;
@@ -256,13 +257,13 @@ function visible() {
 }
 
 function renderBars() {
-  const pool = S.blocks.filter(b => b.active && (S.view === "open" ? !S.mine[b.id]?.sent : S.view === "sent" ? S.mine[b.id]?.sent : true));
+  const pool = S.blocks.filter(b => S.view === "sent" ? S.mine[b.id]?.sent : b.active && (S.view === "open" ? !S.mine[b.id]?.sent : true));
   const counts = Object.fromEntries(LEVELS.map(l => [l.k, 0]));
   pool.forEach(b => { if (b.level in counts) counts[b.level]++; });
   const max = Math.max(1, ...Object.values(counts));
   $("totalN").textContent = pool.length;
   $("totalLbl").textContent = S.view === "open" ? "abiertos sin encadenar"
-    : S.view === "sent" ? (pool.length === 1 ? "encadenado abierto" : "encadenados abiertos") : (pool.length === 1 ? "bloque abierto" : "bloques abiertos");
+    : S.view === "sent" ? (pool.length === 1 ? "bloque encadenado" : "bloques encadenados") : (pool.length === 1 ? "bloque abierto" : "bloques abiertos");
   $("bars").replaceChildren(...LEVELS.map(l => {
     const c = counts[l.k];
     return el("button", { class: "bar" + (c ? " has" : "") + (S.level === l.k ? " sel" : ""), "aria-pressed": S.level === l.k ? "true" : "false", "aria-label": `${l.name}: ${c} bloques`,
