@@ -8,8 +8,8 @@ Ideas que el equipador ha aprobado o le han parecido interesantes y quedan para 
 - **Generador de entrenamientos con bloques reales** (idea 11, 28/10/2026): «4×4 de hoy: estos 4 bloques de tu nivel», «Pirámide: 4 verdes, 3 naranjas, 2 amarillos, 1 morado»… elegidos entre los bloques abiertos de la sala.
 - **Premio del mes** (27/10/2026): aviso editable por el equipador («Este mes, el 1.º de cada liga se lleva un café / una camiseta»). Hay que acordarlo con el rocódromo.
 
-## Ajustar el plano de Patraix (pendiente, 02/11/2026)
-- Pasar el plano de 10 a los 39 sectores reales: Sala 1 (9), placa de la Sala 2 (2), isla de la Sala 2 (3), U de la Sala 2 (6), placa de la derecha de la Sala 3 (2), isla grande de la Sala 3 (9), pared de la izquierda (6) y terraza (2). Detalle y dudas en `mapas/sectores-reales.md`.
+## Ajustar el plano de Patraix (02/11/2026)
+- Hecho: 40 sectores numerados (detalle en `mapas/sectores-reales.md`). Falta marcar los límites de verdad de cada sector (el equipador, con el ordenador) y luego Benimaclet.
 
 ## Del informe de 50 usuarios simulados (28/10/2026, para después)
 El informe es una simulación: sirve para priorizar, no sustituye a preguntar a la gente de la sala.
