@@ -397,9 +397,11 @@ I18N_RX.unshift(...I18N_RX.map(([rx, f]) => {
   const src = rx.source.replace(/^\^(?:\p{Extended_Pictographic}|[✓⚡◎♡♥▶✎◇⬆])\uFE0F?\s/u, "^");
   return src === rx.source ? null : [new RegExp(src, rx.flags.includes("u") ? rx.flags : rx.flags + "u"), m => { const r = f(m); return r == null ? r : r.replace(EMOJI_HEAD, ""); }];
 }).filter(Boolean));
+I18N_RX.unshift([/^Sector (.+)$/, m => `Sector ${m[1]}`]);
 I18N_RX.unshift([/^Apuntarme como «(.+)»$/, m => `Join as “${m[1]}”`]);
 I18N_RX.unshift([/^desde el (\d\d\/\d\d\/\d\d)$/, m => `since ${m[1]}`], [/^Abierto desde el (\S+): (.+)$/, m => `Open since ${m[1]}: ${m[2].replace("Hoy", "today").replace(/días?/, x => x === "día" ? "day" : "days").replace("meses", "months")}`]);
-Object.assign(I18N, { "Desmontado": "Stripped", "bloques encadenados": "problems sent", "bloque encadenado": "problem sent", "días abierto": "days open", "día abierto": "day open", "Hoy": "Today" });
+Object.assign(I18N, { "Toca su zona en el plano o escribe el nombre.": "Tap its area on the map or type the name.", "Ningún sector elegido": "No sector chosen",
+  "· sector nuevo, sin zona en el plano": "· new sector, no area on the map", "Desmontado": "Stripped", "bloques encadenados": "problems sent", "bloque encadenado": "problem sent", "días abierto": "days open", "día abierto": "day open", "Hoy": "Today" });
 for (const [k, v] of [["{n} meses", "{n} months"], ["{n} días", "{n} days"], ["{n} día", "{n} day"]]) I18N_N[k] ??= v;
 I18N_RX.unshift([/^Fuerte: (.+)$/, m => `Strength: ${tw(m[1])}`]);
 Object.assign(I18N, { "Físico": "Physical", "Técnico": "Technical", "Estático": "Static", "físico": "physical", "técnico": "technical", "estático": "static", "Agarre": "Grip", "Agarres": "Grips", "Cazos": "Jugs", "Volúmenes": "Volumes", "cazos": "jugs", "volúmenes": "volumes", "Estilos": "Styles",

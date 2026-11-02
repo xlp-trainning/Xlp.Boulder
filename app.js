@@ -803,6 +803,35 @@ async function uploadThumb(blob, path) {
 function removePhoto(path) { if (path && !isStatic(path)) sb.storage.from("fotos").remove([path, thumbPath(path)].filter(Boolean)); }
 
 /* ---------- formulario del equipador ---------- */
+// Formulario del bloque: plano con las zonas de los sectores; tocar una zona la pone como sector del bloque
+function sectorPicker(input) {
+  const zones = S.sectors.filter(x => Array.isArray(x.shape) && x.shape.length > 2);
+  if (!S.mapPath || !zones.length) return null;
+  const svg = svgEl("svg", { class: "plan-zones", viewBox: "0 0 1 1", preserveAspectRatio: "none" });
+  const chosen = el("div", { class: "pick-chosen", "aria-live": "polite" });
+  const pick = name => { input.value = name; mark(); };
+  const polys = zones.map(x => {
+    const poly = svgEl("polygon", { points: x.shape.map(p => p.join(",")).join(" "), class: "zone", "vector-effect": "non-scaling-stroke", tabindex: "0", role: "button", "aria-label": `Sector ${x.name}` });
+    poly.addEventListener("click", () => pick(x.name));
+    poly.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(x.name); } });
+    svg.append(poly); return [x.name, poly];
+  });
+  const pins = zones.filter(x => x.x != null && x.y != null).map(x => [x.name, el("button", { type: "button", class: "pin", tabindex: "-1",
+    style: `left:${x.x * 100}%;top:${x.y * 100}%;transform:translate(${x.x < .1 ? -8 : x.x > .9 ? -92 : -50}%,-50%)`, onclick: () => pick(x.name) },
+    el("span", { class: "pin-name", text: shortName(x.name) }))]);
+  function mark() {
+    const v = input.value.trim();
+    polys.forEach(([n, p]) => p.classList.toggle("sel", n === v));
+    pins.forEach(([n, p]) => p.classList.toggle("sel", n === v));
+    chosen.replaceChildren(v ? el("span", {}, ico("pin", "sm"), el("strong", { text: v }), zones.some(x => x.name === v) ? null : el("span", { class: "note", text: " · sector nuevo, sin zona en el plano" }))
+      : el("span", { class: "note", text: "Ningún sector elegido" }));
+  }
+  input.addEventListener("input", mark);
+  mark();
+  return el("div", { class: "sector-pick" }, chosen,
+    el("div", { class: "plan-scroll" }, el("div", { class: "plan" }, el("img", { src: photoUrl(S.mapPath), alt: "Plano de la sala" }), svg, pins.map(([, p]) => p))));
+}
+
 function openForm(b) {
   const edit = !!b;
   const d = b ? { level: b.level, color: b.hold_color, styles: [...(b.styles || [])], photo: b.photo_path || "", file: null }
@@ -897,9 +926,9 @@ function openForm(b) {
     el("label", { class: "xlp-check" }, fXlp, xlpBadge(true), el("span", {}, el("strong", { text: "Equipado por mí" }), el("span", { class: "note", text: "Lleva el sello Xlp en la web" }))),
     el("div", { class: "field" }, el("span", { class: "label", text: "Foto del bloque (opcional)" }), photoBox),
     el("div", { class: "field" }, el("span", { class: "label", text: "Color de presa (opcional)" }), sw),
-    el("div", { class: "two" },
-      el("label", { class: "field" }, el("span", { class: "label", text: "Nombre (opcional)" }), fName),
-      el("label", { class: "field" }, el("span", { class: "label", text: "Sector / muro" }), fSector, sectorList)),
+    el("label", { class: "field" }, el("span", { class: "label", text: "Nombre (opcional)" }), fName),
+    el("div", { class: "field" }, el("label", { class: "label", for: "f-sector", text: "Sector / muro" }), sectorPicker(fSector), fSector, sectorList,
+      S.mapPath && S.sectors.some(x => Array.isArray(x.shape) && x.shape.length > 2) ? el("span", { class: "note", text: "Toca su zona en el plano o escribe el nombre." }) : null),
     el("label", { class: "field" }, el("span", { class: "label", text: "Fecha de montaje" }), fDate),
     el("div", { class: "field" }, el("span", { class: "label", text: "Estilo" }), stc),
     el("div", { class: "field" }, el("span", { class: "label", text: "Agarres" }), grc),
