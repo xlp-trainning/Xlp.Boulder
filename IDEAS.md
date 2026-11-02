@@ -9,7 +9,7 @@ Ideas que el equipador ha aprobado o le han parecido interesantes y quedan para 
 - **Premio del mes** (27/10/2026): aviso editable por el equipador («Este mes, el 1.º de cada liga se lleva un café / una camiseta»). Hay que acordarlo con el rocódromo.
 
 ## Ajustar el plano de Patraix (pendiente, 02/11/2026)
-- Pasar el plano de 10 a los 37 sectores reales: Sala 1 (9), placa de la Sala 2 (2), isla de la Sala 2 (3), U de la Sala 2 (6), placa de la derecha de la Sala 3 (2), isla grande de la Sala 3 (9) y pared de la izquierda (6). Detalle y dudas en `mapas/sectores-reales.md`.
+- Pasar el plano de 10 a los 39 sectores reales: Sala 1 (9), placa de la Sala 2 (2), isla de la Sala 2 (3), U de la Sala 2 (6), placa de la derecha de la Sala 3 (2), isla grande de la Sala 3 (9), pared de la izquierda (6) y terraza (2). Detalle y dudas en `mapas/sectores-reales.md`.
 
 ## Del informe de 50 usuarios simulados (28/10/2026, para después)
 El informe es una simulación: sirve para priorizar, no sustituye a preguntar a la gente de la sala.
