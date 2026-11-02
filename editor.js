@@ -4,12 +4,12 @@
 // Rangos de color de presa en HSV (tono en grados, saturación y valor de 0 a 1).
 // Los negros, blancos y grises se distinguen peor del muro: ahí cuentan más las correcciones a mano.
 const HOLD_RANGES = {
-  amarillo: (h, s, v) => h >= 42 && h <= 66 && s >= .38 && v >= .4,
+  amarillo: (h, s, v) => h >= 42 && h <= 66 && s >= .45 && v >= .4,   // la madera del muro llega a .37
   naranja:  (h, s, v) => h >= 12 && h < 42 && s >= .5 && v >= .4,
   rojo:     (h, s, v) => (h < 12 || h >= 344) && s >= .42 && v >= .25,
   rosa:     (h, s, v) => h >= 310 && h < 344 && s >= .22 && v >= .45,
-  morado:   (h, s, v) => h >= 256 && h <= 342 && s >= .137 && v >= .137,
-  azul:     (h, s, v) => h >= 196 && h < 256 && s >= .35 && v >= .2,
+  morado:   (h, s, v) => h >= 240 && h <= 342 && s >= .137 && v >= .137,   // morados de 248-256° en fotos reales
+  azul:     (h, s, v) => h >= 196 && h < 240 && s >= .35 && v >= .3,   // el techo de noche es azul muy oscuro (.2)
   turquesa: (h, s, v) => h >= 165 && h < 196 && s >= .3 && v >= .25,
   verde:    (h, s, v) => h >= 72 && h < 165 && s >= .28 && v >= .2,
   negro:    (h, s, v) => v < .2,
@@ -189,7 +189,12 @@ function openHoldEditor({ source, color }) {
       // Una mancha que solo aparece por las muestras y es mucho mayor que cualquier presa normal es muro bien iluminado
       const baseMax = base ? Math.max(1500, ...comps.map(px => px.filter(i => base[i]).length)) : 0;
       const tooBig = px => base && px.length > 3 * baseMax && px.filter(i => base[i]).length < .3 * px.length;
-      for (const px of comps) if (px.length >= minArea && holdShape(px) && !tooBig(px)) addHold(px);
+      // Ninguna presa ocupa una parte enorme de lo analizado: eso es techo, suelo o pared del mismo color
+      let area = 0; for (let i = 0; i < N; i++) if (inZone(i)) area++;
+      const huge = px => px.length > .12 * area;
+      // Las presas de color tienen luz: una mancha muy oscura (techo, sombra, pared negra) no es presa
+      const dim = px => !["negro", "marron", "gris", "morado"].includes(chosen) && median(px.filter((_, k) => k % Math.max(1, Math.floor(px.length / 200)) === 0).map(i => hsvAt(cor, i * 4)[2])) < .3;
+      for (const px of comps) if (px.length >= minArea && holdShape(px) && !tooBig(px) && !huge(px) && !dim(px)) addHold(px);
       volumes.forEach(addVolume);
       relabel();
     }
@@ -221,8 +226,10 @@ function openHoldEditor({ source, color }) {
       const n = px.length, mx = sx / n, my = sy / n, a = sxx / n - mx * mx, c = syy / n - my * my, b = sxy / n - mx * my;
       const d = Math.sqrt(((a - c) / 2) ** 2 + b * b), l1 = (a + c) / 2 + d, l2 = Math.max(1e-6, (a + c) / 2 - d);
       const long = Math.sqrt(l1 / l2), fill = n / ((x1 - x0 + 1) * (y1 - y0 + 1));
-      if (long > 4.5 && 4 * Math.sqrt(l1) > 70 * sc) return false;   // tira larga (los pies planos y cortos se quedan)
-      if (long > 12) return false;
+      // Tira larga y fina (viga, borde de panel, línea del suelo). Las presas alargadas tipo barra tienen grosor y se quedan
+      const thick = 4 * Math.sqrt(l2);
+      if (long > 4.5 && 4 * Math.sqrt(l1) > 70 * sc && thick < 22 * sc) return false;
+      if (long > 14) return false;
       if (fill < .12) return false;
       return true;
     }
