@@ -3,7 +3,7 @@
 // - Fotos de Supabase (bucket público «fotos»): primero la copia del móvil. Cada foto tiene un nombre único
 //   que no cambia, así que nunca se queda vieja; se ahorra transferencia y se ven sin conexión.
 // Los datos de Supabase no pasan por aquí: los guarda la propia web (offline.js).
-const CACHE = "xlp-web-v19";
+const CACHE = "xlp-web-v20";
 const PHOTOS = "xlp-fotos-v1";
 const PHOTO_PATH = "/storage/v1/object/public/fotos/";
 const MAX_BYTES = 30 * 1024 * 1024, MAX_COUNT = 600;    // tope de la caché de fotos (~30 MB)
@@ -26,7 +26,9 @@ self.addEventListener("fetch", e => {
   e.respondWith((async () => {
     const cache = await caches.open(CACHE);
     try {
-      const res = await fetch(req);
+      // Los archivos de la web se piden saltándose la caché del navegador (GitHub Pages los deja 10 min):
+      // así una versión nueva llega en cuanto está publicada. Con ETag, si no ha cambiado no se descarga otra vez
+      const res = url.origin === SAME ? await fetch(url.href, { cache: "no-cache", credentials: "same-origin" }) : await fetch(req);
       if (res.ok || res.type === "opaque") cache.put(req, res.clone());
       return res;
     } catch (err) {
