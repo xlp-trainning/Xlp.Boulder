@@ -132,6 +132,10 @@ function openWelcome(i = 0) {
           LANG === "es" ? "Read it in English" : "Leer en español")
         : last ? el("button", { class: "wl-link", onclick: () => { closeWelcome(); openInstall(); } }, "Instalar la app en el móvil") : el("span", { class: "wl-link-space" })));
   root.focus({ preventScroll: true });
+  // Si no cabe entero (pantallas bajas), se difumina el final para que se note que se puede desplazar
+  const main = root.querySelector(".wl-main");
+  const more = () => main.classList.toggle("more", main.scrollHeight - main.scrollTop - main.clientHeight > 2);
+  main.addEventListener("scroll", more, { passive: true }); requestAnimationFrame(more);
 }
 function closeWelcome() { store.set("lb-welcome", 1); $("welcomeRoot")?.remove(); document.body.style.overflow = ""; }
 

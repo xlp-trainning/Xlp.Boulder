@@ -841,3 +841,27 @@ html.big-text .wordmark .mark { width: clamp(33px, 8vw, 42px); }
 /* editor de fotos: sensibilidad */
 .ed-sens input[type=range] { width: 100%; max-width: 360px; accent-color: var(--accent); min-height: var(--tap); }
 .ed-sens-ends { display: flex; justify-content: space-between; max-width: 360px; }
+/* bienvenida en pantallas bajas (portátil, móviles pequeños): el contenido nunca se mete bajo el botón.
+   Se centra si cabe y, si no, se desplaza dentro de su zona; además, todo se compacta según el alto disponible */
+.wl-main { justify-content: flex-start; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; padding-block: var(--s-2); }
+.wl-main::-webkit-scrollbar { display: none; }
+.wl-main > :first-child { margin-top: auto; }
+.wl-main > :last-child { margin-bottom: auto; }
+.wl-bottom { padding-top: var(--s-3); }
+@media (max-height: 980px) {
+  .wl-main { gap: var(--s-5); }
+  .wl-art-2, .wl-art-3 { zoom: .82; }
+  .wl-title { font-size: min(clamp(44px, 13vw, 64px), 6.6vh); }
+  .wl-steps { gap: var(--s-3); }
+}
+@media (max-height: 780px) {
+  .wl-main { gap: var(--s-4); }
+  .wl-art-1 { height: 26vh; }
+  .wl-art-2, .wl-art-3 { zoom: .7; }
+  .wl-lead { font-size: min(clamp(32px, 9vw, 44px), 5.4vh); }
+  .wl-steps li > span:last-child > span { font-size: 14px; }
+  .wl-steps strong { font-size: var(--fs-3); }
+  .wl-next { min-height: var(--tap); }
+}
+@media (max-height: 680px) { .wl-main { gap: var(--s-3); } .wl-art-2, .wl-art-3 { zoom: .58; } .wl-steps { gap: var(--s-2); } .wl-text { gap: var(--s-2); } .wl-bottom { gap: 0; } }
+.wl-main.more { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent); }
