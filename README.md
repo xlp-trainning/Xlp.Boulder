@@ -133,6 +133,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `supabase/002-sectores.sql` | crea los sectores de los dos planos con sus zonas (ejecutar una vez) |
 | `supabase/011-quitar-sectores.sql` | quita de Patraix Sala 1 · Pared izquierda, Sala 3 · Pared baja y Sala 3 · Celosía (ejecutar una vez) |
 | `supabase/012-sectores-numerados.sql` | Patraix con los 40 sectores numerados (1–9 sala 1, 10–20 sala 2, 21–38 sala 3, 39–40 terraza) (ejecutar una vez) |
+| `supabase/013-talonajes-empeines.sql` | la etiqueta «Talonajes» pasa a «Talonajes/Empeines» (ejecutar una vez) |
 | `supabase/003-progreso.sql` | añade flash y fecha de encadenado a los votos (ejecutar una vez) |
 | `supabase/004-ranking.sql` | ranking por ligas: apodos y cálculo del ranking (ejecutar una vez) |
 | `supabase/005-sello.sql` | añade el sello Xlp a los bloques (ejecutar una vez) |

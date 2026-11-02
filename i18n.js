@@ -16,7 +16,7 @@ const I18N = {
   "Nar": "Ora", "Ama": "Yel", "Mor": "Pur", "Neg": "Blk", "Comp": "Comp",
   "Az": "Bl", "Ve": "Gr", "Na": "Or", "Am": "Ye", "Mo": "Pu", "Ro": "Rd", "Ne": "Bk", "Co": "Co", "Rs": "Pk", "Tu": "Tq", "Bl": "Wh", "Gr": "Gy", "Ma": "Br",
   "Placa": "Slab", "Vertical": "Vertical", "Desplome": "Overhang", "Techo": "Roof", "Diedro": "Corner", "Arista": "Arête", "Regletas": "Crimps", "Romos": "Slopers",
-  "Pinzas": "Pinches", "Bidedos": "Pockets", "Dinámico": "Dynamic", "Coordinación": "Coordination", "Compresión": "Compression", "Talonajes": "Heel hooks", "Equilibrio": "Balance",
+  "Pinzas": "Pinches", "Bidedos": "Pockets", "Dinámico": "Dynamic", "Coordinación": "Coordination", "Compresión": "Compression", "Talonajes": "Heel hooks", "Talonajes/Empeines": "Heel/toe hooks", "Equilibrio": "Balance",
   "Técnica": "Technique", "placa": "slab", "desplome": "overhang", "techo": "roof", "regletas": "crimps", "romos": "slopers", "pinzas": "pinches", "dinámico": "dynamic", "técnica": "technique",
   "Los lunes": "Mondays", "Los martes": "Tuesdays", "Los miércoles": "Wednesdays", "Los jueves": "Thursdays", "Los viernes": "Fridays", "Los sábados": "Saturdays", "Los domingos": "Sundays",
 

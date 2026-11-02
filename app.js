@@ -12,7 +12,7 @@ const LEVELS = [
 const SHORT = { azul: "Azul", verde: "Verde", naranja: "Nar", amarillo: "Ama", morado: "Mor", rojo: "Rojo", negro: "Neg", compe: "Comp" };
 const LV = Object.fromEntries(LEVELS.map(l => [l.k, l]));
 // Etiquetas de cada bloque: estilo de escalada (cómo es el bloque) y tipo de agarre (con qué presas)
-const CLIMB_STYLES = ["Placa","Vertical","Desplome","Techo","Diedro","Arista","Físico","Técnico","Estático","Dinámico","Coordinación","Compresión","Talonajes","Equilibrio"];
+const CLIMB_STYLES = ["Placa","Vertical","Desplome","Techo","Diedro","Arista","Físico","Técnico","Estático","Dinámico","Coordinación","Compresión","Talonajes/Empeines","Equilibrio"];
 const GRIPS = ["Regletas","Romos","Pinzas","Bidedos","Cazos","Volúmenes"];
 const STYLES = [...CLIMB_STYLES, ...GRIPS];
 const COLORS = {
@@ -112,7 +112,8 @@ async function loadAll() {
     sb.rpc("first_sends", { p_gym: S.gym }),
   ]);
   if (b.error) throw b.error;
-  S.blocks = b.data;
+  // «Talonajes» pasó a llamarse «Talonajes/Empeines» (supabase/013): los bloques aún sin actualizar se leen ya con el nombre nuevo
+  S.blocks = b.data.map(x => (x.styles || []).includes("Talonajes") ? { ...x, styles: x.styles.map(t => t === "Talonajes" ? "Talonajes/Empeines" : t) } : x);
   S.stats = toStats(s.data);
   S.sectors = sec.data || [];
   S.firsts = toFirsts(fst.data);
