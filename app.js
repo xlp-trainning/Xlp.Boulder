@@ -175,8 +175,16 @@ async function loadAllComments() {
 const statsFor = id => S.stats[id] || { avg: 0, n: 0, sends: 0, projects: 0, flashes: 0, soft: 0, fair: 0, hard: 0, attempts: 0, mShort: 0, mAny: 0, mTall: 0 };
 const starStr = avg => { const r = Math.round(avg); return "★".repeat(r) + "☆".repeat(5 - r); };
 const fmtDate = d => { if (!d) return ""; const [y, m, dd] = d.slice(0, 10).split("-"); return `${dd}/${m}/${y.slice(2)}`; };
-// Sectores: los del plano y los de los bloques abiertos (los de bloques ya desmontados no vuelven a salir)
-const sectorNames = () => [...new Set([...S.sectors.map(s => s.name), ...S.blocks.filter(b => b.active).map(b => b.sector).filter(Boolean)])].sort((a, b) => a.localeCompare(b, "es", { numeric: true }));
+// Sectores: los del plano. Si el rocódromo aún no tiene sectores apuntados, los que salen en sus bloques abiertos
+const sectorNames = () => (S.sectors.length ? S.sectors.map(s => s.name) : [...new Set(S.blocks.filter(b => b.active).map(b => b.sector).filter(Boolean))])
+  .sort((a, b) => a.localeCompare(b, "es", { numeric: true }));
+// Bloques abiertos con un sector que ya no está en el plano (renombrado o borrado): el equipador los pasa a uno que exista
+const orphanSectors = () => {
+  if (!S.sectors.length) return [];
+  const known = new Set(S.sectors.map(s => s.name)), n = {};
+  S.blocks.filter(b => b.active && b.sector && !known.has(b.sector)).forEach(b => n[b.sector] = (n[b.sector] || 0) + 1);
+  return Object.entries(n).sort((a, b) => a[0].localeCompare(b[0], "es", { numeric: true }));
+};
 
 function tape(b, short) {
   const l = LV[b.level] || { bg: "var(--line)", fg: "var(--ink)", name: "?" };
@@ -439,6 +447,10 @@ function lassoOn(plan, done) {
 
 function mapEditor() {
   const box = el("div", { class: "section editor" }, el("span", { class: "label", text: "Equipador · plano y sectores" }));
+  const orphans = orphanSectors();
+  if (orphans.length) box.append(el("div", { class: "banner orphan-box" },
+    el("span", { class: "banner-msg" }, ico("pin"), el("span", { text: `${orphans.reduce((a, [, n]) => a + n, 0)} bloques abiertos tienen un sector que ya no está en el plano. Ábrelos, toca «Editar» y elige su zona.` })),
+    el("div", { class: "row" }, orphans.map(([name, n]) => el("button", { class: "btn small", onclick: () => goSector(name) }, `${name} · ${n}`)))));
   const file = el("input", { type: "file", accept: "image/*,.svg", id: "map-file", hidden: true, onchange: async () => {
     const f = file.files[0]; if (!f) return;
     toast("Subiendo plano…");
