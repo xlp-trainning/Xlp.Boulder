@@ -865,3 +865,4 @@ html.big-text .wordmark .mark { width: clamp(33px, 8vw, 42px); }
 }
 @media (max-height: 680px) { .wl-main { gap: var(--s-3); } .wl-art-2, .wl-art-3 { zoom: .58; } .wl-steps { gap: var(--s-2); } .wl-text { gap: var(--s-2); } .wl-bottom { gap: 0; } }
 .wl-main.more { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent); }
+.toast { pointer-events: none; }   /* el aviso no tapa lo que hay debajo (p. ej. la foto en el editor) */

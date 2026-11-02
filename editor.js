@@ -245,9 +245,54 @@ function openHoldEditor({ source, color }) {
     }
     // Un volumen ocupa su contorno salvo las presas que tenga encima, que siguen siendo presas aparte
     function addVolume(v) {
-      const px = polygonPixels(v.pts).filter(i => lab[i] < 0);
+      const px = (v.px || polygonPixels(v.pts)).filter(i => lab[i] < 0 && inZone(i));
       if (px.length < 20) return;
       addHold(px, false, { volume: v }); holds[holds.length - 1].state = v.state;
+    }
+    // Volumen automático: desde el toque crece por el color del volumen (sin hacer caso de la luz de cada cara)
+    // hasta el muro, y el resultado se cierra en su forma geométrica (el contorno convexo, si se parece)
+    function autoVolume(x, y) {
+      const N = W * H, i0 = y * W + x, r0 = Math.max(3, Math.round(6 * sc)), seedPx = [];
+      for (let dy = -r0; dy <= r0; dy++) for (let dx = -r0; dx <= r0; dx++) {
+        const xx = x + dx, yy = y + dy;
+        if (dx * dx + dy * dy <= r0 * r0 && xx >= 0 && yy >= 0 && xx < W && yy < H) seedPx.push(labAt(yy * W + xx));
+      }
+      const s0 = medianLab(seedPx), k = SENS[sens].tol / 17;
+      // Los colores del muro que no son el del volumen: el crecimiento se para al llegar a ellos
+      const others = wallColors().filter(w => dE(w, s0) > 20);
+      const near = c => !others.length || dE(c, s0) < Math.min(...others.map(w => dE(c, w)));
+      const ok = c => Math.hypot(c[1] - s0[1], c[2] - s0[2]) < 13 * k && Math.abs(c[0] - s0[0]) < 42 && near(c);
+      let area = 0; for (let i = 0; i < N; i++) if (inZone(i)) area++;
+      const R = Math.round(.6 * Math.max(W, H)), seen = new Uint8Array(N), m = new Uint8Array(N), st = [i0];
+      seen[i0] = 1; let n = 0;
+      while (st.length) {
+        const p = st.pop(); m[p] = 1; n++;
+        if (n > .3 * area) return null;                                     // se ha escapado al muro
+        const px_ = p % W, py = (p - px_) / W, cp = labAt(p);
+        for (const q of [px_ > 0 ? p - 1 : -1, px_ < W - 1 ? p + 1 : -1, py > 0 ? p - W : -1, py < H - 1 ? p + W : -1]) {
+          if (q < 0 || seen[q] || !inZone(q)) continue;
+          const qx = q % W, qy = (q - qx) / W;
+          if (Math.abs(qx - x) > R || Math.abs(qy - y) > R) continue;
+          const c = labAt(q);
+          if (ok(c) && dE(c, cp) < 25) { seen[q] = 1; st.push(q); }
+        }
+      }
+      if (n < Math.max(200, .002 * area)) return null;
+      const rc = Math.max(2, Math.round(3 * sc));
+      const closed = box(box(m, W, H, rc, false), W, H, rc, true);
+      const px = []; for (let i = 0; i < N; i++) if (closed[i]) px.push(i);
+      // Contorno convexo (cadena monótona) con los puntos del borde
+      const pts = [];
+      for (const p of px) { const xx = p % W, yy = (p - xx) / W; if (!closed[p - 1] || !closed[p + 1] || !closed[p - W] || !closed[p + W]) pts.push([xx, yy]); }
+      pts.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+      const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+      const lo = [], hi = [];
+      for (const q of pts) { while (lo.length >= 2 && cross(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); }
+      for (let j = pts.length - 1; j >= 0; j--) { const q = pts[j]; while (hi.length >= 2 && cross(hi[hi.length - 2], hi[hi.length - 1], q) <= 0) hi.pop(); hi.push(q); }
+      const hull = lo.slice(0, -1).concat(hi.slice(0, -1));
+      let ha = 0; hull.forEach(([ax, ay], j) => { const [bx, by] = hull[(j + 1) % hull.length]; ha += ax * by - bx * ay; }); ha = Math.abs(ha) / 2;
+      // Si el volumen es casi convexo, su forma geométrica limpia; si no (forma en L…), lo que ha encontrado
+      return ha && px.length / ha > .72 ? { pts: hull } : { px };
     }
     // Añade una presa a partir de sus píxeles, rellenando los huecos (el agujero del tornillo)
     function addHold(px, fillHoles = true, extra = {}) {
@@ -345,7 +390,7 @@ function openHoldEditor({ source, color }) {
       const on = holds.filter(h => h.state !== "off");
       const n = s => holds.filter(h => h.state === s).length;
       info.textContent = sampling ? "Toca el centro de una presa del bloque para aprender su color."
-        : drawMode && drawKind === "volume" ? "Rodea el volumen con el dedo y suelta para cerrarlo."
+        : drawMode && drawKind === "volume" ? "Toca el volumen y su forma se busca sola. Si no sale bien, rodéalo con el dedo."
         : drawMode ? "Paso 1 · Rodea con el dedo la zona a analizar, o arrastra en diagonal para marcar un rectángulo."
         : !chosen ? "Paso 2 · Elige el color de las presas del bloque."
         : `${on.length} ${on.length === 1 ? "presa" : "presas"} · ${n("start")} de salida · ${n("top")} de top` + (samples.length ? ` · color afinado (${samples.length})` : "");
@@ -418,6 +463,20 @@ function openHoldEditor({ source, color }) {
       let pts = livePts; livePts = [];
       const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
       const bw = Math.max(...xs) - Math.min(...xs), bh = Math.max(...ys) - Math.min(...ys);
+      // Volumen con un toque: se busca solo su forma
+      if (drawKind === "volume" && (pts.length < 3 || (bw < 30 * sc && bh < 30 * sc))) {
+        const [tx, ty] = pts[0].map(Math.round), cx = Math.min(W - 1, Math.max(0, tx)), cy = Math.min(H - 1, Math.max(0, ty));
+        drawKind = "zone"; drawZoneBtns();
+        const there = lab[cy * W + cx];
+        if (there >= 0 && holds[there].volume) { draw(); return toast("Ese volumen ya está marcado. Tócalo para marcarlo como salida o top."); }
+        if (!inZone(cy * W + cx)) { draw(); return toast("Ese punto está fuera del muro marcado"); }
+        const found = autoVolume(cx, cy);
+        if (!found) { draw(); return toast("No encuentro bien el volumen ahí. Pulsa «Volumen» y toca más al centro, o rodéalo con el dedo."); }
+        const v = { ...found, state: "normal" }; volumes.push(v);
+        const n = holds.length; addVolume(v);
+        if (holds.length === n) { volumes.pop(); draw(); return toast("Ese volumen queda fuera de la zona o encima de otras presas."); }
+        relabel(); draw(); return toast("Volumen añadido. Tócalo para marcarlo como salida o top.");
+      }
       if (pts.length < 2 || bw < 30 * sc || bh < 30 * sc) {
         drawMode = drawKind === "zone" && !zoneReady; drawKind = "zone"; canvas.classList.toggle("drawing", drawMode); drawZoneBtns(); draw();
         return toast("Trazo demasiado pequeño. Rodéalo con el dedo o arrastra en diagonal.");
@@ -477,7 +536,7 @@ function openHoldEditor({ source, color }) {
           el("input", { type: "range", min: "1", max: "5", step: "1", value: String(sens), "aria-label": "Sensibilidad de la búsqueda de presas",
             onchange: e => { sens = +e.target.value; if (analyzed) run(); } }),
           el("span", { class: "ed-sens-ends note" }, el("span", { text: "Menos ruido" }), el("span", { text: "Más presas" }))),
-        el("p", { class: "note ed-help", text: "Paso 3 · Toca una presa para cambiarla: salida → top → quitar → normal. Si falta alguna, toca encima para añadirla. Si se cuelan cosas o faltan muchas, usa «Afinar color» y toca una presa del bloque, o mueve la sensibilidad. Los volúmenes del color del muro se añaden con «Volumen»." }),
+        el("p", { class: "note ed-help", text: "Paso 3 · Toca una presa para cambiarla: salida → top → quitar → normal. Si falta alguna, toca encima para añadirla. Si se cuelan cosas o faltan muchas, usa «Afinar color» y toca una presa del bloque, o mueve la sensibilidad. Para un volumen, pulsa «Volumen» y tócalo: su forma se busca sola (o rodéalo con el dedo)." }),
         el("div", { class: "actions" }, useBtn,
           el("button", { class: "btn", type: "button", onclick: () => { close(); resolve({ blob: null, color: chosen }); } }, "Usar sin editar"))));
     function close() { root.remove(); if (typeof source !== "string") URL.revokeObjectURL(img.src); }
