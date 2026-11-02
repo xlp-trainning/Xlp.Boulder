@@ -838,3 +838,6 @@ html.big-text .wordmark .mark { width: clamp(33px, 8vw, 42px); }
 .pick-chosen > span { display: inline-flex; align-items: center; gap: 6px; }
 .pick-chosen .ico { color: var(--accent-text); }
 .sector-pick .plan-scroll { max-height: 60vh; }
+/* editor de fotos: sensibilidad */
+.ed-sens input[type=range] { width: 100%; max-width: 360px; accent-color: var(--accent); min-height: var(--tap); }
+.ed-sens-ends { display: flex; justify-content: space-between; max-width: 360px; }
