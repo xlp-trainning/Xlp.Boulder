@@ -2,7 +2,7 @@
 # hasta una distancia máxima. Genera el SQL para Supabase y un JSON para las pruebas.
 import json, re, sys
 from shapely.geometry import Polygon, LineString, box, Point
-from shapely.ops import unary_union
+from shapely.ops import unary_union, polylabel
 
 def load(path):
     src = open(path).read()
@@ -34,13 +34,14 @@ def regions(building, anchors, maxd, cell=3):
         out[k] = r
     return out
 
-def to_rows(gym, regs, anchors, vb):
+def to_rows(gym, regs, anchors, vb, label_in_zone=False):
     vx, vy, vw, vh = vb
     f = lambda x, y: [round((x - vx) / vw, 4), round((y - vy) / vh, 4)]
     rows = []
     for name, r in regs.items():
         c = anchors[name].centroid
-        lp = c if r.contains(c) else r.representative_point()
+        # La etiqueta va en el centro de su zona (el punto más alejado del borde), y si no cabe, sobre su tramo de pared
+        lp = polylabel(r, tolerance=1) if label_in_zone else c if r.contains(c) else r.representative_point()
         rows.append({"gym_id": gym, "name": name, "x": f(lp.x, lp.y)[0], "y": f(lp.x, lp.y)[1],
                      "shape": [f(x, y) for x, y in list(r.exterior.coords)[:-1]]})
     return rows
@@ -49,25 +50,36 @@ def to_rows(gym, regs, anchors, vb):
 ns, vb = load("natural-patraix.py"); W = ns["walls"]
 building = unary_union([Polygon(ns["left"]), Polygon(ns["right"])])
 P = lambda k: Polygon(W[k])
-pat = {
-  "Sala 2 · La U": LineString([(217,140),(270,130),(280,132),(310,162),(312,188),(303,218),(277,242),(233,272),(190,302)]),
-  "Sala 2 · Isla": P("isla"),
-  "Sala 2 · Pared izquierda": P("izq1"),
-  "Terraza · Panel": P("panel6"),
-  "Sala 1 · Banda": LineString([(190,341),(250,322),(310,300),(357,282)]),
-  "Sala 1 · Zigzag": unary_union([P("zig"), LineString([(380,250),(452,366)])]),
-  "Sala 1 · Diagonal": LineString([(280,427),(352,392),(372,383),(427,390),(445,376)]),
-  "Sala 1 · Pared izquierda": unary_union([P("izq2"), P("bola"), P("murete")]),
-  "Terraza · Diagonal": LineString([(263,488),(290,488),(400,416),(457,377)]),
-  "Sala 3 · Pared del fondo": P("w86"),
-  "Sala 3 · Isla": P("isla8"),
-  "Sala 3 · Pared baja": P("w83"),
-  "Sala 3 · Celosía": P("abajo"),
-}
-# Muros que siguen en el plano pero ya no son sectores (02/11/2026): se usan para calcular las zonas
-# de los demás, pero no se crean
-QUITADOS = {"Sala 1 · Pared izquierda", "Sala 3 · Pared baja", "Sala 3 · Celosía"}
-rows = [r for r in to_rows("patraix", regions(building, pat, 55), pat, vb) if r["name"] not in QUITADOS]
+# Sectores numerados (02/11/2026): del 1 en la sala 1 al 37 en la sala 3, y 38-39 en la terraza.
+# Mientras el equipador no marque los límites de verdad, cada pared se reparte en tramos iguales a lo largo.
+from shapely.ops import substring
+def split_line(line, n):
+    L = line.length
+    return [substring(line, L * k / n, L * (k + 1) / n) for k in range(n)]
+def split_poly(poly, n, axis=0):
+    x0, y0, x1, y1 = poly.bounds
+    out = []
+    for k in range(n):
+        b = box(x0 + (x1 - x0) * k / n, y0 - 1, x0 + (x1 - x0) * (k + 1) / n, y1 + 1) if axis == 0 else box(x0 - 1, y0 + (y1 - y0) * k / n, x1 + 1, y0 + (y1 - y0) * (k + 1) / n)
+        out.append(poly.intersection(b))
+    return out
+tramos = [
+  ("Sala 1", split_line(LineString([(190,341),(250,322),(310,300),(357,282)]), 3)            # banda
+           + split_line(LineString([(380,250),(452,366)]), 3)                                # zigzag
+           + split_line(LineString([(280,427),(352,392),(372,383),(427,390),(445,376)]), 3)),  # diagonal
+  ("Sala 2", split_line(LineString([(116,174),(116,326)]), 2)                                # placa de la izquierda al entrar
+           + split_poly(P("isla"), 3)                                                        # isla
+           + split_line(LineString([(217,140),(270,130),(280,132),(310,162),(312,188),(303,218),(277,242),(233,272),(190,302)]), 6)),  # la U
+  ("Sala 3", split_line(LineString([(1132,130),(1132,191)]), 2)                              # placa de la derecha
+           + split_poly(P("isla8"), 9)                                                       # isla grande
+           + split_line(LineString([(1120,150),(1077,158),(1027,155),(987,158),(960,138),(930,141),(890,128),(860,134),(790,132)]), 6)),  # pared de la izquierda (la de arriba en el plano)
+  ("Terraza", split_line(LineString([(146,158),(272,110)]), 2)),                             # panel
+]
+pat, n = {}, 0
+for sala, geoms in tramos:
+    for g in geoms:
+        n += 1; pat[f"{sala} · {n}"] = g
+rows = to_rows("patraix", regions(building, pat, 55), pat, vb, label_in_zone=True)
 
 # ---------- Natural Benimaclet ----------
 ns, vb = load("natural-benimaclet.py"); W = ns["walls"]
