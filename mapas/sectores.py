@@ -64,7 +64,10 @@ pat = {
   "Sala 3 · Pared baja": P("w83"),
   "Sala 3 · Celosía": P("abajo"),
 }
-rows = to_rows("patraix", regions(building, pat, 55), pat, vb)
+# Muros que siguen en el plano pero ya no son sectores (02/11/2026): se usan para calcular las zonas
+# de los demás, pero no se crean
+QUITADOS = {"Sala 1 · Pared izquierda", "Sala 3 · Pared baja", "Sala 3 · Celosía"}
+rows = [r for r in to_rows("patraix", regions(building, pat, 55), pat, vb) if r["name"] not in QUITADOS]
 
 # ---------- Natural Benimaclet ----------
 ns, vb = load("natural-benimaclet.py"); W = ns["walls"]

@@ -131,6 +131,7 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `og.png` | imagen de vista previa al compartir el enlace |
 | `mapas/` | planos de Natural Patraix y Natural Benimaclet (PNG, SVG y el script que los genera) y `sectores.py`, que calcula las zonas de los sectores |
 | `supabase/002-sectores.sql` | crea los sectores de los dos planos con sus zonas (ejecutar una vez) |
+| `supabase/011-quitar-sectores.sql` | quita de Patraix Sala 1 · Pared izquierda, Sala 3 · Pared baja y Sala 3 · Celosía (ejecutar una vez) |
 | `supabase/003-progreso.sql` | añade flash y fecha de encadenado a los votos (ejecutar una vez) |
 | `supabase/004-ranking.sql` | ranking por ligas: apodos y cálculo del ranking (ejecutar una vez) |
 | `supabase/005-sello.sql` | añade el sello Xlp a los bloques (ejecutar una vez) |

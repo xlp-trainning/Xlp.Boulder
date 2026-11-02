@@ -175,7 +175,8 @@ async function loadAllComments() {
 const statsFor = id => S.stats[id] || { avg: 0, n: 0, sends: 0, projects: 0, flashes: 0, soft: 0, fair: 0, hard: 0, attempts: 0, mShort: 0, mAny: 0, mTall: 0 };
 const starStr = avg => { const r = Math.round(avg); return "★".repeat(r) + "☆".repeat(5 - r); };
 const fmtDate = d => { if (!d) return ""; const [y, m, dd] = d.slice(0, 10).split("-"); return `${dd}/${m}/${y.slice(2)}`; };
-const sectorNames = () => [...new Set([...S.sectors.map(s => s.name), ...S.blocks.map(b => b.sector).filter(Boolean)])].sort((a, b) => a.localeCompare(b, "es"));
+// Sectores: los del plano y los de los bloques abiertos (los de bloques ya desmontados no vuelven a salir)
+const sectorNames = () => [...new Set([...S.sectors.map(s => s.name), ...S.blocks.filter(b => b.active).map(b => b.sector).filter(Boolean)])].sort((a, b) => a.localeCompare(b, "es"));
 
 function tape(b, short) {
   const l = LV[b.level] || { bg: "var(--line)", fg: "var(--ink)", name: "?" };
