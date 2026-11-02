@@ -844,6 +844,18 @@ function sectorPicker(input) {
     el("div", { class: "plan-scroll" }, el("div", { class: "plan" }, el("img", { src: photoUrl(S.mapPath), alt: "Plano de la sala" }), svg, pins.map(([, p]) => p))));
 }
 
+// Por qué no se ha guardado un bloque, dicho claro (con el código para poder buscarlo)
+function saveError(e) {
+  const code = e?.code || "", msg = e?.message || String(e || "");
+  const why = code === "42501" || code === "PGRST116" ? "Supabase no te deja cambiarlo: tu sesión no tiene permiso de equipador. Cierra sesión de equipador, vuelve a entrar y prueba otra vez."
+    : /^PGRST30[13]$/.test(code) || /jwt|token/i.test(msg) ? "Tu sesión de equipador ha caducado. Cierra sesión de equipador y vuelve a entrar."
+    : code === "23514" ? "Algún dato no es válido (nombre, sector o beta demasiado largos, o un enlace de vídeo que no empieza por https://)."
+    : code === "23502" ? "Falta un dato obligatorio del bloque."
+    : isNetErr(e) ? "Sin conexión. Prueba otra vez cuando tengas cobertura."
+    : "No se pudo guardar.";
+  return `${why} (${code || "error"}: ${msg.slice(0, 120)})`;
+}
+
 function openForm(b) {
   const edit = !!b;
   const d = b ? { level: b.level, color: b.hold_color, styles: [...(b.styles || [])], photo: b.photo_path || "", file: null }
@@ -915,13 +927,18 @@ function openForm(b) {
     const body = { ...(edit ? {} : { gym_id: S.gym }), name: fName.value.trim(), level: d.level, hold_color: d.color, sector, styles: d.styles,
       set_date: fDate.value || today(), beta: fBeta.value.trim(), video, photo_path, xlp: fXlp.checked };
     if (!edit) store.set("lb-xlp-default", fXlp.checked);
-    const { data, error } = edit
-      ? await sb.from("blocks").update(body).eq("id", b.id).select().single()
-      : await sb.from("blocks").insert(body).select().single();
+    const save = () => edit ? sb.from("blocks").update(body).eq("id", b.id).select().single() : sb.from("blocks").insert(body).select().single();
+    let { data, error } = await save();
+    // Sesión caducada o sin permiso (el cambio no llega a ningún bloque): se renueva la sesión y se prueba otra vez
+    if (error && /^(PGRST116|PGRST301|PGRST303|42501)$/.test(error.code || "")) {
+      await sb.auth.refreshSession().catch(() => {});
+      ({ data, error } = await save());
+    }
     if (error) {
+      console.error(error);
       if (photo_path !== d.photo) removePhoto(photo_path);
       saveBtn.disabled = false; saveBtn.textContent = edit ? "Guardar cambios" : "Añadir bloque";
-      return fail(error.code === "42501" ? "Tu cuenta no tiene permiso de equipador." : "No se pudo guardar. Inténtalo de nuevo.");
+      return fail(saveError(error));
     }
     if (edit && b.photo_path && b.photo_path !== photo_path) removePhoto(b.photo_path);
     // Un sector nuevo escrito a mano pasa a la lista de sectores para poder colocarlo en el plano
