@@ -481,6 +481,29 @@ I18N_RX.unshift([/^(.+) bloqueado$/, m => `${m[1]} blocked`], [/^(.+) desbloquea
   [/^(\d+) (betas?)$/, m => `${m[1]} ${m[1] === "1" ? "beta" : "betas"}`], [/^(\d+) (grupos?)$/, m => `${m[1]} ${m[1] === "1" ? "group" : "groups"}`],
   [/^última actividad hace (\d+) (min|h|días)$/, m => `last active ${m[1]} ${m[2] === "días" ? "days" : m[2]} ago`], [/^última actividad ayer$/, () => "last active yesterday"], [/^última actividad sin actividad$/, () => "no activity yet"]);
 
+// Lanzamiento: que no se te pierda, opinión, glosario, ir a mi puesto y grupo de prueba
+Object.assign(I18N, { "Que no se te pierda": "Don't lose it", "Ponte un apodo con PIN: con él recuperas tu progreso, tus grupos y tu ranking en otro móvil.": "Get a nickname with a PIN: with it you can recover your progress, groups and ranking on another phone.",
+  "Guardar apodo": "Save nickname", "Guardado. Apunta tu PIN en algún sitio": "Saved. Write your PIN down somewhere",
+  "¿Qué tal la app después de esta semana? Cuéntanos qué te gusta y qué cambiarías": "How's the app after this week? Tell us what you like and what you'd change", "Opinar": "Give feedback",
+  "Qué significa cada cosa": "What each thing means", "Volver al bloque": "Back to the problem", "¿Qué es encadenar, flash o proyecto?": "What's a send, a flash or a project?",
+  "Bloque": "Problem", "Un problema de búlder: una línea de presas marcada con cinta del color de su nivel, sin cuerda y a poca altura.": "A boulder problem: a line of holds marked with tape in its grade colour, no rope and close to the ground.",
+  "Encadenar": "Send", "Subir el bloque de la salida al top sin caerte, en un solo intento.": "Climbing the problem from the start to the top without falling, in one go.",
+  "Flash": "Flash", "Encadenarlo al primer intento. Suma más puntos.": "Sending it on your first attempt. It's worth more points.",
+  "Intento o pegue": "Attempt", "Cada vez que te pones en la salida y lo pruebas.": "Each time you get on the start holds and try it.",
+  "Proyecto": "Project", "Un bloque que estás trabajando y aún no te sale. Márcalo y lo tendrás a mano.": "A problem you're working on and haven't sent yet. Mark it and keep it handy.",
+  "Beta": "Beta", "Cómo se hace un bloque: dónde van los pies, la secuencia, el truco del paso clave.": "How a problem is done: where the feet go, the sequence, the trick for the crux.",
+  "Salida y top": "Start and top", "Las presas donde se empieza (con las dos manos) y la última, que hay que coger con las dos manos para que cuente.": "The holds you start on (with both hands) and the last one, which you must hold with both hands for it to count.",
+  "Nivel": "Grade", "El color de la cinta, de más fácil a más difícil: azul, verde, naranja, amarillo, morado, rojo y negro. «Compe» son bloques de competición.": "The tape colour, from easiest to hardest: blue, green, orange, yellow, purple, red and black. “Comp” are competition problems.",
+  "Liga": "League", "En el ranking compites con quien escala parecido a ti: tu liga es el color más difícil del que hayas encadenado 10 bloques.": "In the ranking you compete with people who climb like you: your league is the hardest colour you've sent 10 problems of.",
+  "Racha": "Streak", "Semanas seguidas encadenando al menos un bloque.": "Weeks in a row sending at least one problem.",
+  "Nivel real": "Real level", "Tu nivel según los bloques que encadenas, contando lo difícil que le parece a la gente cada uno.": "Your level based on the problems you send, taking into account how hard people find each one.",
+  "Desmontado": "Stripped", "Un bloque que ya han quitado de la pared. Sigue en tus encadenados.": "A problem that has been taken off the wall. It stays in your sends.",
+  "Grupo de prueba": "Test group", "Solo el grupo de prueba": "Test group only" });
+I18N_RX.unshift([/^Llevas (\d+) (bloques? encadenados?)\. Todo está guardado en este móvil: si cambias de móvil o se borran los datos del navegador, se perdería\.$/, m => `You've sent ${m[1]} ${m[1] === "1" ? "problem" : "problems"}. It's all stored on this phone: if you change phones or the browser data is cleared, it would be lost.`],
+  [/^Ponle un PIN a «(.+)» y podrás recuperarlo todo en cualquier móvil\.$/, m => `Give “${m[1]}” a PIN and you can recover everything on any phone.`],
+  [/^Ir a mi puesto \((\d+)\.º\)$/, m => `Go to my position (#${m[1]})`],
+  [/^Grupo de prueba: (\d+) (personas? ha(?:n)? entrado) con el enlace (.+)$/, m => `Test group: ${m[1]} ${m[1] === "1" ? "person has" : "people have"} joined with the link ${m[3]}`]);
+
 // Traductor: frase entera → con números → con nombres → por trozos separados por « · »
 function tr(text) {
   if (LANG === "es" || !text) return text;

@@ -923,3 +923,17 @@ html.big-text .wordmark .mark { width: clamp(33px, 8vw, 42px); }
 .us-help { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; color: var(--ink-2); font-size: var(--fs-2); }
 .blocked-banner { background: var(--danger-soft); color: var(--ink); justify-content: flex-start; gap: var(--s-3); }
 .blocked-banner .ico { color: var(--danger); }
+
+/* =========================================================== 22 · lanzamiento: destello, glosario, ir a mi puesto */
+/* destello al encadenar donde el móvil no vibra (iPhone): un fogonazo amarillo cinta que se apaga solo */
+.cheer-flash { position: fixed; inset: 0; z-index: 69; pointer-events: none; background: var(--tape); opacity: 0; animation: cheer-flash .6s var(--ease) both; }
+.cheer-flash.is-flash { background: #FFFFFF; }
+@keyframes cheer-flash { 0% { opacity: 0; } 15% { opacity: .55; } 100% { opacity: 0; } }
+.glossary { margin: 0; display: grid; grid-template-columns: 1fr; gap: 4px; }
+.glossary dt { font-weight: 800; margin-top: var(--s-3); }
+.glossary dd { margin: 0; color: var(--ink-2); }
+.glossary-link { align-self: flex-start; padding-inline: 0; }
+.rk-me-btn { align-self: flex-start; }
+.rk-row.me.flash-me { animation: rk-me 1.2s var(--ease); }
+@keyframes rk-me { 0%, 60% { background: var(--accent-soft); } }
+.us-pill.cohort { background: var(--tape); color: var(--tape-ink); }

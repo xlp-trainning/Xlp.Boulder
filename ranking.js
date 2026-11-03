@@ -152,6 +152,14 @@ function renderRanking() {
           levelDot(l.k), l.name, n ? el("span", { class: "mono", text: String(n) }) : null);
       })),
       el("span", { class: "label", text: `Liga ${view.name} · ${monthName(shown)}` }),
+      // Ir a mi puesto: cambia a tu liga y te lleva a tu fila
+      me && (me.league !== view.k || rows.length > 6) ? (() => {
+        const pos = RK.rows.filter(r => r.league === me.league && (r.sends > 0 || RK.month === "cur")).findIndex(r => r.is_me) + 1;
+        return pos ? el("button", { class: "btn small rk-me-btn", onclick: () => {
+          RK.league = me.league; renderRanking();
+          const row = document.querySelector(".rk-row.me");
+          if (row) { row.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); row.classList.add("flash-me"); setTimeout(() => row.classList.remove("flash-me"), 1300); }
+        } }, ico("target", "sm"), `Ir a mi puesto (${pos}.º)`) : null; })() : null,
       RK.loading && !RK.rows.length ? el("p", { class: "note", text: "Cargando ranking…" })
         : RK.error ? el("p", { class: "note", text: "No se pudo cargar el ranking. Inténtalo de nuevo en un rato." })
         : rows.length ? el("ol", { class: "rk-list" }, rows.map((r, i) => el("li", { class: "rk-row" + (r.is_me ? " me" : "") },

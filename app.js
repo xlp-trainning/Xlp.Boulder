@@ -146,6 +146,7 @@ async function loadSession() {
   if (!S.isMaster && S.page === "usuarios") S.page = "bloques";
   $("who").textContent = S.isSetter ? "Modo equipador" : "";
   checkBlocked();   // usuarios.js: aviso si la cuenta está bloqueada
+  tagCohort();      // lanzamiento.js: marca del grupo de prueba
   $("loginBtn").textContent = S.session && !S.session.user.is_anonymous ? "Cerrar sesión de equipador" : "Acceso equipador";
 }
 async function refresh() {
@@ -165,6 +166,8 @@ async function refresh() {
     else S.error = "No se pudieron cargar los bloques. Comprueba la conexión y vuelve a intentarlo.";
   }
   markNet();
+  // Bloques abre en «Novedades», salvo que esta semana no se haya montado nada: entonces en «Abiertos»
+  if (!S.loaded && S.view === "new" && !S.blocks.some(b => b.active && isNew(b))) S.view = "open";
   S.loaded = true;
   render();
   if (openId) openDetail(openId);
@@ -801,6 +804,7 @@ function openDetail(id) {
           onclick: () => saveMine(id, mine.sent && !mine.flash ? { ...mine, sent: false, flash: false } : { ...mine, sent: true, flash: false, attempts: mine.attempts > 1 ? mine.attempts : null }) }, ico("check"), "Encadenado"),
         el("button", { class: "btn flash" + (mine.flash ? " primary" : ""), "aria-pressed": mine.flash ? "true" : "false",
           onclick: () => saveMine(id, mine.flash ? { ...mine, sent: false, flash: false, attempts: null } : { ...mine, sent: true, flash: true, attempts: 1 }) }, ico("zap"), "Flash")),
+      el("button", { class: "linkbtn glossary-link", onclick: () => openGlossary(id) }, "¿Qué es encadenar, flash o proyecto?"),
       mine.sent ? el("div", { class: "note", text: `${mine.flash ? "Flash" : "Encadenado"}${mine.sent_at ? " el " + fmtDate(mine.sent_at) : ""}${!mine.flash && mine.attempts > 1 ? ` al ${mine.attempts}.º intento` : ""} · +${pointsFor(b, mine.flash)} puntos` }) : null,
       attemptsBox(id, mine), feelBox(id, b, mine),
       el("div", { class: "actions" },
@@ -1074,6 +1078,7 @@ function saveMine(id, next) {
   const before = { medals: earnedMedals(), league: myLeague().ord };
   S.mine[id] = next;
   if (next.sent && !prev?.sent || next.sent && next.flash !== !!prev?.flash) celebrate(id, next, before);
+  if (next.sent && !prev?.sent) maybeProtect();   // lanzamiento.js: «que no se te pierda»
   render(); if (openId === id) openDetail(id);
   mineBusy = mineBusy.then(async () => {
     if (!(await ensureVoter())) throw new Error("sin sesión");

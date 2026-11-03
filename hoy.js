@@ -23,6 +23,7 @@ function renderHoy() {
     ses ? alertBtn("timer", `Tienes una sesión en marcha (${fmtMins(sesSummary(ses).mins)})`, () => { SES.open = true; render(); }, "Abrir") : null,
     ...G.active.filter(a => !a.am_in).map(a => alertBtn("users", `${a.starter} ha empezado una sesión en grupo en «${a.group_name}»`, () => joinGroupSession(a), "Unirme")),
     ...(G.pending || []).map(({ g, d }) => alertBtn("swords", `${d.challenger_nick} te ha retado a un duelo en «${g.name}»`, () => { G.sel = g.id; G.tab = "retos"; setPage("grupos"); })),
+    feedbackDue() ? alertBtn("message", "¿Qué tal la app después de esta semana? Cuéntanos qué te gusta y qué cambiarías", openFeedback, "Opinar") : null,
     wrappedPending() ? alertBtn("gift", `Tu resumen de ${monthName(monthStart(1))} está listo`, () => openWrapped(1)) : null,
     st.cur > 0 && !st.thisWeek ? alertBtn("flame", `Encadena algo esta semana para no perder tu racha de ${st.cur} ${st.cur === 1 ? "semana" : "semanas"}.`, () => startSession(), "Empezar") : null,
   ].filter(Boolean);
@@ -170,7 +171,8 @@ function openSettings() {
     el("div", { class: "field" }, el("span", { class: "label", text: "La app" }),
       el("div", { class: "row" },
         el("button", { class: "btn", onclick: () => openInstall() }, ico("phone"), "Instalar · pasar mi progreso"),
-        el("button", { class: "btn", onclick: () => { closeSheet(); openWelcome(); } }, "Ver la bienvenida otra vez")))));
+        el("button", { class: "btn", onclick: () => { closeSheet(); openWelcome(); } }, "Ver la bienvenida otra vez"),
+        el("button", { class: "btn", onclick: () => openGlossary() }, ico("bulb"), "Qué significa cada cosa")))));
 }
 
 applyLook();

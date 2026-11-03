@@ -2,7 +2,8 @@
 // Cada móvil es un usuario (cuenta anónima). La lista enseña los que tienen algo: apodo, votos, encadenados o betas.
 // Además, en cualquier móvil: si la cuenta está bloqueada, un aviso arriba lo explica.
 
-const US = { summary: null, list: null, q: "", loading: false, error: null, busy: null, missing: false };
+const US = { summary: null, list: null, q: "", loading: false, error: null, busy: null, missing: false, onlyTest: store.get("lb-us-test", false) };
+const TEST_LINK = "https://xlp-trainning.github.io/Xlp.Boulder/?prueba";
 const shortId = id => String(id || "").slice(0, 6);
 const usName = u => u.nick || (u.is_setter && typeof setterById === "function" && setterById(u.user_id)?.name) || `Sin apodo · ${shortId(u.user_id)}`;
 const usAgo = d => !d ? "sin actividad" : (typeof ago === "function" ? ago(d) : new Date(d).toLocaleDateString("es-ES"));
@@ -57,6 +58,7 @@ function renderUsuarios() {
   if (!US.list) { if (!US.loading) loadUsuarios(); return root.replaceChildren(skeleton(6)); }
 
   const s = US.summary || {};
+  const list = US.onlyTest ? US.list.filter(u => u.cohort === "prueba") : US.list;
   const kpi = (n, l) => el("div", { class: "kpi" }, el("span", { class: "kpi-n", text: n ?? 0 }), el("span", { class: "note", text: l }));
   const search = el("input", { class: "search", id: "us-q", type: "search", value: US.q, placeholder: "Buscar por apodo…", "aria-label": "Buscar usuario por apodo", autocomplete: "off", spellcheck: "false" });
   let t; search.addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => { US.q = search.value.trim(); loadUsuarios(); }, 350); });
@@ -64,6 +66,7 @@ function renderUsuarios() {
   const row = u => el("li", { class: "us-row" + (u.blocked ? " is-blocked" : "") },
     el("div", { class: "us-main" },
       el("div", { class: "us-name" }, el("strong", { text: usName(u) }),
+        u.cohort === "prueba" ? el("span", { class: "us-pill cohort", text: "Grupo de prueba" }) : null,
         u.is_setter ? el("span", { class: "us-pill", text: "Equipador" }) : null,
         u.in_ranking ? el("span", { class: "us-pill", text: "Ranking" }) : null,
         u.has_pin ? el("span", { class: "us-pill", text: "PIN" }) : null,
@@ -86,12 +89,14 @@ function renderUsuarios() {
       el("p", { class: "note", text: "Cada móvil cuenta como un usuario. Activo es quien ha entrado, apuntado o votado en ese plazo." }),
       el("div", { class: "kpis" },
         kpi(s.total, "móviles en total"), kpi(s.active_7, "activos esta semana"), kpi(s.active_30, "activos este mes"), kpi(s.new_7, "nuevos esta semana"),
-        kpi(s.with_nick, "con apodo"), kpi(s.ranking, "en el ranking"), kpi(s.sending, "han encadenado algo"), kpi(s.blocked, "bloqueados"))),
+        kpi(s.with_nick, "con apodo"), kpi(s.ranking, "en el ranking"), kpi(s.sending, "han encadenado algo"), kpi(s.blocked, "bloqueados")),
+      s.cohort != null ? el("p", { class: "note", text: `Grupo de prueba: ${s.cohort} ${s.cohort === 1 ? "persona ha entrado" : "personas han entrado"} con el enlace ${TEST_LINK}` }) : null),
     el("section", { class: "section" },
       el("div", { class: "today-head" }, el("span", { class: "label", text: US.q ? `Resultados para «${US.q}»` : "Con actividad" }),
-        el("span", { class: "note", text: `${US.list.length}${US.list.length >= 300 ? "+" : ""}` })),
+        el("span", { class: "note", text: `${list.length}${US.list.length >= 300 ? "+" : ""}` })),
       el("label", { class: "search-wrap" }, ico("search"), search),
-      US.list.length ? el("ul", { class: "us-list" }, US.list.map(row))
+      US.list.some(u => u.cohort) ? el("button", { class: "chip", "aria-pressed": US.onlyTest ? "true" : "false", onclick: () => { US.onlyTest = !US.onlyTest; store.set("lb-us-test", US.onlyTest); renderUsuarios(); } }, "Solo el grupo de prueba") : null,
+      list.length ? el("ul", { class: "us-list" }, list.map(row))
         : el("p", { class: "note", text: US.q ? "Nadie con ese apodo." : "Todavía nadie ha apuntado nada." })),
     el("section", { class: "section" },
       el("div", { class: "today-head" }, el("span", { class: "label", text: "Qué hace cada cosa" })),

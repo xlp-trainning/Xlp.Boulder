@@ -12,6 +12,7 @@ Ideas que el equipador ha aprobado o le han parecido interesantes y quedan para 
 - Hecho: 40 sectores numerados (detalle en `mapas/sectores-reales.md`). Falta marcar los límites de verdad de cada sector (el equipador, con el ordenador) y luego Benimaclet.
 
 ## Del informe de 50 usuarios simulados (28/10/2026, para después)
+> Hecho antes del grupo de prueba (03/11/2026): glosario (parte del 1), aviso «que no se te pierda» con apodo y PIN (parte del 2), abrir en «Abiertos» si no hay novedades (parte del 4), «Ir a mi puesto» en el ranking (parte del 5) y destello al encadenar en iPhone (6).
 El informe es una simulación: sirve para priorizar, no sustituye a preguntar a la gente de la sala.
 
 Prioridades, por número de personas que lo mencionan:

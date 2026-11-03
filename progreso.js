@@ -63,7 +63,10 @@ const earnedMedals = () => { const c = progressCtx(); return new Set(MEDALS.filt
 
 // Al encadenar: una tira de cinta cruza la pantalla con los puntos, el móvil vibra y, si hay, aviso de liga y medallas
 function cheer(b, flash) {
-  try { navigator.vibrate?.(flash ? [20, 40, 20, 40, 60] : [30, 50, 60]); } catch (e) {}
+  let buzz = false;
+  try { buzz = !!navigator.vibrate?.(flash ? [20, 40, 20, 40, 60] : [30, 50, 60]); } catch (e) {}
+  // En iPhone Safari no deja vibrar: en su lugar, un destello de pantalla
+  if (!buzz) { document.querySelector(".cheer-flash")?.remove(); const f = el("div", { class: "cheer-flash" + (flash ? " is-flash" : ""), "aria-hidden": "true" }); document.body.append(f); setTimeout(() => f.remove(), 700); }
   document.querySelector(".cheer")?.remove();
   const c = el("div", { class: "cheer", "aria-hidden": "true" },
     el("div", { class: "cheer-tape " + (flash ? "flash" : "send") },
