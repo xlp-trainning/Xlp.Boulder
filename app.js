@@ -199,7 +199,7 @@ function tape(b, short) {
   return el("div", { class: "tape", style: `background:${l.bg};color:${l.fg}` }, inner);
 }
 // Sello Xlp de los bloques equipados por el dueño de la web: la X del logo y «Xlp»
-const XLP_MARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#1C2422"/><g transform="translate(11 11)"><rect x="-7" y="-1.9" width="14" height="3.8" rx=".8" fill="#F5CE1B" transform="rotate(45)"/><rect x="-7" y="-1.9" width="14" height="3.8" rx=".8" fill="#4CC3A8" transform="rotate(-45)"/></g><circle cx="18.6" cy="18.6" r="2" fill="#F8FAF9"/></svg>';
+const XLP_MARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#15171C"/><g transform="translate(11 11)"><rect x="-7" y="-1.9" width="14" height="3.8" rx=".8" fill="#F5CE1B" transform="rotate(45)"/><rect x="-7" y="-1.9" width="14" height="3.8" rx=".8" fill="#3DD6A3" transform="rotate(-45)"/></g><circle cx="18.6" cy="18.6" r="2" fill="#F8FAF9"/></svg>';
 function xlpBadge(iconOnly, label = "Xlp", who = "Xlp") {
   const s = el("span", { class: "xlp-badge" + (iconOnly ? " icon" : ""), title: `Equipado por ${who}`, "aria-label": iconOnly ? `Equipado por ${who}` : null });
   s.innerHTML = XLP_MARK; if (!iconOnly) s.append(label);

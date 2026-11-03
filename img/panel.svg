@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 960" width="1600" height="960">
+<rect width="1600" height="960" fill="#15171C"/>
+<polygon points="0,0 160,160 0,160" fill="#2F6BFF"/>
+<circle cx="240.0" cy="80.0" r="67" fill="#B794F6"/><circle cx="240.0" cy="80.0" r="10" fill="#15171C"/>
+<rect x="345.6" y="32" width="109" height="19" rx="10" fill="#FF5A4E"/>
+<rect x="345.6" y="70" width="109" height="19" rx="10" fill="#FF5A4E"/>
+<rect x="345.6" y="109" width="109" height="19" rx="10" fill="#FF5A4E"/>
+<clipPath id="q30"><rect x="480" y="0" width="160" height="160"/></clipPath><circle cx="640" cy="160" r="160" fill="#FFC933" clip-path="url(#q30)"/>
+<circle cx="720.0" cy="80.0" r="48" fill="#B794F6"/><circle cx="720.0" cy="80.0" r="10" fill="#15171C"/>
+<rect x="832" y="25.6" width="19" height="109" rx="10" fill="#2F6BFF"/>
+<rect x="870" y="25.6" width="19" height="109" rx="10" fill="#2F6BFF"/>
+<rect x="909" y="25.6" width="19" height="109" rx="10" fill="#2F6BFF"/>
+<clipPath id="q60"><rect x="960" y="0" width="160" height="160"/></clipPath><circle cx="960" cy="160" r="160" fill="#FF5A4E" clip-path="url(#q60)"/>
+<circle cx="1200.0" cy="80.0" r="51" fill="none" stroke="#2F6BFF" stroke-width="19"/>
+<polygon points="1280,0 1440,0 1440,160" fill="#B794F6"/>
+<polygon points="1280,0 1440,0 1440,160" fill="#F3EEE4" transform="rotate(180 1360.0 80.0)" opacity="1"/>
+<polygon points="1440,0 1600,160 1440,160" fill="#F3EEE4"/>
+<polygon points="1440,0 1600,160 1440,160" fill="#2F6BFF" transform="rotate(180 1520.0 80.0)" opacity="1"/>
+<polygon points="0,160 160,160 160,320" fill="#FFC933"/>
+<clipPath id="q11"><rect x="160" y="160" width="160" height="160"/></clipPath><circle cx="160" cy="240.0" r="80.0" fill="#3DD6A3" clip-path="url(#q11)"/>
+<polygon points="320,160 480,160 320,320" fill="#F3EEE4"/>
+<circle cx="560.0" cy="240.0" r="67" fill="#2F6BFF"/><circle cx="560.0" cy="240.0" r="10" fill="#15171C"/>
+<circle cx="720.0" cy="240.0" r="67" fill="#FF5A4E"/><circle cx="720.0" cy="240.0" r="10" fill="#15171C"/>
+<clipPath id="q51"><rect x="800" y="160" width="160" height="160"/></clipPath><circle cx="960" cy="320" r="160" fill="#B794F6" clip-path="url(#q51)"/>
+<rect x="1145.6" y="192" width="109" height="19" rx="10" fill="#B794F6"/>
+<rect x="1145.6" y="230" width="109" height="19" rx="10" fill="#B794F6"/>
+<rect x="1145.6" y="269" width="109" height="19" rx="10" fill="#B794F6"/>
+<rect x="1312" y="185.6" width="19" height="109" rx="10" fill="#3DD6A3"/>
+<rect x="1350" y="185.6" width="19" height="109" rx="10" fill="#3DD6A3"/>
+<rect x="1389" y="185.6" width="19" height="109" rx="10" fill="#3DD6A3"/>
+<clipPath id="q91"><rect x="1440" y="160" width="160" height="160"/></clipPath><circle cx="1440" cy="240.0" r="80.0" fill="#FF5A4E" clip-path="url(#q91)"/>
+<rect x="32" y="345.6" width="19" height="109" rx="10" fill="#F3EEE4"/>
+<rect x="70" y="345.6" width="19" height="109" rx="10" fill="#F3EEE4"/>
+<rect x="109" y="345.6" width="19" height="109" rx="10" fill="#F3EEE4"/>
+<clipPath id="q12"><rect x="160" y="320" width="160" height="160"/></clipPath><circle cx="160" cy="320" r="160" fill="#FF5A4E" clip-path="url(#q12)"/>
+<rect x="320" y="320" width="160" height="160" fill="#2F6BFF"/>
+<circle cx="400.0" cy="400.0" r="19.2" fill="#15171C"/>
+<circle cx="560.0" cy="400.0" r="67" fill="#3DD6A3"/><circle cx="560.0" cy="400.0" r="10" fill="#15171C"/>
+<rect x="640" y="320" width="160" height="160" fill="#2F6BFF"/>
+<circle cx="720.0" cy="400.0" r="19.2" fill="#15171C"/>
+<clipPath id="q52"><rect x="800" y="320" width="160" height="160"/></clipPath><circle cx="960" cy="400.0" r="80.0" fill="#3DD6A3" clip-path="url(#q52)"/>
+<polygon points="960,320 1120,320 960,480" fill="#B794F6"/>
+<clipPath id="q72"><rect x="1120" y="320" width="160" height="160"/></clipPath><circle cx="1120" cy="480" r="160" fill="#F3EEE4" clip-path="url(#q72)"/>
+<rect x="1280" y="320" width="160" height="160" fill="#B794F6"/>
+<circle cx="1360.0" cy="400.0" r="19.2" fill="#15171C"/>
+<polygon points="1440,320 1600,320 1600,480" fill="#3DD6A3"/>
+<circle cx="240.0" cy="560.0" r="58" fill="#2F6BFF"/><circle cx="240.0" cy="560.0" r="10" fill="#15171C"/>
+<circle cx="400.0" cy="560.0" r="67" fill="#3DD6A3"/><circle cx="400.0" cy="560.0" r="10" fill="#15171C"/>
+<circle cx="560.0" cy="560.0" r="67" fill="#FFC933"/><circle cx="560.0" cy="560.0" r="10" fill="#15171C"/>
+<rect x="640" y="480" width="160" height="160" fill="#FF5A4E"/>
+<circle cx="720.0" cy="560.0" r="19.2" fill="#15171C"/>
+<clipPath id="q53"><rect x="800" y="480" width="160" height="160"/></clipPath><circle cx="800" cy="640" r="160" fill="#B794F6" clip-path="url(#q53)"/>
+<circle cx="1040.0" cy="560.0" r="58" fill="#F3EEE4"/><circle cx="1040.0" cy="560.0" r="10" fill="#15171C"/>
+<clipPath id="q73"><rect x="1120" y="480" width="160" height="160"/></clipPath><circle cx="1120" cy="640" r="160" fill="#2F6BFF" clip-path="url(#q73)"/>
+<circle cx="1360.0" cy="560.0" r="51" fill="none" stroke="#3DD6A3" stroke-width="19"/>
+<rect x="1440" y="480" width="160" height="160" fill="#FF5A4E"/>
+<circle cx="1520.0" cy="560.0" r="19.2" fill="#15171C"/>
+<polygon points="160,640 160,800 0,800" fill="#FFC933"/>
+<polygon points="160,640 160,800 0,800" fill="#3DD6A3" transform="rotate(180 80.0 720.0)" opacity="1"/>
+<circle cx="240.0" cy="720.0" r="48" fill="#F3EEE4"/><circle cx="240.0" cy="720.0" r="10" fill="#15171C"/>
+<rect x="320" y="640" width="160" height="160" fill="#FFC933"/>
+<circle cx="400.0" cy="720.0" r="19.2" fill="#15171C"/>
+<clipPath id="q34"><rect x="480" y="640" width="160" height="160"/></clipPath><circle cx="560.0" cy="640" r="80.0" fill="#2F6BFF" clip-path="url(#q34)"/>
+<circle cx="720.0" cy="720.0" r="67" fill="#B794F6"/><circle cx="720.0" cy="720.0" r="10" fill="#15171C"/>
+<clipPath id="q54"><rect x="800" y="640" width="160" height="160"/></clipPath><circle cx="800" cy="640" r="160" fill="#3DD6A3" clip-path="url(#q54)"/>
+<clipPath id="q64"><rect x="960" y="640" width="160" height="160"/></clipPath><circle cx="1120" cy="640" r="160" fill="#2F6BFF" clip-path="url(#q64)"/>
+<clipPath id="q74"><rect x="1120" y="640" width="160" height="160"/></clipPath><circle cx="1120" cy="720.0" r="80.0" fill="#3DD6A3" clip-path="url(#q74)"/>
+<circle cx="1520.0" cy="720.0" r="51" fill="none" stroke="#F3EEE4" stroke-width="19"/>
+<clipPath id="q05"><rect x="0" y="800" width="160" height="160"/></clipPath><circle cx="0" cy="880.0" r="80.0" fill="#B794F6" clip-path="url(#q05)"/>
+<polygon points="160,800 320,800 320,960" fill="#3DD6A3"/>
+<polygon points="160,800 320,800 320,960" fill="#FF5A4E" transform="rotate(180 240.0 880.0)" opacity="1"/>
+<polygon points="320,800 480,800 480,960" fill="#FF5A4E"/>
+<rect x="640" y="800" width="160" height="160" fill="#F3EEE4"/>
+<circle cx="720.0" cy="880.0" r="19.2" fill="#15171C"/>
+<rect x="832" y="825.6" width="19" height="109" rx="10" fill="#2F6BFF"/>
+<rect x="870" y="825.6" width="19" height="109" rx="10" fill="#2F6BFF"/>
+<rect x="909" y="825.6" width="19" height="109" rx="10" fill="#2F6BFF"/>
+<circle cx="1040.0" cy="880.0" r="51" fill="none" stroke="#FF5A4E" stroke-width="19"/>
+<rect x="1152" y="825.6" width="19" height="109" rx="10" fill="#2F6BFF"/>
+<rect x="1190" y="825.6" width="19" height="109" rx="10" fill="#2F6BFF"/>
+<rect x="1229" y="825.6" width="19" height="109" rx="10" fill="#2F6BFF"/>
+<rect x="1312" y="825.6" width="19" height="109" rx="10" fill="#FFC933"/>
+<rect x="1350" y="825.6" width="19" height="109" rx="10" fill="#FFC933"/>
+<rect x="1389" y="825.6" width="19" height="109" rx="10" fill="#FFC933"/>
+<polygon points="1600,800 1600,960 1440,960" fill="#FF5A4E"/>
+</svg>

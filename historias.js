@@ -1,7 +1,7 @@
 // Tarjetas para historias de Instagram (1080x1920) de un bloque encadenado. El resumen del mes está en wrapped.js.
 // Usa el estado y las utilidades de app.js y progreso.js.
 
-const STORY = { w: 1080, h: 1920, bg: "#0C1210", ink: "#EEF4F1", muted: "#A3B3AC", accent: "#4CC3A8", tape: "#F5CE1B", tapeInk: "#1E1A07", line: "#2B3732",
+const STORY = { w: 1080, h: 1920, bg: "#15171C", ink: "#F3EEE4", muted: "#A8A59E", accent: "#FFC933", tape: "#F5CE1B", tapeInk: "#1E1A07", line: "#33373F",
   url: "xlp-trainning.github.io/Xlp.Boulder" };
 const DISPLAY = '"Big Shoulders Display", Impact, "Arial Narrow", sans-serif', BODY = 'Figtree, system-ui, sans-serif';
 
@@ -52,7 +52,7 @@ function drawMark(x, cx, cy, s) {
   x.save(); x.translate(cx, cy);
   x.fillStyle = "#26302D"; x.beginPath(); x.roundRect(-s / 2, -s / 2, s, s, s * .22); x.fill();
   const tape = (rot, color) => { x.save(); x.rotate(rot); x.fillStyle = color; x.beginPath(); x.roundRect(-s * .33, -s * .09, s * .66, s * .18, s * .03); x.fill(); x.restore(); };
-  x.translate(-s * .04, -s * .04); tape(Math.PI / 4, "#F5CE1B"); tape(-Math.PI / 4, "#4CC3A8"); x.translate(s * .04, s * .04);
+  x.translate(-s * .04, -s * .04); tape(Math.PI / 4, "#F5CE1B"); tape(-Math.PI / 4, "#3DD6A3"); x.translate(s * .04, s * .04);
   x.fillStyle = STORY.ink; x.beginPath(); x.arc(s * .32, s * .32, s * .085, 0, Math.PI * 2); x.fill();
   x.restore();
 }
@@ -71,7 +71,7 @@ function drawFooter(x) {
     x.fillStyle = l.solid ? "#F4F4F2" : l.bg;
     x.beginPath(); x.moveTo(i * w, STORY.h - 52); x.lineTo(i * w + w / 2, STORY.h - 40); x.lineTo(i * w + w + 1, STORY.h - 52); x.lineTo(i * w + w + 1, STORY.h); x.lineTo(i * w, STORY.h); x.fill();
   });
-  x.fillStyle = STORY.muted; x.font = `600 32px "JetBrains Mono", ui-monospace, monospace`; x.textAlign = "center";
+  x.fillStyle = STORY.muted; x.font = `600 32px "Figtree", system-ui, sans-serif`; x.textAlign = "center";
   x.fillText(STORY.url, STORY.w / 2, STORY.h - 92); x.textAlign = "left";
 }
 function fitText(x, text, maxW, size, weight = 900, font = DISPLAY) {

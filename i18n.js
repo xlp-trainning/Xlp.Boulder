@@ -76,7 +76,7 @@ const I18N = {
 
   // Mi progreso
   "puntos": "points", "encadenados": "sends", "nivel más alto": "highest grade", "semanas seguidas": "weeks in a row", "semana seguida": "week in a row", "Tu siguiente reto": "Your next challenge",
-  "Es tu proyecto": "It's your project", "Recién montado": "Freshly set", "De tu nivel": "At your level", "Para sumar puntos": "To earn points",
+  "Es tu proyecto": "It's your project", "Recién montado": "Freshly set", "En tu plan de la semana": "In your weekly plan", "Para ti": "For you", "De tu nivel": "At your level", "Para sumar puntos": "To earn points",
   "¡Lo tienes todo encadenado! Vuelve cuando haya bloques nuevos.": "You've sent everything! Come back when there are new problems.", "Cuando haya bloques abiertos, aquí te propondremos tres para ti.": "When there are open problems, we'll suggest three for you here.",
   "Conseguida": "Earned", "Primer flash": "First flash", "Haz un bloque a la primera": "Send a problem first go", "10 flashes": "10 flashes", "Diez bloques a la primera": "Ten problems first go",
   "10 encadenados": "10 sends", "Encadena diez bloques": "Send ten problems", "50 encadenados": "50 sends", "Encadena cincuenta bloques": "Send fifty problems", "100 puntos": "100 points", "Suma cien puntos": "Earn a hundred points",
@@ -398,7 +398,7 @@ I18N_RX.unshift(...I18N_RX.map(([rx, f]) => {
   return src === rx.source ? null : [new RegExp(src, rx.flags.includes("u") ? rx.flags : rx.flags + "u"), m => { const r = f(m); return r == null ? r : r.replace(EMOJI_HEAD, ""); }];
 }).filter(Boolean));
 I18N_RX.unshift([/^(\d+) (presas?) · (\d+) de salida · (\d+) de top · color afinado \((\d+)\)$/, m => `${m[1]} ${m[1] === "1" ? "hold" : "holds"} · ${m[3]} start · ${m[4]} top · colour tuned (${m[5]})`]);
-I18N_RX.unshift([/^Equipado por (.+)$/, m => `Set by ${m[1]}`], [/^(.+) ya es equipador$/, m => `${m[1]} is now a setter`],
+I18N_RX.unshift([/^Equipado por (.+)$/, m => `Set by ${m[1]}`], [/^equipado por (.+)$/, m => `set by ${m[1]}`], [/^(.+) ya es equipador$/, m => `${m[1]} is now a setter`],
   [/^Quién equipa los bloques de (.+) y cómo los valora la gente\. Toca un equipador para ver todos sus bloques\.$/, m => `Who sets the problems at ${m[1]} and how people rate them. Tap a setter to see all their problems.`],
   [/^(\d+) (bloques abiertos|bloque abierto) en (.+) · (\d+) equipados? en total$/, m => `${m[1]} open ${m[1] === "1" ? "problem" : "problems"} at ${m[3]} · ${m[4]} set in total`],
   [/^Sus bloques abiertos · (\d+)$/, m => `Their open problems · ${m[1]}`], [/^Estilos que más equipa: (.+)$/, m => `Styles they set most: ${m[1].replace(/([^,(]+?) \((\d+)\)/g, (_, w, n) => `${w.startsWith(" ") ? " " : ""}${tw(w.trim())} (${n})`)}`],

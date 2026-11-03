@@ -33,7 +33,7 @@ const SENS = { 1: { f: .78, tol: 11 }, 2: { f: .89, tol: 14 }, 3: { f: 1, tol: 1
 // Para contar como presa, un color tiene que estar bastante más cerca de la presa que del muro (no a medio camino)
 const MARGIN = .6;
 const STATES = ["normal", "start", "top", "off"];
-const MARK = { start: { color: "#4CC3A8", text: "SALIDA", rings: 1 }, top: { color: "#F5CE1B", text: "TOP", rings: 2 } };
+const MARK = { start: { color: "#3DD6A3", text: "SALIDA", rings: 1 }, top: { color: "#F5CE1B", text: "TOP", rings: 2 } };
 
 function hsvAt(d, i) {
   const r = d[i] / 255, g = d[i + 1] / 255, b = d[i + 2] / 255;

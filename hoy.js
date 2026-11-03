@@ -10,6 +10,13 @@ const alertBtn = (icon, text, go, cta) => el("button", { class: "today-alert", o
 const scoreChip = (n, label, icon, cls) => el("button", { class: "today-chip" + (cls ? " " + cls : ""), onclick: () => setPage("progreso") },
   el("b", {}, icon ? ico(icon) : null, String(n)), el("small", { text: label }));
 
+// Ilustración de la portada: un trozo del panel geométrico (img/panel.svg). Cada bloque enseña otro encuadre, siempre el mismo
+function wallArt(b) {
+  let h = 2166136261; for (const ch of String(b.id)) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+  const x = (h >>> 0) % 101, y = (h >>> 8) % 101;
+  return el("span", { class: "th-art", "aria-hidden": "true", style: `background-position:${x}% ${y}%` });
+}
+
 function renderHoy() {
   const root = $("page-hoy");
   if (!S.loaded) return;
@@ -18,6 +25,10 @@ function renderHoy() {
   const pf = profile(), plan = weekPlan(pf), recs = plan ? [] : recommendations(3);
   const projects = S.blocks.filter(b => b.active && S.mine[b.id]?.project && !S.mine[b.id]?.sent).slice(0, 3);
   const ses = sesActive();
+  // El bloque de la portada: lo último montado (mejor si tiene foto); si no hay novedades, tu siguiente reto
+  const pick = fresh.filter(b => !S.mine[b.id]?.sent);
+  const hero = pick.find(b => b.photo_path) || pick[0] || (plan ? plan.blocks[0] : recs[0]?.b) || null;
+  const heroWhy = pick.includes(hero) ? "Recién montado" : plan ? "En tu plan de la semana" : recs[0]?.why || "Para ti";
 
   // Avisos: lo que conviene hacer ya
   const alerts = [
@@ -31,8 +42,15 @@ function renderHoy() {
   root.replaceChildren(el("div", { class: "today" }, ...[
     // El bloque héroe: un trozo de muro con el saludo, tu marcador y la acción principal
     el("section", { class: "today-hero is-wall" },
-      el("span", { class: "today-kick", text: currentGym()?.name || "Xlp.Boulder" }),
-      el("h2", { class: "today-hi", text: nick ? `${greeting()}, ${nick}` : greeting() }),
+      el("div", { class: "th-top" }, el("span", { class: "today-kick", text: currentGym()?.name || "Xlp.Boulder" }),
+        el("h2", { class: "today-hi", text: nick ? `${greeting()}, ${nick}` : greeting() })),
+      // El protagonista: el bloque que toca hoy, con su foto de la pared
+      hero ? el("button", { class: "th-block", onclick: () => openDetail(hero.id), "aria-label": `Ver ${title(hero)}` },
+        wallArt(hero),
+        el("span", { class: "th-info" }, tape(hero),
+          el("span", { class: "th-txt" }, el("span", { class: "th-why", text: heroWhy }),
+            el("span", { class: "th-name", text: title(hero) }),
+            el("span", { class: "th-meta", text: [hero.sector, setterOf(hero)?.name && `equipado por ${setterOf(hero).name}`].filter(Boolean).join(" · ") })))) : null,
       el("div", { class: "today-score" },
         scoreChip(st.cur, st.cur === 1 ? "semana de racha" : "semanas de racha", "flame", "streak"),
         scoreChip(c.monthPoints, "puntos este mes"),
@@ -144,7 +162,7 @@ function applyLook() {
   const t = store.get("lb-theme", "auto");
   if (t === "auto") delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
   // La barra del móvil sigue el tema elegido (en «auto», cada meta vuelve a su color)
-  document.querySelectorAll("meta[data-tc]").forEach(m => m.content = t === "auto" ? m.dataset.tc : t === "dark" ? "#0F1513" : "#E8EDE9");
+  document.querySelectorAll("meta[data-tc]").forEach(m => m.content = t === "auto" ? m.dataset.tc : t === "dark" ? "#22252C" : "#EEEDE9");
   document.documentElement.classList.toggle("big-text", !!store.get("lb-big", false));
 }
 function openSettings() {

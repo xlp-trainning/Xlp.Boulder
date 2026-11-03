@@ -1,19 +1,20 @@
-/* Xlp.Boulder · «la cinta de salida»
-   Sistema visual: tokens en :root (color, espacio en pasos de 4 px, radios, sombras, tiempos), textura de pared
-   (grano de magnesio y rejilla de tuercas T), cintas de nivel con el final cortado y momentos «muro» oscuros
-   (Hoy, modo sesión, celebración, Tu mes, bienvenida). Documentado en CLAUDE.md → «Sistema visual». */
+/* Xlp.Boulder · «la sala»: contrachapado, paneles negros en diagonal y cinta de salida
+   La pared real de Natural Climb: madera de abedul con agujeros de tuercas T, cortada por paneles negros en
+   diagonal, y presas de colores vivos. Tokens en :root; el muro negro (.is-wall) y su corte en diagonal
+   (--cut-diag) para los momentos de impacto. Documentado en DESIGN.md y CLAUDE.md → «Sistema visual». */
 
 /* =========================================================== 1 · tokens */
 :root {
-  /* color · claro: neutros verdosos, nunca gris puro ni blanco puro */
-  --bg: #E8EDE9; --bg-2: #DCE4DE; --surface: #F7F9F5; --surface-2: #EDF2EE;
-  --ink: #13201B; --ink-2: #2A3832; --muted: #4F5F58; --line: #C8D2CB; --line-2: #A9B7AE;
-  --accent: #0B6B5A; --accent-2: #08574A; --accent-ink: #FFFFFF; --accent-soft: #D2E7DF; --accent-text: #0B6B5A;
-  --tape: #F5CE1B; --tape-ink: #1E1A07; --tape-text: #735C00;
-  --star: #C08600; --danger: #B3261E; --danger-soft: #F5DEDA; --info: #24679F;
-  --scrim: rgba(8, 14, 12, .5);
-  /* el muro: superficies oscuras de los momentos de impacto (iguales en los dos temas) */
-  --wall: #0C1210; --wall-2: #151E1B; --wall-3: #1E2925; --wall-ink: #EEF4F1; --wall-muted: #9AABA4; --wall-line: #2B3732; --wall-accent: #4CC3A8;
+  /* color · claro: el contrachapado de la pared (neutros de madera, nunca gris ni blanco puros); la acción, en negro de panel */
+  --bg: #EEEDE9; --bg-2: #E3E1DB; --surface: #FAF9F7; --surface-2: #F1EFEB;
+  --ink: #15171C; --ink-2: #33363D; --muted: #5A5955; --line: #DAD7D0; --line-2: #BDB8AE;
+  --accent: #15171C; --accent-2: #000000; --accent-ink: #FAF9F7; --accent-soft: #E3E1DB; --accent-text: #2456D6;
+  --tape: #F5CE1B; --tape-ink: #1E1A07; --tape-text: #6E5600;
+  --star: #8F6000; --danger: #B3261E; --danger-soft: #F5DEDA; --info: #1C55B8;
+  --scrim: rgba(12, 10, 8, .55);
+  /* el muro: los paneles negros de la sala (iguales en los dos temas); su acento es la madera */
+  --wall: #15171C; --wall-2: #1F2228; --wall-3: #2A2E35; --wall-ink: #F3EEE4; --wall-muted: #A8A59E; --wall-line: #33373F; --wall-accent: #FFC933;
+  --wood: #FFC933; --wood-ink: #15171C;   /* el amarillo del panel geométrico: la acción sobre el muro */
   /* niveles (los mismos que LEVELS en app.js) */
   --lv-azul: #1E63D6; --lv-verde: #2E9D45; --lv-naranja: #F07A1A; --lv-amarillo: #F5CE1B; --lv-morado: #7B3FB8; --lv-rojo: #D7262C; --lv-negro: #1C1C1E;
   --gold: #F5CE1B; --silver: #C3CEC9; --bronze: #D58A4F;
@@ -21,10 +22,10 @@
   /* espacio: escala de 4 px */
   --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px; --s-16: 64px;
   /* radios: cinta, pieza pequeña, control, panel, hoja */
-  --r-1: 3px; --r-2: 6px; --r-3: 10px; --r-4: 14px; --r-5: 20px; --r-pill: 999px;
+  --r-1: 2px; --r-2: 4px; --r-3: 6px; --r-4: 8px; --r-5: 10px; --r-pill: 999px;   /* la sala es angulosa: radios cortos */
   /* sombras */
-  --sh-1: 0 1px 0 rgba(19, 32, 27, .07);
-  --sh-2: 0 1px 2px rgba(19, 32, 27, .08), 0 8px 22px rgba(19, 32, 27, .07);
+  --sh-1: none;
+  --sh-2: none;   /* en reposo nada flota: se separa por tono o por línea */
   --sh-3: 0 22px 60px rgba(8, 14, 12, .32);
   --sh-tape: 0 2px 0 rgba(0, 0, 0, .12), 0 6px 14px rgba(0, 0, 0, .14);
   /* tiempos */
@@ -34,54 +35,55 @@
   /* tipografía */
   --f-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
   --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --f-mono: var(--f-body);   /* fechas y datos: la letra del texto con cifras tabulares */
   --fs-1: 12px; --fs-2: 13px; --fs-3: 15px; --fs-4: 17px; --fs-5: 20px;
   --fd-1: 24px; --fd-2: 32px; --fd-3: 44px; --fd-4: 64px; --fd-5: 88px;
   /* formas de cinta: final en V (vertical), muesca al final (horizontal) y cinta rasgada */
   --cut-v: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 7px), 0 100%);
   --cut-top: polygon(0 0, 50% 6px, 100% 0, 100% 100%, 0 100%);
   --cut-end: polygon(0 0, 100% 0, calc(100% - 6px) 50%, 100% 100%, 0 100%);
+  --cut-diag: polygon(0 0, 100% 0, 100% calc(100% - 34px), 0 100%);   /* el borde en diagonal de los paneles negros */
   --torn: polygon(0 9%, 3% 0, 34% 5%, 66% 0, 97% 4%, 100% 0, 98% 50%, 100% 100%, 64% 95%, 30% 100%, 2% 96%, 0 90%, 1.5% 50%);
   /* texturas: grano de magnesio y rejilla de tuercas T */
-  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .07 0 0 0 0 .12 0 0 0 0 .1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  --grain-wall: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .055 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  --nut: rgba(19, 32, 27, .1); --nut-wall: rgba(238, 244, 241, .075);
+  --grain: none;   /* plano: sin texturas */
+  --grain-wall: none;
+  --nut: rgba(27, 24, 20, .2); --nut-wall: rgba(244, 236, 220, .09);
   --nuts-size: 44px;
   color-scheme: light;
 }
 /* Tema oscuro: sigue al móvil salvo que se elija claro en Ajustes (y el mismo bloque para «oscuro» elegido) */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0F1513; --bg-2: #0A0F0D; --surface: #17201D; --surface-2: #1F2A26;
-    --ink: #E8EFEB; --ink-2: #C8D3CE; --muted: #98A8A1; --line: #29352F; --line-2: #3A4842;
-    --accent: #4CC3A8; --accent-2: #6CD3BB; --accent-ink: #06120F; --accent-soft: #163430; --accent-text: #5FD0B5;
-    --tape-text: #F5CE1B; --star: #F2B634; --danger: #F2827A; --danger-soft: #3A1E1B; --info: #7AB6EE;
+    --bg: #22252C; --bg-2: #1A1D22; --surface: #2B2F37; --surface-2: #343842;   /* más claro que el muro, para que los paneles se sigan viendo */
+    --ink: #F3EEE4; --ink-2: #D9D5CC; --muted: #ACA9A2; --line: #3D414A; --line-2: #535864;
+    --accent: #FFC933; --accent-2: #FFD65C; --accent-ink: #15171C; --accent-soft: #3A3423; --accent-text: #8FB0FF;
+    --tape-text: #F5CE1B; --star: #F2B634; --danger: #F2827A; --danger-soft: #3A1E1B; --info: #8CB8F2;
     --scrim: rgba(0, 0, 0, .62);
-    --sh-1: 0 1px 0 rgba(0, 0, 0, .3); --sh-2: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 26px rgba(0, 0, 0, .3);
-    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    --nut: rgba(232, 239, 235, .06);
+    --sh-1: none; --sh-2: none;
+    --grain: none;
+    --nut: rgba(244, 236, 220, .07);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-    --bg: #0F1513; --bg-2: #0A0F0D; --surface: #17201D; --surface-2: #1F2A26;
-    --ink: #E8EFEB; --ink-2: #C8D3CE; --muted: #98A8A1; --line: #29352F; --line-2: #3A4842;
-    --accent: #4CC3A8; --accent-2: #6CD3BB; --accent-ink: #06120F; --accent-soft: #163430; --accent-text: #5FD0B5;
-    --tape-text: #F5CE1B; --star: #F2B634; --danger: #F2827A; --danger-soft: #3A1E1B; --info: #7AB6EE;
+    --bg: #22252C; --bg-2: #1A1D22; --surface: #2B2F37; --surface-2: #343842;   /* más claro que el muro, para que los paneles se sigan viendo */
+    --ink: #F3EEE4; --ink-2: #D9D5CC; --muted: #ACA9A2; --line: #3D414A; --line-2: #535864;
+    --accent: #FFC933; --accent-2: #FFD65C; --accent-ink: #15171C; --accent-soft: #3A3423; --accent-text: #8FB0FF;
+    --tape-text: #F5CE1B; --star: #F2B634; --danger: #F2827A; --danger-soft: #3A1E1B; --info: #8CB8F2;
     --scrim: rgba(0, 0, 0, .62);
-    --sh-1: 0 1px 0 rgba(0, 0, 0, .3); --sh-2: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 26px rgba(0, 0, 0, .3);
-    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    --nut: rgba(232, 239, 235, .06);
+    --sh-1: none; --sh-2: none;
+    --grain: none;
+    --nut: rgba(244, 236, 220, .07);
     color-scheme: dark;
 }
 /* Un «muro»: cualquier zona con esta clase pasa a la pared oscura, con sus propios tokens para lo que lleva dentro */
 .is-wall {
-  --bg: var(--wall); --bg-2: #080C0B; --surface: var(--wall-2); --surface-2: var(--wall-3);
-  --ink: var(--wall-ink); --ink-2: #CAD6D0; --muted: var(--wall-muted); --line: var(--wall-line); --line-2: #3D4B45;
-  --accent: var(--wall-accent); --accent-2: #6CD3BB; --accent-ink: #06120F; --accent-soft: #163430; --accent-text: #5FD0B5;
+  --bg: var(--wall); --bg-2: #0F1115; --surface: var(--wall-2); --surface-2: var(--wall-3);
+  --ink: var(--wall-ink); --ink-2: #D9D5CC; --muted: var(--wall-muted); --line: var(--wall-line); --line-2: #4C463D;
+  --accent: var(--wall-accent); --accent-2: #FFD65C; --accent-ink: #15171C; --accent-soft: #3A3423; --accent-text: #FFC933;
   --tape-text: var(--tape); --danger: #F2827A; --star: #F2B634; --nut: var(--nut-wall);
   background-color: var(--wall); color: var(--wall-ink); color-scheme: dark;
-  background-image: radial-gradient(circle, var(--nut-wall) 0 2px, transparent 2.6px), radial-gradient(circle, transparent 4.2px, var(--nut-wall) 4.6px 5.4px, transparent 5.8px), var(--grain-wall);
+  background-image: none;
   background-size: var(--nuts-size) var(--nuts-size), var(--nuts-size) var(--nuts-size), 180px 180px;
   background-position: 14px 14px, 14px 14px, 0 0;
 }
@@ -91,7 +93,7 @@
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; color: var(--ink); font-family: var(--f-body); font-size: var(--fs-3); line-height: 1.5;
-  background: var(--bg) var(--grain) repeat; background-size: 180px 180px;
+  background: var(--bg);
   padding: calc(env(safe-area-inset-top, 0px) + var(--s-4)) max(var(--s-4), env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + var(--s-8)) max(var(--s-4), env(safe-area-inset-left, 0px));
   -webkit-tap-highlight-color: transparent;
 }
@@ -229,7 +231,12 @@ body[data-screen="hoy"] #sessionBtn:not(.primary) { display: none; }   /* en «H
 @media (min-width: 768px) { .mainnav { margin: 0; padding: 0; } }
 
 /* =========================================================== 6 · bloques: tira de niveles, filtros y lista */
-.dist { display: flex; flex-direction: column; gap: var(--s-3); }
+/* la tira de niveles va en un panel negro de la sala: los colores de las cintas resaltan como en la pared */
+.dist { display: flex; flex-direction: column; gap: var(--s-4); margin-inline: calc(-1 * var(--s-4)); padding: var(--s-5) var(--s-4) calc(var(--s-6) + 34px); clip-path: var(--cut-diag); margin-bottom: calc(-1 * var(--s-4)); }
+@media (min-width: 768px) { .dist { margin-inline: 0; border-radius: var(--r-5) var(--r-5) 0 0; padding-inline: var(--s-6); } }
+.dist .bar .n { color: var(--ink); }
+.dist .bar .col { box-shadow: none; }
+.is-wall .tape, .is-wall .bar .col { box-shadow: inset 0 0 0 1px rgba(244, 236, 220, .4); }   /* la cinta negra se ve sobre el panel negro */
 .dist-head { display: flex; flex-wrap: wrap; gap: 4px var(--s-4); align-items: flex-end; justify-content: space-between; }
 .dist-head .total { display: flex; align-items: baseline; gap: var(--s-2); font-family: var(--f-display); font-weight: 900; font-size: var(--fd-4); line-height: .82; font-variant-numeric: tabular-nums; }
 .dist-head .total small { font-family: var(--f-body); font-size: var(--fs-2); font-weight: 700; color: var(--muted); }
@@ -286,7 +293,7 @@ select.sort { padding-right: var(--s-8); }
   transition: background-color var(--d-1) var(--ease), transform var(--d-1) var(--ease);
 }
 .card:hover { background: var(--surface-2); }
-.card.has-photo { grid-template-columns: 54px 1fr 68px; }
+.card.has-photo { grid-template-columns: 54px 1fr 84px; }
 .card.off { color: var(--muted); }
 .card.off .tape { filter: saturate(.35); opacity: .7; }
 /* la cinta del nivel: tira de color con el final cortado en V */
@@ -303,10 +310,10 @@ select.sort { padding-right: var(--s-8); }
 .hold { display: inline-flex; align-items: center; gap: 5px; }
 .hold .dot { width: 10px; height: 10px; }
 .styles { display: flex; flex-wrap: wrap; gap: 4px; }
-.tag { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); border: 1px solid var(--line-2); padding: 1px 6px; border-radius: var(--r-1); }
+.tag { font-size: var(--fs-2); font-weight: 700; color: var(--ink-2); background: var(--surface-2); padding: 2px 8px; border-radius: var(--r-2); }
 /* en las filas, los estilos y el equipador son texto: la cinta y el nombre mandan */
 .card .styles { gap: 0 5px; }
-.card .tag { border: 0; padding: 0; text-transform: none; letter-spacing: 0; font-size: var(--fs-2); font-weight: 600; }
+.card .tag { border: 0; padding: 0; background: none; text-transform: none; letter-spacing: 0; font-size: var(--fs-2); font-weight: 600; }
 .card .tag + .tag::before { content: "· "; color: var(--muted); }
 .meta .xlp-badge { border: 0; background: none; padding: 0; font-size: var(--fs-2); font-weight: 600; letter-spacing: 0; color: var(--muted); }
 .stars-line { display: flex; align-items: center; gap: 6px; font-size: var(--fs-2); color: var(--muted); flex-wrap: wrap; }
@@ -316,7 +323,7 @@ select.sort { padding-right: var(--s-8); }
 .sent-badge .ico, .proj-badge .ico { width: 14px; height: 14px; stroke-width: 2.6; }
 /* «Nuevo»: trozo de cinta amarilla con muesca */
 .new-badge { flex: none; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; background: var(--tape); color: var(--tape-ink); padding: 3px 10px 3px 7px; line-height: 1.3; clip-path: var(--cut-end); }
-.thumb { width: 68px; height: 68px; object-fit: cover; display: block; border-radius: var(--r-2); background: var(--bg-2); align-self: center; }
+.thumb { width: 84px; height: 84px; object-fit: cover; display: block; border-radius: var(--r-3); background: var(--bg-2); align-self: center; }
 .rec { display: flex; flex-direction: column; min-width: 0; background: var(--surface); }
 .rec-why { padding: var(--s-3) var(--s-4) 0 calc(54px + var(--s-6)); font-size: var(--fs-2); font-weight: 700; color: var(--accent-text); }
 .rec .card { padding-top: var(--s-2); }
@@ -658,16 +665,31 @@ body.has-session-bar .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + 84
 /* =========================================================== 16 · hoy */
 .today { display: flex; flex-direction: column; gap: var(--s-6); }
 /* el bloque héroe: un trozo de muro con el saludo, el marcador y la acción principal */
-.today-hero { position: relative; border-radius: var(--r-5); padding: var(--s-5) var(--s-5) var(--s-5); display: flex; flex-direction: column; gap: var(--s-4); overflow: hidden; box-shadow: var(--sh-2); }
+/* un panel negro de la sala, a sangre en el móvil, con el borde de abajo en diagonal como los de la pared */
+.today-hero { position: relative; margin-inline: calc(-1 * var(--s-4)); padding: var(--s-5) var(--s-4) calc(var(--s-8) + 34px); display: flex; flex-direction: column; gap: var(--s-4); overflow: hidden; clip-path: var(--cut-diag); }
+@media (min-width: 768px) { .today-hero { margin-inline: 0; border-radius: var(--r-5) var(--r-5) 0 0; padding-inline: var(--s-6); } }
+.th-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-2) var(--s-3); }
+.th-block { display: flex; flex-direction: column; gap: 0; padding: 0; border: 0; background: var(--wall-2); color: var(--ink); text-align: left; border-radius: var(--r-4); overflow: hidden; transition: transform var(--d-1) var(--ease); }
+.th-block:active { transform: scale(.985); }
+/* el panel geométrico: presas (círculos con su agujero), volúmenes (triángulos y cuartos de círculo) y regletas */
+.th-art { display: block; width: 100%; aspect-ratio: 5 / 3; background: #15171C url("img/panel.svg") 0 0 / 220% auto no-repeat; }
+.dist::before { content: ""; display: block; height: 64px; margin: calc(-1 * var(--s-5)) calc(-1 * var(--s-4)) 0; background: #15171C url("img/panel.svg") 30% 40% / 640px auto repeat-x; }
+@media (min-width: 768px) { .dist::before { margin-inline: calc(-1 * var(--s-6)); } }
+@media (min-width: 768px) { .th-block { flex-direction: row; } .th-art { width: 46%; } }
+.th-info { display: grid; grid-template-columns: 64px 1fr; gap: var(--s-4); align-items: stretch; padding: var(--s-4); flex: 1; }
+.th-info .tape { min-height: 84px; }
+.th-info .tape .grade { font-size: 18px; }
+.th-txt { display: flex; flex-direction: column; gap: 4px; min-width: 0; justify-content: center; }
+.th-why { font-size: var(--fs-2); font-weight: 800; color: var(--wood); }
+.th-name { font-family: var(--f-display); font-weight: 900; font-size: clamp(36px, 11vw, 56px); line-height: .9; text-transform: uppercase; overflow-wrap: anywhere; }
+.th-meta { font-size: var(--fs-2); color: var(--muted); }
 .today-kick { align-self: flex-start; background: var(--tape); color: var(--tape-ink); font: 800 12px/1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; padding: 7px 14px 7px 10px; transform: rotate(-1.5deg); clip-path: var(--torn); }
-.today-hi { margin: 0; font-family: var(--f-display); font-weight: 900; font-size: clamp(40px, 12vw, 64px); text-transform: uppercase; line-height: .88; letter-spacing: .005em; overflow-wrap: anywhere; }
-.today-score { display: grid; grid-template-columns: repeat(2, 1fr); }
-@media (min-width: 560px) { .today-score { grid-template-columns: repeat(4, 1fr); } }
+.today-hi { margin: 0; font-size: var(--fs-3); font-weight: 700; color: var(--ink-2); }
+.today-score { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
 .today-chip { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: var(--tap-lg); border: 0; border-top: 1px solid var(--line); background: none; color: var(--ink); padding: var(--s-3) var(--s-2) var(--s-2) var(--s-3); text-align: left; transition: transform var(--d-1) var(--ease); }
-.today-chip:nth-child(odd) { padding-left: 0; }
-.today-chip:nth-child(even) { border-left: 1px solid var(--line); }
-@media (min-width: 560px) { .today-chip:not(:first-child) { border-left: 1px solid var(--line); padding-left: var(--s-3); } }
-.today-chip b { display: flex; align-items: center; gap: 4px; font-family: var(--f-display); font-weight: 900; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+.today-chip:first-child { padding-left: 0; }
+.today-chip:not(:first-child) { border-left: 1px solid var(--line); }
+.today-chip b { display: flex; align-items: center; gap: 4px; font-family: var(--f-display); font-weight: 900; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }
 .today-chip b .ico { width: 22px; height: 22px; }
 .today-chip.streak b .ico { color: #FF8A4C; }
 .today-chip small { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
@@ -730,7 +752,9 @@ body.has-session-bar .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + 84
 .wl-link-space { height: var(--tap); }
 .wl-art { position: relative; }
 .wl-art-1 { height: min(42vh, 300px); }
-.wl-tapes { position: absolute; inset: -40px -120px; }
+.wl-tapes { position: absolute; inset: 0 0 36px; background: #15171C url("img/panel.svg") 18% 30% / 820px auto; border-radius: var(--r-4); animation: wl-in .5s var(--ease) both; }
+@keyframes wl-in { from { opacity: 0; transform: translateY(12px); } }
+.wl-tapes span { display: none; }
 .wl-tapes span { position: absolute; left: -10%; width: 130%; height: 28px; top: calc(8% + var(--i) * 11%); clip-path: var(--torn);
   transform: rotate(calc(-14deg + var(--i) * 3.5deg)); opacity: .96; animation: wl-tape .6s var(--ease) both; animation-delay: calc(var(--i) * 40ms); }
 @keyframes wl-tape { from { transform: translateX(-30%) rotate(calc(-14deg + var(--i) * 3.5deg)); opacity: 0; } }
@@ -778,7 +802,7 @@ body.has-session-bar .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + 84
 :root[data-theme="dark"] .net-banner { background: #3A3211; color: #FFE8A0; }
 .net-banner { justify-content: flex-start; }
 .xlp-badge { flex: none; display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800; letter-spacing: .04em; color: var(--ink);
-  background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-1); padding: 1px 7px 1px 2px; line-height: 1.4; vertical-align: middle; }
+  background: var(--surface-2); border: 0; border-radius: var(--r-2); padding: 2px 8px 2px 3px; line-height: 1.4; vertical-align: middle; }
 .xlp-badge svg { width: 16px; height: 16px; display: block; border-radius: 4px; }
 .xlp-badge.icon { padding: 0; border: 0; background: none; }
 .hero-tag .info > .xlp-badge { align-self: flex-start; font-size: 12.5px; padding: 2px 10px 2px 3px; }
@@ -897,3 +921,12 @@ html.big-text .wordmark .mark { width: clamp(33px, 8vw, 42px); }
 @media (max-width: 420px) { .setter-mix { display: none; } .setter-row { grid-template-columns: 44px 1fr auto; } }
 .linkbtn.setter-link { align-self: flex-start; padding: 0; min-height: 0; text-decoration: none; }
 .g-name .xlp-badge { vertical-align: 4px; }
+
+/* =========================================================== 21 · panel geométrico en cada sección */
+/* Una franja del panel (img/panel.svg) abre cada página; cada una enseña otro trozo, y el borde baja en diagonal */
+#page-mapa::before, #page-ranking::before, #page-grupos::before, #page-progreso::before, #page-equipadores::before, #page-stats::before, #page-buzon::before {
+  content: ""; display: block; height: 56px; margin: 0 calc(-1 * var(--s-4)) calc(-1 * var(--s-2));
+  background: #15171C url("img/panel.svg") var(--band, 0%) 40% / 620px auto repeat-x; clip-path: polygon(0 0, 100% 0, 100% 62%, 0 100%);
+}
+#page-ranking { --band: 35%; } #page-grupos { --band: 62%; } #page-progreso { --band: 88%; } #page-equipadores { --band: 18%; } #page-stats { --band: 50%; } #page-buzon { --band: 74%; }
+@media (min-width: 768px) { #page-mapa::before, #page-ranking::before, #page-grupos::before, #page-progreso::before, #page-equipadores::before, #page-stats::before, #page-buzon::before { margin-inline: 0; border-radius: var(--r-4) var(--r-4) 0 0; } }

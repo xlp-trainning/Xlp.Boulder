@@ -13,28 +13,29 @@
 - Dos rocódromos: Natural Patraix y Natural Benimaclet. Planos en `mapas/`.
 - `editor.js`: editor de la foto del bloque (zona a analizar, presas por color, volúmenes, salida y top).
 
-## Sistema visual · «la cinta de salida»
+## Sistema visual · «el panel»
 - **`DESIGN.md`** (en la raíz) describe este sistema en el formato DESIGN.md: colores, tipografía, espacios, formas, componentes, qué hacer y qué no, y el comportamiento por anchos. Léelo antes de tocar la interfaz y actualízalo cuando cambies un token o un componente.
 - No copies el DESIGN.md de otra marca (la colección awesome-design-md): la app tiene su propia identidad.
-La estética sale de la pared del rocódromo: cinta de carrocero para los niveles, magnesio y tuercas T. Todo está en `styles.css` (secciones numeradas) e `icons.js`.
+Abstracto y moderno: superficies planas, radios cortos y color a bloques. El motivo es el panel geométrico `img/panel.svg` (presas como círculos con agujero, volúmenes como triángulos y cuartos de círculo, regletas como franjas), en coral, cobalto, girasol, menta, lila y tiza sobre #15171C. Las cintas de nivel se mantienen. Todo está en `styles.css` (secciones numeradas) e `icons.js`.
 
 - **Tokens** (`:root` en `styles.css`). No escribas colores ni medidas sueltos: usa siempre los tokens.
-  - Color: `--bg`, `--bg-2`, `--surface`, `--surface-2`, `--ink`, `--ink-2`, `--muted`, `--line`, `--line-2`, `--accent` (verde azulado, el color principal), `--accent-text`, `--accent-soft`, `--tape` (amarillo cinta #F5CE1B: poco, solo para destacar), `--tape-text`, `--danger`, `--star`.
-  - Neutros siempre verdosos, nunca gris ni blanco puros. El tema oscuro redefine los mismos tokens dos veces: dentro de `@media (prefers-color-scheme: dark)` y en `[data-theme="dark"]`. Si cambias uno, cambia los dos.
+  - Color: `--bg`, `--bg-2`, `--surface`, `--surface-2`, `--ink`, `--ink-2`, `--muted`, `--line`, `--line-2`, `--accent` (negro #15171C en claro; girasol #FFC933 en oscuro y sobre el muro), `--accent-text`, `--accent-soft`, `--tape` (amarillo cinta #F5CE1B: poco, solo para destacar), `--tape-text`, `--danger`, `--star`.
+  - Neutros cálidos (blanco tiza #EEEDE9, carbón #22252C en oscuro), nunca gris ni blanco puros. El tema oscuro redefine los mismos tokens dos veces: dentro de `@media (prefers-color-scheme: dark)` y en `[data-theme="dark"]`. Si cambias uno, cambia los dos.
   - Espacio: `--s-1` … `--s-16`, en pasos de 4 px.
-  - Radios: `--r-1` (cinta), `--r-2` (chip), `--r-3` (botón y campo), `--r-4` (panel), `--r-5` (bloque héroe).
-  - Sombras: `--sh-1` … `--sh-3`. Tiempos: `--d-1` 150 ms, `--d-2` 200 ms, `--d-3` 250 ms, con `--ease`.
+  - Radios cortos (2–10 px): `--r-1` (cinta), `--r-2` (chip), `--r-3` (botón y campo), `--r-4` (panel), `--r-5`.
+  - Sombras: `--sh-1` y `--sh-2` valen `none` (en reposo nada flota); `--sh-3` solo para hojas y diálogos. Tiempos: `--d-1` 150 ms, `--d-2` 200 ms, `--d-3` 250 ms, con `--ease`.
   - Tamaños táctiles: `--tap` 44 px, `--tap-lg` 52 px, `--tap-xl` 64 px (los botones del modo sesión).
-- **Formas de cinta**: `--cut-v` (final en V: la cinta del nivel en las filas), `--cut-top` (barras de la tira de niveles), `--cut-end` (muesca: «Nuevo», ligas, barras de progreso) y `--torn` (cinta rasgada y girada 1,5–2°: etiqueta del rocódromo, nivel en la ficha, avisos de la bienvenida). Gira solo lo que es «cinta pegada»; el resto va recto.
-- **Texturas**: el `body` lleva `--grain` (grano de magnesio, SVG). La clase `.is-wall` convierte cualquier zona en «muro»: pared oscura con rejilla de tuercas T, en los dos temas. Además redefine los tokens dentro, así que lo que va dentro se adapta solo.
-  - Se usa en los momentos de impacto: bloque héroe de Hoy (`.today-hero`), modo sesión (`.session`), visor de Tu mes (`.wrapped`) y bienvenida (`.wl`).
+- **Formas**: `--cut-diag` (borde de abajo en diagonal: paneles del muro y franjas del panel), `--cut-v` (final en V: la cinta del nivel en las filas), `--cut-top` (barras de la tira de niveles), `--cut-end` (muesca: «Nuevo», ligas, barras de progreso) y `--torn` (cinta rasgada y girada 1,5–2°: etiqueta del rocódromo, nivel en la ficha, avisos de la bienvenida). Gira solo lo que es «cinta pegada»; el resto va recto.
+- **Sin texturas** (`--grain: none`). La clase `.is-wall` convierte cualquier zona en «muro»: panel liso #15171C en los dos temas, que redefine los tokens dentro.
+  - Se usa en los momentos de impacto: portada de Hoy (`.today-hero`), tira de niveles de Bloques (`.dist`), modo sesión (`.session`), Tu mes (`.wrapped`) y bienvenida (`.wl`).
+  - **El panel geométrico** aparece en la portada de Hoy (`wallArt()`, un encuadre distinto por bloque), encima de la tira de niveles, en la bienvenida y como franja al abrir cada página (sección 21, `--band`). No lo pongas detrás de texto ni en las listas.
 - **Tipografía**:
   - Big Shoulders Display para números tipo marcador y títulos en mayúsculas.
   - Figtree para el texto.
-  - JetBrains Mono para fechas y datos.
+  - Fechas y datos (`.mono`): Figtree con cifras tabulares. No hay tercera familia.
   - Los números grandes van en condensada (`.kpi-n`, `.ses-kpis`, `.today-chip b`, `.rk-pts`).
 - **Composición**:
-  - Hoy: un solo bloque héroe y, debajo, listas.
+  - Hoy: la portada con el bloque recién montado (o tu siguiente reto), el saludo pequeño y tu marcador; debajo, listas.
   - Bloques: encima de la lista solo van las barras de nivel, las pestañas y una fila con el buscador y «Filtros» (orden, estilo, equipador y presa en un panel que se abre). La lista empieza en la primera pantalla del móvil. En las filas, los estilos y el equipador van como texto, sin recuadro.
   - Títulos de sección en frase normal y negrita (`.today-head`), nunca en mayúsculas pequeñas. Las mayúsculas espaciadas quedan para el muro y la marca.
   - Bloques y demás listas: filas densas separadas por una línea (`.grid` con `gap: 1px` sobre `--line`, dos columnas desde 768 px), nunca tarjetas iguales.
@@ -57,12 +58,12 @@ La estética sale de la pared del rocódromo: cinta de carrocero para los nivele
 
 ## Skill de diseño · taste-skill
 - Instalada en `.claude/skills/taste-skill/` (de [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill), licencia MIT, commit 12af471). Se usa para revisar y pulir pantallas, no para rediseñar la app desde cero.
-- **Manda «la cinta de salida».** La app es una *app screen*: sigue `references/app-screens.md`, usa `draw.mjs --app --keep palette,type` y respeta los tokens, tipografías e iconos de arriba.
+- **Manda el sistema visual de arriba («el panel»).** La app es una *app screen*: sigue `references/app-screens.md`, usa `draw.mjs --app --keep palette,type` y respeta los tokens, tipografías e iconos de arriba.
 - Choques conocidos que son decisiones de marca y se mantienen (en el inspector, `--allow` para esa regla):
-  - JetBrains Mono en fechas y datos.
+  - Las estrellas ★ de la puntuación (el inspector las cuenta como emoji).
+  - El color que llena la portada de Hoy y las franjas del panel (`colour-sprawl`): se pidió una app llamativa.
   - Big Shoulders en mayúsculas.
   - Las líneas de 1 px entre filas (`.grid`).
-  - Las sombras `--sh-*`.
   - La cinta girada.
   - Los sectores numerados, que son nombres reales.
 - Para revisar: `node .claude/skills/taste-skill/scripts/lint.mjs <archivos>` y `node .claude/skills/taste-skill/scripts/inspect.mjs index.html --app`. Requiere Node 22 y Chromium.
@@ -74,5 +75,5 @@ La estética sale de la pared del rocódromo: cinta de carrocero para los nivele
 - Las adaptaciones están en su `SKILL.md`:
   - Sin React: ignora las reglas de hidratación y de `<Link>`.
   - Español en frase normal, sin «Title Case», y comillas «».
-  - En estilo manda «la cinta de salida».
+  - En estilo manda el sistema visual («el panel», `DESIGN.md`).
   - Guardar el estado en la URL se propone antes de hacerlo.

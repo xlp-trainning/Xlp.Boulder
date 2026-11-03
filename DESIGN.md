@@ -1,62 +1,67 @@
-# DESIGN.md · Xlp.Boulder — «la cinta de salida»
+# DESIGN.md · Xlp.Boulder — «el panel»
 
-Sistema visual de Xlp.Boulder, la libreta de bloques de Natural Climb Patraix y Benimaclet. Sigue el formato DESIGN.md (Google Stitch, colección VoltAgent/awesome-design-md): un documento en texto que cualquier agente lee antes de tocar la interfaz.
+Sistema visual de Xlp.Boulder («el panel»), la libreta de bloques de Natural Climb Patraix y Benimaclet. Sigue el formato DESIGN.md (Google Stitch, colección VoltAgent/awesome-design-md): un documento en texto que cualquier agente lee antes de tocar la interfaz.
 
 Es la descripción **de esta app**, no de otra marca. La fuente de verdad son los tokens de `styles.css` (`:root`) y `LEVELS` en `app.js`; si cambias algo allí, cambia este archivo. Las reglas de trabajo para Claude están en `CLAUDE.md`.
 
 ## Overview
 
-La estética sale de la pared del rocódromo:
-- la **cinta de carrocero** con la que se marcan los niveles de cada bloque;
-- el **magnesio**, como grano sobre el fondo;
-- las **tuercas T** del muro, como rejilla en las zonas oscuras.
+Abstracto y moderno: superficies planas, bordes nítidos y color a bloques. El motivo es **el panel geométrico** (`img/panel.svg`), una rejilla de baldosas que reduce la pared a formas:
+- **presas**: círculos con su agujero, o solo el aro;
+- **volúmenes**: triángulos, medios círculos y cuartos de círculo, a veces con dos caras de distinto color;
+- **regletas**: tres franjas redondeadas.
 
 Es una app que se usa con el móvil en la mano, entre intento e intento: filas densas, textos cortos, botones grandes y un solo momento de impacto por pantalla.
 
 Tres capas:
-1. **El papel**: fondo claro verdoso (u oscuro, en tema oscuro) con grano de magnesio. Ahí van listas, filtros y fichas.
-2. **El muro** (`.is-wall`): pared casi negra con rejilla de tuercas T, igual en los dos temas. Solo para los momentos de impacto: el bloque héroe de Hoy, el modo sesión, Tu mes y la bienvenida.
-3. **La cinta**: el color del nivel, cortado como un trozo de cinta pegado. Es lo único que lleva color fuerte.
+1. **El papel**: blanco tiza liso (o carbón, en tema oscuro). Ahí van listas, filtros y fichas. Sin texturas.
+2. **El muro** (`.is-wall`): panel casi negro #15171C, igual en los dos temas, con el borde de abajo en diagonal (`--cut-diag`). Para los momentos de impacto: la portada de Hoy, la tira de niveles de Bloques, el modo sesión, Tu mes y la bienvenida.
+3. **El color**: el panel geométrico y las cintas de nivel. Fuera de ahí, casi nada lleva color fuerte.
+
+Cada página abre con una franja del panel (sección 21 de `styles.css`), cada una con otro encuadre (`--band`). La portada de Hoy enseña un trozo distinto para cada bloque (`wallArt()` en `hoy.js`).
 
 ## Colors
 
-Neutros siempre verdosos, nunca gris ni blanco puros. Cada token existe en claro, en oscuro (dos veces en `styles.css`: `@media (prefers-color-scheme: dark)` y `[data-theme="dark"]`) y dentro del muro.
+Neutros cálidos y suaves, nunca gris ni blanco puros. Cada token existe en claro, en oscuro (dos veces en `styles.css`: `@media (prefers-color-scheme: dark)` y `[data-theme="dark"]`) y dentro del muro.
+
+### Panel geométrico
+
+Coral #FF5A4E · cobalto #2F6BFF · girasol #FFC933 · menta #3DD6A3 · lila #B794F6 · tiza #F3EEE4, sobre #15171C. Dos baldosas vecinas nunca repiten color. Para regenerarlo: `python3 img/panel.py img/panel.svg 3` (el último número es la semilla).
 
 ### Brand & Accent
 
-| Token | Claro | Oscuro / muro | Uso |
-|---|---|---|---|
-| `--accent` | #0B6B5A | #4CC3A8 | Verde azulado: acción principal, foco, enlaces |
-| `--accent-text` | #0B6B5A | #5FD0B5 | Texto en color de acento |
-| `--accent-soft` | #D2E7DF | #163430 | Fondos suaves de aviso o selección |
-| `--tape` | #F5CE1B | #F5CE1B | Amarillo cinta: «Nuevo», etiqueta del rocódromo, foco sobre el muro. Poco |
-| `--tape-ink` | #1E1A07 | — | Texto encima de la cinta amarilla |
-| `--tape-text` | #735C00 | #F5CE1B | Texto en amarillo sobre fondo claro (AA) |
+| Token | Claro | Oscuro | Muro | Uso |
+|---|---|---|---|---|
+| `--accent` | #15171C | #FFC933 | #FFC933 | Acción principal: negro sobre el papel, girasol sobre lo oscuro |
+| `--accent-ink` | #FAF9F7 | #15171C | #15171C | Texto encima del acento |
+| `--accent-text` | #2456D6 | #8FB0FF | #FFC933 | Enlaces y texto destacado |
+| `--tape` | #F5CE1B | #F5CE1B | #F5CE1B | «Nuevo», etiqueta del rocódromo, foco sobre el muro |
+| `--wood` | #FFC933 | #FFC933 | #FFC933 | Girasol del panel (nombre heredado) |
 
 ### Surface
 
 | Token | Claro | Oscuro | Muro |
 |---|---|---|---|
-| `--bg` | #E8EDE9 | #0F1513 | #0C1210 |
-| `--bg-2` | #DCE4DE | #0A0F0D | #080C0B |
-| `--surface` | #F7F9F5 | #17201D | #151E1B |
-| `--surface-2` | #EDF2EE | #1F2A26 | #1E2925 |
-| `--line` | #C8D2CB | #29352F | #2B3732 |
-| `--line-2` | #A9B7AE | #3A4842 | #3D4B45 |
+| `--bg` | #EEEDE9 | #22252C | #15171C |
+| `--bg-2` | #E3E1DB | #1A1D22 | #0F1115 |
+| `--surface` | #FAF9F7 | #2B2F37 | #1F2228 |
+| `--surface-2` | #F1EFEB | #343842 | #2A2E35 |
+| `--line` | #DAD7D0 | #3D414A | #33373F |
+| `--line-2` | #BDB8AE | #535864 | — |
 
 ### Text
 
 | Token | Claro | Oscuro | Muro |
 |---|---|---|---|
-| `--ink` | #13201B | #E8EFEB | #EEF4F1 |
-| `--ink-2` | #2A3832 | #C8D3CE | #CAD6D0 |
-| `--muted` | #4F5F58 | #98A8A1 | #9AABA4 |
+| `--ink` | #15171C | #F3EEE4 | #F3EEE4 |
+| `--ink-2` | #33363D | #D9D5CC | #D9D5CC |
+| `--muted` | #5A5955 | #ACA9A2 | #A8A59E |
 
-Estado: `--danger` #B3261E / #F2827A, `--star` #C08600 / #F2B634, `--info` #24679F / #7AB6EE.
+Estado: `--danger` #B3261E / #F2827A, `--star` #8F6000 / #F2B634.
 
 ### Niveles (la cinta)
 
-Los mismos en `--lv-*` (CSS) y `LEVELS` (`app.js`). El texto encima (`fg`) está elegido para cumplir AA.
+Los mismos en `--lv-*` (CSS) y `LEVELS` (`app.js`). El texto encima (`fg`) está elegido para cumplir AA. Sobre el muro, la cinta lleva un filo claro para que el negro se vea.
 
 | Nivel | Fondo | Texto |
 |---|---|---|
@@ -69,7 +74,7 @@ Los mismos en `--lv-*` (CSS) y `LEVELS` (`app.js`). El texto encima (`fg`) está
 | Negro | #1C1C1E | #FFFFFF |
 | Compe | rayas #1C1C1E / #F4F4F2 a 135° | #1C1C1E |
 
-Modo daltónico: cada nivel lleva además su abreviatura escrita en la cinta («AZUL», «VERDE», «NAR»…). El color nunca va solo.
+Modo daltónico: cada nivel lleva además su abreviatura escrita en la cinta. El color nunca va solo.
 
 ## Typography
 
@@ -77,7 +82,7 @@ Modo daltónico: cada nivel lleva además su abreviatura escrita en la cinta («
 
 - **Big Shoulders Display** (700–900): números tipo marcador, el logotipo, títulos de los momentos de impacto, abreviatura del nivel en la cinta. En mayúsculas.
 - **Figtree** (400–800): todo el texto.
-- **JetBrains Mono** (500–600): fechas y datos (`.mono`), con cifras tabulares.
+- Fechas y datos (`.mono`): Figtree con cifras tabulares. Dos familias, no más.
 
 ### Hierarchy
 
@@ -114,29 +119,24 @@ Densidad de herramienta, no de folleto: el usuario está en la sala y quiere ver
 
 ## Elevation & Depth
 
-| Token | Uso |
-|---|---|
-| `--sh-1` | Línea de 1px bajo filas y paneles |
-| `--sh-2` | Paneles que se separan del papel (bloque héroe) |
-| `--sh-3` | Hojas y diálogos que flotan |
-| `--sh-tape` | La cinta pegada, que levanta un poco del papel |
+Plano. En reposo nada flota (`--sh-1` y `--sh-2` valen `none`): se separa por tono o por una línea. Solo flotan las hojas y diálogos (`--sh-3`) y la cinta pegada (`--sh-tape`).
 
 ### Decorative Depth
 
-- `--grain`: grano de magnesio en SVG sobre el `body`.
-- `.is-wall`: rejilla de tuercas T (dos `radial-gradient`) más grano claro.
-- Sin degradados de color en fondos ni botones. Sin desenfoques de cristal.
+- Sin texturas ni grano (`--grain: none`), sin degradados de color, sin desenfoques.
+- El único adorno es el panel geométrico, y siempre en su sitio: portada de Hoy, franja de cada página, tira de niveles y bienvenida.
 
 ## Shapes
 
 ### Border Radius Scale
 
-`--r-1` 3px (cinta) · `--r-2` 6px (chip) · `--r-3` 10px (botón y campo) · `--r-4` 14px (panel) · `--r-5` 20px (bloque héroe) · `--r-pill` (barra de sesión).
+Radios cortos: `--r-1` 2px (cinta) · `--r-2` 4px (chip y etiqueta) · `--r-3` 6px (botón y campo) · `--r-4` 8px (panel) · `--r-5` 10px · `--r-pill` (barra de sesión).
 
 ### Formas de cinta (`clip-path`)
 
 | Token | Forma | Dónde |
 |---|---|---|
+| `--cut-diag` | Borde de abajo en diagonal | Los paneles del muro y las franjas del panel |
 | `--cut-v` | Final en V | La cinta del nivel en cada fila |
 | `--cut-top` | Muesca arriba | Barras de la tira de niveles |
 | `--cut-end` | Muesca al final | «Nuevo», ligas, barras de progreso |
@@ -154,8 +154,9 @@ Solo se gira lo que es «cinta pegada». Todo lo demás va recto.
 
 ### Cards & Containers
 
-- **Fila de bloque** (`.card`): cinta del nivel a la izquierda, nombre a 17px, una línea de meta (sector · fecha · equipador con su inicial), estilos como texto («Placa · Técnico»), estrellas y estado (Flash, Encadenado, Proyecto). Sin recuadros dentro.
-- **Bloque héroe** (`.today-hero`): un solo bloque en el muro, con el saludo y los marcadores.
+- **Fila de bloque** (`.card`): cinta del nivel a la izquierda, nombre a 17px, una línea de meta (sector · fecha · equipador con su inicial), estilos como texto («Placa · Técnico»), estrellas y estado (Flash, Encadenado, Proyecto), y la miniatura de la foto si la hay (84px). Sin recuadros dentro.
+- **Etiquetas de estilo en la ficha** (`.tag`): pastilla plana en `--surface-2`, en frase normal.
+- **Portada de Hoy** (`.today-hero`): panel negro a sangre con borde en diagonal; arriba la etiqueta del rocódromo y el saludo pequeño; el bloque recién montado (o tu siguiente reto) con un trozo del panel geométrico, su cinta y su nombre en grande; debajo, racha, puntos y encadenados en una fila, y «Empezar sesión» en girasol.
 - **Hoja** (`.sheet`): ficha y formularios, a pantalla completa en el móvil, con `overscroll-behavior: contain`.
 
 ### Inputs & Forms
@@ -194,10 +195,10 @@ Barra de pestañas de texto (`.mainnav`): Hoy, Bloques, Mapa, Ranking, Grupos, E
 
 ### Don't
 
-- Gris o blanco puros.
+- Gris o blanco puros, texturas o grano.
 - Tarjetas iguales en rejilla, o iconos dentro de cuadrados de color.
 - Títulos en mayúsculas pequeñas espaciadas fuera del muro.
-- Degradados, brillos o fondos desenfocados.
+- Degradados, brillos, fondos desenfocados o manchas de color.
 - Emojis como iconos.
 - Copiar el sistema visual de otra marca o app: este documento es el de Xlp.Boulder.
 
