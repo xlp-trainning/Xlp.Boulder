@@ -62,3 +62,6 @@ Ideas sueltas:
 
 ## Propuesta sin decidir · estado en la dirección web
 - Guardar la pestaña y los filtros en la URL (p. ej. `#bloques?nivel=rojo&vista=new`) para poder compartir un enlace a «los rojos nuevos de Patraix» y que el botón atrás del móvil funcione entre pestañas. Sale de la revisión web-design-guidelines (nov. 2026).
+
+## Decidido · sin perfiles de usuario
+- No hay perfiles visibles de otros usuarios (nov. 2026). De cada persona solo se ve lo que comparte: ranking (si se apunta), betas y la actividad dentro de sus grupos. No proponer perfiles públicos.
