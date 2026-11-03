@@ -18,7 +18,7 @@ Tres capas:
 2. **El muro** (`.is-wall`): panel casi negro #15171C, igual en los dos temas, con el borde de abajo en diagonal (`--cut-diag`). Para los momentos de impacto: la portada de Hoy, la tira de niveles de Bloques, el modo sesión, Tu mes y la bienvenida.
 3. **El color**: el panel geométrico y las cintas de nivel. Fuera de ahí, casi nada lleva color fuerte.
 
-Cada página abre con una franja del panel (sección 21 de `styles.css`), cada una con otro encuadre (`--band`). La portada de Hoy enseña un trozo distinto para cada bloque (`wallArt()` en `hoy.js`).
+Cada página abre con una franja del panel (sección 21 de `styles.css`), cada una con otro encuadre (`--band`). 
 
 ## Colors
 
@@ -124,7 +124,7 @@ Plano. En reposo nada flota (`--sh-1` y `--sh-2` valen `none`): se separa por to
 ### Decorative Depth
 
 - Sin texturas ni grano (`--grain: none`), sin degradados de color, sin desenfoques.
-- El único adorno es el panel geométrico, y siempre en su sitio: portada de Hoy, franja de cada página, tira de niveles y bienvenida.
+- El único adorno es el panel geométrico, y siempre en su sitio: franja de cada página, tira de niveles y bienvenida. La portada de Hoy lleva la rejilla de tuercas.
 
 ## Shapes
 
@@ -156,7 +156,7 @@ Solo se gira lo que es «cinta pegada». Todo lo demás va recto.
 
 - **Fila de bloque** (`.card`): cinta del nivel a la izquierda, nombre a 17px, una línea de meta (sector · fecha · equipador con su inicial), estilos como texto («Placa · Técnico»), estrellas y estado (Flash, Encadenado, Proyecto), y la miniatura de la foto si la hay (84px). Sin recuadros dentro.
 - **Etiquetas de estilo en la ficha** (`.tag`): pastilla plana en `--surface-2`, en frase normal.
-- **Portada de Hoy** (`.today-hero`): panel negro a sangre con borde en diagonal; arriba la etiqueta del rocódromo y el saludo pequeño; el bloque recién montado (o tu siguiente reto) con un trozo del panel geométrico, su cinta y su nombre en grande; debajo, racha, puntos y encadenados en una fila, y «Empezar sesión» en girasol.
+- **Portada de Hoy** (`.today-hero`): un trozo de muro con la rejilla de tuercas, la etiqueta del rocódromo en cinta, el saludo en grande en condensada, el marcador (racha, puntos, encadenados) y «Empezar sesión» en girasol. El usuario prefirió esta versión a la del bloque destacado con el panel.
 - **Hoja** (`.sheet`): ficha y formularios, a pantalla completa en el móvil, con `overscroll-behavior: contain`.
 
 ### Inputs & Forms

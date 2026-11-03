@@ -28,14 +28,14 @@ Abstracto y moderno: superficies planas, radios cortos y color a bloques. El mot
 - **Formas**: `--cut-diag` (borde de abajo en diagonal: paneles del muro y franjas del panel), `--cut-v` (final en V: la cinta del nivel en las filas), `--cut-top` (barras de la tira de niveles), `--cut-end` (muesca: «Nuevo», ligas, barras de progreso) y `--torn` (cinta rasgada y girada 1,5–2°: etiqueta del rocódromo, nivel en la ficha, avisos de la bienvenida). Gira solo lo que es «cinta pegada»; el resto va recto.
 - **Sin texturas** (`--grain: none`). La clase `.is-wall` convierte cualquier zona en «muro»: panel liso #15171C en los dos temas, que redefine los tokens dentro.
   - Se usa en los momentos de impacto: portada de Hoy (`.today-hero`), tira de niveles de Bloques (`.dist`), modo sesión (`.session`), Tu mes (`.wrapped`) y bienvenida (`.wl`).
-  - **El panel geométrico** aparece en la portada de Hoy (`wallArt()`, un encuadre distinto por bloque), encima de la tira de niveles, en la bienvenida y como franja al abrir cada página (sección 21, `--band`). No lo pongas detrás de texto ni en las listas.
+  - **El panel geométrico** aparece encima de la tira de niveles, en la bienvenida y como franja al abrir cada página (sección 21, `--band`). No lo pongas detrás de texto ni en las listas.
 - **Tipografía**:
   - Big Shoulders Display para números tipo marcador y títulos en mayúsculas.
   - Figtree para el texto.
   - Fechas y datos (`.mono`): Figtree con cifras tabulares. No hay tercera familia.
   - Los números grandes van en condensada (`.kpi-n`, `.ses-kpis`, `.today-chip b`, `.rk-pts`).
 - **Composición**:
-  - Hoy: la portada con el bloque recién montado (o tu siguiente reto), el saludo pequeño y tu marcador; debajo, listas.
+  - Hoy: la portada en el muro con la rejilla de tuercas, el saludo en grande, tu marcador y «Empezar sesión»; debajo, listas. (Se probó una portada con el bloque destacado y el panel, y el usuario prefirió esta.)
   - Bloques: encima de la lista solo van las barras de nivel, las pestañas y una fila con el buscador y «Filtros» (orden, estilo, equipador y presa en un panel que se abre). La lista empieza en la primera pantalla del móvil. En las filas, los estilos y el equipador van como texto, sin recuadro.
   - Títulos de sección en frase normal y negrita (`.today-head`), nunca en mayúsculas pequeñas. Las mayúsculas espaciadas quedan para el muro y la marca.
   - Bloques y demás listas: filas densas separadas por una línea (`.grid` con `gap: 1px` sobre `--line`, dos columnas desde 768 px), nunca tarjetas iguales.
