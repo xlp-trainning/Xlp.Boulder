@@ -14,6 +14,8 @@
 - `editor.js`: editor de la foto del bloque (zona a analizar, presas por color, volúmenes, salida y top).
 
 ## Sistema visual · «la cinta de salida»
+- **`DESIGN.md`** (en la raíz) describe este sistema en el formato DESIGN.md: colores, tipografía, espacios, formas, componentes, qué hacer y qué no, y el comportamiento por anchos. Léelo antes de tocar la interfaz y actualízalo cuando cambies un token o un componente.
+- No copies el DESIGN.md de otra marca (la colección awesome-design-md): la app tiene su propia identidad.
 La estética sale de la pared del rocódromo: cinta de carrocero para los niveles, magnesio y tuercas T. Todo está en `styles.css` (secciones numeradas) e `icons.js`.
 
 - **Tokens** (`:root` en `styles.css`). No escribas colores ni medidas sueltos: usa siempre los tokens.
