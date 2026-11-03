@@ -59,3 +59,6 @@ Ideas sueltas:
 - Notas privadas del equipador por bloque (presas usadas, ideas, qué cambiar).
 - Eventos temáticos de temporada (Halloween, Navidad…) con medalla especial.
 - Copias de seguridad de la base de datos y exportar a Excel.
+
+## Propuesta sin decidir · estado en la dirección web
+- Guardar la pestaña y los filtros en la URL (p. ej. `#bloques?nivel=rojo&vista=new`) para poder compartir un enlace a «los rojos nuevos de Patraix» y que el botón atrás del móvil funcione entre pestañas. Sale de la revisión web-design-guidelines (nov. 2026).
