@@ -120,6 +120,8 @@ function openHoldEditor({ source, color }) {
     let holds = [], lab = new Int32Array(W * H).fill(-1), disp = lab, ring = lab, chosen = color && HOLD_RANGES[color] ? color : "";
     // Afinar: colores tomados tocando presas del bloque (en Lab) y sensibilidad elegida
     let samples = [], sampling = false, sens = 3;
+    // Goma: lo borrado a mano se queda borrado aunque se vuelva a analizar; cada pasada se puede deshacer
+    let eraseMode = false, erasing = false, erased = new Uint8Array(W * H), strokes = [], stroke = null, brush = 0, lastErase = null;
     // Zona del muro: si está marcada, solo se buscan presas dentro (fuera quedan techo, colchoneta…)
     // Paso 1: marcar la zona (o elegir toda la foto). Hasta entonces no se busca nada.
     let zone = null, zonePts = [], zoneReady = false, analyzed = false, drawMode = true, drawing = false, livePts = [], skipClick = false;
@@ -196,7 +198,45 @@ function openHoldEditor({ source, color }) {
       const dim = px => !["negro", "marron", "gris", "morado"].includes(chosen) && median(px.filter((_, k) => k % Math.max(1, Math.floor(px.length / 200)) === 0).map(i => hsvAt(cor, i * 4)[2])) < .3;
       for (const px of comps) if (px.length >= minArea && holdShape(px) && !tooBig(px) && !huge(px) && !dim(px)) addHold(px);
       volumes.forEach(addVolume);
-      relabel();
+      strokes = [];                                   // las presas se han vuelto a numerar: no se puede deshacer lo anterior
+      eraseLab(); relabel();
+    }
+    // Quita de las presas los píxeles borrados con la goma y recalcula su caja; sin píxeles, la presa desaparece
+    function eraseLab() {
+      for (let i = 0; i < lab.length; i++) if (erased[i] && lab[i] >= 0) lab[i] = -1;
+      boxes();
+    }
+    function boxes() {
+      const b = holds.map(() => [W, H, -1, -1, 0]);
+      for (let i = 0; i < lab.length; i++) {
+        const id = lab[i]; if (id < 0) continue;
+        const x = i % W, y = (i - x) / W, q = b[id];
+        if (x < q[0]) q[0] = x; if (y < q[1]) q[1] = y; if (x > q[2]) q[2] = x; if (y > q[3]) q[3] = y; q[4]++;
+      }
+      holds.forEach((h, id) => {
+        const [x0, y0, x1, y1, n] = b[id];
+        if (!n) { if (!h.gone) { h.gone = true; h.prevState = h.state; h.state = "off"; } return; }
+        if (h.gone) { h.gone = false; h.state = h.prevState || "normal"; }
+        Object.assign(h, { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 });
+      });
+    }
+    // Lo añadido a mano (presa tocada o volumen) gana a la goma
+    const unErase = id => { for (let i = 0; i < lab.length; i++) if (lab[i] === id) erased[i] = 0; };
+    function eraseAt(x, y) {
+      const r = brush, r2 = r * r;
+      for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+        if (dx * dx + dy * dy > r2) continue;
+        const xx = Math.round(x + dx), yy = Math.round(y + dy);
+        if (xx < 0 || yy < 0 || xx >= W || yy >= H) continue;
+        const i = yy * W + xx;
+        if (!erased[i]) { erased[i] = 1; stroke.push([i, lab[i]]); }
+      }
+      ctx.fillStyle = "rgba(12,18,16,.72)"; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();   // se ve al momento
+    }
+    function undoErase() {
+      const s0 = strokes.pop(); if (!s0) return;
+      for (const [i, l] of s0) { erased[i] = 0; if (l >= 0) lab[i] = l; }
+      boxes(); relabel(); draw(); drawZoneBtns();
     }
     // Zonas conectadas de una máscara (listas de píxeles)
     function components(m) {
@@ -330,7 +370,7 @@ function openHoldEditor({ source, color }) {
         }
       }
       if (px.length < 12) return false;
-      addHold(px); relabel(); return true;
+      addHold(px); unErase(holds.length - 1); relabel(); return true;
     }
 
     function draw(forExport) {
@@ -390,7 +430,8 @@ function openHoldEditor({ source, color }) {
     function updateInfo() {
       const on = holds.filter(h => h.state !== "off");
       const n = s => holds.filter(h => h.state === s).length;
-      info.textContent = sampling ? "Toca el centro de una presa del bloque para aprender su color."
+      info.textContent = eraseMode ? "Goma: pasa el dedo por lo que sobra para borrarlo. Pulsa «Goma» para terminar."
+        : sampling ? "Toca el centro de una presa del bloque para aprender su color."
         : drawMode && drawKind === "volume" ? "Modo volumen: toca cada volumen y su forma se busca sola (o rodéalo con el dedo). Tocar uno marcado lo quita. Pulsa «Volumen» para terminar."
         : drawMode ? "Paso 1 · Rodea con el dedo la zona a analizar, o arrastra en diagonal para marcar un rectángulo."
         : !chosen ? "Paso 2 · Elige el color de las presas del bloque."
@@ -427,7 +468,7 @@ function openHoldEditor({ source, color }) {
       samples.push(c); run();
     }
     canvas.addEventListener("click", e => {
-      if (drawMode || skipClick) { skipClick = false; return; }
+      if (eraseMode || drawMode || skipClick) { skipClick = false; return; }
       if (sampling) { const r = canvas.getBoundingClientRect(); return sampleAt(Math.round((e.clientX - r.left) / r.width * W), Math.round((e.clientY - r.top) / r.height * H)); }
       if (!analyzed) return toast(zoneReady ? "Elige primero el color de las presas" : "Primero marca la zona a analizar");
       const r = canvas.getBoundingClientRect();
@@ -450,15 +491,30 @@ function openHoldEditor({ source, color }) {
 
     const toImg = e => { const r = canvas.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; };
     canvas.addEventListener("pointerdown", e => {
+      if (eraseMode) {
+        e.preventDefault(); erasing = true; stroke = []; canvas.setPointerCapture(e.pointerId);
+        brush = Math.max(4, Math.round(15 * W / canvas.getBoundingClientRect().width));   // unos 15 px de pantalla
+        lastErase = toImg(e); eraseAt(...lastErase); return;
+      }
       if (!drawMode) return;
       e.preventDefault(); drawing = true; livePts = [toImg(e)]; canvas.setPointerCapture(e.pointerId);
     });
     canvas.addEventListener("pointermove", e => {
+      if (erasing) {
+        const p = toImg(e), [qx, qy] = lastErase, d = Math.hypot(p[0] - qx, p[1] - qy), steps = Math.max(1, Math.ceil(d / (brush / 2)));
+        for (let k = 1; k <= steps; k++) eraseAt(qx + (p[0] - qx) * k / steps, qy + (p[1] - qy) * k / steps);
+        lastErase = p; return;
+      }
       if (!drawing) return;
       const p = toImg(e), q = livePts[livePts.length - 1];
       if (Math.hypot(p[0] - q[0], p[1] - q[1]) > 6 * sc) { livePts.push(p); draw(); }
     });
     const endDraw = () => {
+      if (erasing) {
+        erasing = false; skipClick = true;
+        if (stroke.length) strokes.push(stroke); stroke = null;
+        eraseLab(); relabel(); draw(); drawZoneBtns(); return;
+      }
       if (!drawing) return;
       drawing = false; drawMode = false; skipClick = true; canvas.classList.remove("drawing");
       let pts = livePts; livePts = [];
@@ -481,7 +537,7 @@ function openHoldEditor({ source, color }) {
         const v = { ...found, state: "normal" }; volumes.push(v);
         const n = holds.length; addVolume(v);
         if (holds.length === n) { volumes.pop(); draw(); return toast("Ese volumen queda fuera de la zona o encima de otras presas."); }
-        relabel(); draw(); return toast("Volumen añadido. Toca otro, o pulsa «Volumen» para terminar.");
+        unErase(holds.length - 1); relabel(); draw(); return toast("Volumen añadido. Toca otro, o pulsa «Volumen» para terminar.");
       }
       if (drawKind === "volume" && (pts.length < 2 || bw < 30 * sc || bh < 30 * sc)) { stayVolume(); draw(); return toast("Trazo demasiado pequeño. Toca el volumen o rodéalo con el dedo."); }
       if (pts.length < 2 || bw < 30 * sc || bh < 30 * sc) {
@@ -499,7 +555,7 @@ function openHoldEditor({ source, color }) {
         const n = holds.length; addVolume(v);
         stayVolume();
         if (holds.length === n) { volumes.pop(); draw(); return toast("Ese volumen queda fuera de la zona o encima de otras presas."); }
-        relabel(); draw(); return toast("Volumen añadido. Toca otro, o pulsa «Volumen» para terminar.");
+        unErase(holds.length - 1); relabel(); draw(); return toast("Volumen añadido. Toca otro, o pulsa «Volumen» para terminar.");
       }
       zonePts = pts;
       const oc = document.createElement("canvas"); oc.width = W; oc.height = H;
@@ -518,7 +574,11 @@ function openHoldEditor({ source, color }) {
     function stayVolume() { drawMode = true; drawKind = "volume"; canvas.classList.add("drawing"); drawZoneBtns(); updateInfo(); }
     const wholePhoto = () => { zone = null; zonePts = []; zoneReady = true; walls = null; setDrawMode(false); if (chosen) run(); else draw(); };
     function drawZoneBtns() {
-      zoneBtns.replaceChildren(...(drawMode && drawKind === "volume"
+      zoneBtns.replaceChildren(...(eraseMode
+        ? [el("button", { type: "button", class: "btn small primary", "aria-pressed": "true", onclick: () => { eraseMode = false; canvas.classList.remove("drawing"); drawZoneBtns(); updateInfo(); } }, ico("eraser", "sm"), "Goma"),
+           el("button", { type: "button", class: "btn small", disabled: !strokes.length, onclick: undoErase }, ico("undo", "sm"), "Deshacer"),
+           el("span", { class: "note", text: "Activa: pulsa para terminar" })]
+        : drawMode && drawKind === "volume"
         ? [el("button", { type: "button", class: "btn small primary", "aria-pressed": "true", onclick: () => setDrawMode(false) }, ico("layers", "sm"), "Volumen"),
            el("span", { class: "note", text: "Activo: pulsa para terminar" })]
         : drawMode
@@ -528,6 +588,7 @@ function openHoldEditor({ source, color }) {
         : [el("button", { type: "button", class: "btn small", onclick: () => setDrawMode(true) }, ico("pencil", "sm"), "Zona"),
            el("button", { type: "button", class: "btn small", disabled: !zone, onclick: wholePhoto }, "Toda la foto"),
            el("button", { type: "button", class: "btn small", disabled: !analyzed, onclick: () => setDrawMode(true, "volume") }, ico("layers", "sm"), "Volumen"),
+           el("button", { type: "button", class: "btn small", disabled: !analyzed, onclick: () => { eraseMode = true; sampling = false; canvas.classList.add("drawing"); drawZoneBtns(); updateInfo(); } }, ico("eraser", "sm"), "Goma"),
            el("button", { type: "button", class: "btn small" + (samples.length ? " primary" : ""), disabled: !analyzed, onclick: () => { sampling = true; drawZoneBtns(); updateInfo(); } }, ico("target", "sm"), "Afinar color"),
            samples.length ? el("button", { type: "button", class: "btn small", onclick: () => { samples = []; drawZoneBtns(); run(); } }, "Quitar ajuste") : null]
       ).filter(Boolean));

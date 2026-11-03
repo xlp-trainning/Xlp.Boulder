@@ -401,7 +401,9 @@ I18N_RX.unshift([/^(\d+) (presas?) · (\d+) de salida · (\d+) de top · color a
 I18N_RX.unshift([/^Sector (.+)$/, m => `Sector ${m[1]}`]);
 I18N_RX.unshift([/^Apuntarme como «(.+)»$/, m => `Join as “${m[1]}”`]);
 I18N_RX.unshift([/^desde el (\d\d\/\d\d\/\d\d)$/, m => `since ${m[1]}`], [/^Abierto desde el (\S+): (.+)$/, m => `Open since ${m[1]}: ${m[2].replace("Hoy", "today").replace(/días?/, x => x === "día" ? "day" : "days").replace("meses", "months")}`]);
-Object.assign(I18N, { "Modo volumen: toca cada volumen y su forma se busca sola (o rodéalo con el dedo). Tocar uno marcado lo quita. Pulsa «Volumen» para terminar.": "Volume mode: tap each volume and its shape is found automatically (or draw round it). Tapping a marked one removes it. Tap “Volume” to finish.",
+Object.assign(I18N, { "Goma": "Eraser", "Deshacer": "Undo", "Activa: pulsa para terminar": "On: tap to finish",
+  "Goma: pasa el dedo por lo que sobra para borrarlo. Pulsa «Goma» para terminar.": "Eraser: run your finger over what's not part of the problem to erase it. Tap “Eraser” to finish.",
+  "Modo volumen: toca cada volumen y su forma se busca sola (o rodéalo con el dedo). Tocar uno marcado lo quita. Pulsa «Volumen» para terminar.": "Volume mode: tap each volume and its shape is found automatically (or draw round it). Tapping a marked one removes it. Tap “Volume” to finish.",
   "Volumen añadido. Toca otro, o pulsa «Volumen» para terminar.": "Volume added. Tap another, or tap “Volume” to finish.", "Volumen quitado": "Volume removed", "Activo: pulsa para terminar": "On: tap to finish",
   "No encuentro bien el volumen ahí. Toca más al centro o rodéalo con el dedo.": "I can't find the volume there. Tap nearer the centre or draw round it.", "Trazo demasiado pequeño. Toca el volumen o rodéalo con el dedo.": "Stroke too small. Tap the volume or draw round it.",
   "Toca el volumen y su forma se busca sola. Si no sale bien, rodéalo con el dedo.": "Tap the volume and its shape is found automatically. If it doesn't come out right, draw round it with your finger.",

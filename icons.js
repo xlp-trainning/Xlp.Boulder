@@ -55,6 +55,8 @@ const ICONS = {
   search: "M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM20.5 20.5l-5.4-5.4",
   key: "M7.5 14.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM10.5 9.5H21M18 9.5V13M15 9.5v2.5",
   layers: "M12 3 2.5 8 12 13l9.5-5zM2.5 12.5 12 17.5l9.5-5M2.5 16.5 12 21.5l9.5-5",
+  eraser: "M8 20.5h12M4.6 14.6l8.5-8.5a2 2 0 0 1 2.8 0l3.5 3.5a2 2 0 0 1 0 2.8L12 19.8H8.8l-4.2-4.2a.8.8 0 0 1 0-1zM9 10.2l5.3 5.3",
+  undo: "M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11",
 };
 
 // <svg class="ico"> con el icono pedido. Decorativo por defecto: el texto del botón ya lo dice
