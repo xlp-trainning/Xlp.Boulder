@@ -20,9 +20,10 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Xlp.Boulder">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700;800&display=swap">
+<!-- Tipografías y librerías servidas desde la propia web: ninguna petición a terceros salvo Supabase -->
+<link rel="preload" href="fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/big-shoulders-display-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
 <link rel="stylesheet" href="styles.css">
 <script>/* tema y letra elegidos en Ajustes, antes de pintar */ try { var t = JSON.parse(localStorage.getItem("lb-theme")); if (t && t !== "auto") { document.documentElement.dataset.theme = t; document.querySelectorAll("meta[data-tc]").forEach(function (m) { m.content = t === "dark" ? "#22252C" : "#EEEDE9"; }); } if (JSON.parse(localStorage.getItem("lb-big"))) document.documentElement.classList.add("big-text"); } catch (e) {}</script>
 </head>
@@ -136,7 +137,7 @@
 <script src="i18n.js"></script>
 <script src="icons.js"></script>
 <script src="config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="vendor/supabase-2.45.4.js"></script>
 <script src="editor.js"></script>
 <script src="app.js"></script>
 <script src="offline.js"></script>
