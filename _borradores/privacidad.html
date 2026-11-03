@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Privacidad · Xlp.Boulder</title>
+<meta name="theme-color" content="#EEEDE9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#22252C" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+  :root { --bg: #EEEDE9; --surface: #FAF9F7; --ink: #15171C; --muted: #5A5955; --line: #DAD7D0; --accent: #2456D6; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #22252C; --surface: #2B2F37; --ink: #F3EEE4; --muted: #ACA9A2; --line: #3D414A; --accent: #8FB0FF; color-scheme: dark; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 Figtree, system-ui, sans-serif;
+    padding: calc(env(safe-area-inset-top, 0px) + 24px) max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px)); }
+  main { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+  h1, h2 { font-family: "Big Shoulders Display", "Arial Narrow", sans-serif; font-weight: 900; text-transform: uppercase; line-height: .95; margin: 0; }
+  h1 { font-size: clamp(40px, 10vw, 56px); } h2 { font-size: 26px; margin-bottom: 8px; }
+  p, ul { margin: 0 0 8px; } ul { padding-left: 20px; } li { margin-bottom: 4px; }
+  .note { color: var(--muted); font-size: 14px; }
+  section { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; }
+  a { color: var(--accent); font-weight: 700; }
+  .back { align-self: flex-start; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; } td, th { text-align: left; vertical-align: top; padding: 8px 6px; border-top: 1px solid var(--line); } th { width: 34%; }
+  .scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="./">← Volver a Xlp.Boulder</a>
+  <header>
+    <h1>Privacidad</h1>
+    <p class="note">Última actualización: {{FECHA}}</p>
+  </header>
+
+  <section>
+    <h2>En pocas palabras</h2>
+    <ul>
+      <li>No pedimos email ni nombre para usar la app: cada móvil tiene una cuenta anónima.</li>
+      <li>Guardamos lo que tú apuntas (encadenados, votos, betas…) para que la app funcione, y nada más.</li>
+      <li>No hay publicidad, no vendemos datos y no usamos cookies de terceros ni herramientas de seguimiento.</li>
+      <li>Puedes pedir en cualquier momento que borremos todo lo tuyo.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Quién es el responsable</h2>
+    <p>{{RESPONSABLE}}, que administra Xlp.Boulder a título personal. Xlp.Boulder no es un servicio oficial de Natural Climb.</p>
+    <p>Contacto para cualquier tema de privacidad: <a href="mailto:{{EMAIL}}">{{EMAIL}}</a>, o el <b>Buzón de sugerencias</b> de la app.</p>
+  </section>
+
+  <section>
+    <h2>Qué datos guardamos y para qué</h2>
+    <div class="scroll"><table>
+      <tr><th>Identificador anónimo del móvil</th><td>Para recordar lo tuyo sin pedirte registro. Lo crea la app la primera vez que la abres.</td></tr>
+      <tr><th>Lo que apuntas</th><td>Encadenados, flash, intentos, proyectos, puntuaciones, sensación de dificultad y voto de morfo. Sirven para tu progreso, tus medallas, el ranking y las estadísticas de cada bloque.</td></tr>
+      <tr><th>Apodo y PIN (opcionales)</th><td>El apodo sale en el ranking, en tus grupos y junto a tus betas. El PIN se guarda cifrado y solo sirve para recuperar tu apodo en otro móvil.</td></tr>
+      <tr><th>Betas (opcional)</th><td>El texto, el enlace a tu vídeo si lo pones y tu altura si decides indicarla. Las ve cualquiera que abra el bloque.</td></tr>
+      <tr><th>Grupos (opcional)</th><td>A qué grupos perteneces, duelos, retos, reacciones y sesiones en grupo. Solo los ven los miembros de cada grupo.</td></tr>
+      <tr><th>Buzón de sugerencias</th><td>Lo que escribes, para que el equipo de la sala lo lea y conteste.</td></tr>
+      <tr><th>Equipadores</th><td>Email, contraseña (gestionada por Supabase, nunca la vemos) y el nombre con el que firman sus bloques.</td></tr>
+      <tr><th>Datos técnicos</th><td>Al conectarse, los servidores registran la dirección IP y el tipo de navegador durante un tiempo limitado, por seguridad.</td></tr>
+    </table></div>
+    <p class="note">Además, el propio móvil guarda tus preferencias (idioma, tema, letra) y una copia de los bloques para usar la app sin cobertura. Eso no sale del móvil y se borra al borrar los datos del navegador.</p>
+  </section>
+
+  <section>
+    <h2>Por qué podemos tratarlos</h2>
+    <ul>
+      <li>Para darte el servicio que usas al apuntar, votar o unirte a un grupo (art. 6.1.b del RGPD).</li>
+      <li>Los datos opcionales (apodo, altura, betas, grupos) porque tú decides ponerlos y puedes quitarlos (art. 6.1.a).</li>
+      <li>La moderación (bloquear cuentas que molestan) y los registros de seguridad, por interés legítimo en que la app sea segura y agradable (art. 6.1.f).</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Quién más interviene</h2>
+    <ul>
+      <li><b>Supabase</b> guarda la base de datos y las cuentas, como encargado del tratamiento. Servidores en {{REGION}}.</li>
+      <li><b>GitHub Pages</b> sirve la web. GitHub está en EE. UU. y está adherido al Marco de Privacidad de Datos UE-EE. UU.</li>
+    </ul>
+    <p>Las tipografías y las librerías se sirven desde la propia web: no se envían datos a Google ni a otros terceros.</p>
+  </section>
+
+  <section>
+    <h2>Cuánto tiempo</h2>
+    <p>Mientras exista tu cuenta. Si nos pides que la borremos, se elimina todo lo tuyo. Si habías creado un grupo, pasa al miembro más antiguo para que el resto no lo pierda.</p>
+  </section>
+
+  <section>
+    <h2>Tus derechos</h2>
+    <p>Puedes pedir ver, corregir o borrar tus datos, llevártelos, limitar su uso u oponerte a él. Escribe a <a href="mailto:{{EMAIL}}">{{EMAIL}}</a> o usa el Buzón de sugerencias, indicando tu apodo (o el código de «Pasar mi progreso» si no tienes apodo). Contestamos en menos de un mes.</p>
+    <p>Si no te atendemos bien, puedes reclamar ante la Agencia Española de Protección de Datos: <a href="https://www.aepd.es" rel="noopener">www.aepd.es</a>.</p>
+  </section>
+
+  <section>
+    <h2>Menores</h2>
+    <p>Si tienes menos de 14 años, usa la app con permiso de tu madre, padre o tutor.</p>
+  </section>
+</main>
+</body>
+</html>
