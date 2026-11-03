@@ -229,11 +229,10 @@ function card(b) {
     tape(b, true),
     el("div", { class: "card-body" },
       el("div", { class: "card-top" }, el("h3", { text: title(b) }),
-        setterBadge(setterOf(b)),
         isNew(b) ? el("span", { class: "new-badge", text: "Nuevo" }) : null,
         b.active ? null : el("span", { class: "off-badge", text: "Desmontado" }),
         fav ? el("span", { class: "fav-ind", title: "En favoritos" }, ico("heart", "sm fill")) : null),
-      el("div", { class: "meta" }, b.sector ? el("span", { text: b.sector }) : null, holdMeta(b), b.set_date ? el("span", { class: "mono", text: fmtDate(b.set_date) }) : null),
+      el("div", { class: "meta" }, b.sector ? el("span", { text: b.sector }) : null, holdMeta(b), b.set_date ? el("span", { class: "mono", text: fmtDate(b.set_date) }) : null, setterBadge(setterOf(b))),
       (b.styles || []).length ? el("div", { class: "styles" }, b.styles.map(s => el("span", { class: "tag", text: s }))) : null,
       line),
     b.photo_path ? thumbImg(b.photo_path, { class: "thumb", alt: "", loading: "lazy" }) : null);
@@ -309,9 +308,20 @@ function renderChips() {
   Object.entries(COLORS).filter(([k]) => used.has(k)).forEach(([k, c]) => cc.append(el("button", { class: "chip", "aria-pressed": S.colors.has(k) ? "true" : "false",
     onclick: () => { S.colors.has(k) ? S.colors.delete(k) : S.colors.add(k); render(); } },
     colorDot(k, c.hex), c.name)));
-  const filtering = S.level || S.sector || S.setter || S.styles.size || S.colors.size || S.q;
-  if (filtering) cc.append(el("button", { class: "clear", onclick: () => { S.level = null; S.sector = null; S.setter = null; S.styles.clear(); S.colors.clear(); S.q = ""; $("q").value = ""; render(); } }, "Quitar filtros"));
   cc.hidden = !cc.firstChild;
+  // Botón «Filtros · n» y, con el panel cerrado, lo que está filtrando en una línea
+  const n = S.styles.size + S.colors.size + (S.setter ? 1 : 0) + (S.sector ? 1 : 0) + (S.sort && S.sort !== "new" ? 1 : 0);
+  $("filterLbl").textContent = n ? `Filtros · ${n}` : "Filtros";
+  $("filterBtn").classList.toggle("on", !!n);
+  $("filterBtn").setAttribute("aria-expanded", S.filtersOpen ? "true" : "false");
+  $("filterPanel").hidden = !S.filtersOpen;
+  const af = $("activeFilters"), filtering = S.level || S.sector || S.setter || S.styles.size || S.colors.size || S.q;
+  af.replaceChildren(); af.hidden = !filtering;
+  if (filtering) {
+    const bits = [S.level && lvName({ level: S.level }), S.sector, S.setter && setterById(S.setter)?.name, ...S.styles, ...[...S.colors].map(k => COLORS[k]?.name)].filter(Boolean);
+    if (!S.filtersOpen && bits.length) af.append(el("span", { class: "af-bits", text: bits.join(" · ") }));
+    af.append(el("button", { class: "clear", onclick: () => { S.level = null; S.sector = null; S.setter = null; S.styles.clear(); S.colors.clear(); S.q = ""; $("q").value = ""; render(); } }, "Quitar filtros"));
+  }
 }
 
 function renderBloques() {
@@ -1108,6 +1118,7 @@ document.querySelectorAll("[data-page]").forEach(b => b.addEventListener("click"
 document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => { S.view = b.dataset.view; store.set("lb-view", S.view); render(); }));
 $("q").addEventListener("input", e => { S.q = e.target.value.trim(); render(); });
 $("sort").addEventListener("change", e => { S.sort = e.target.value; render(); });
+$("filterBtn").addEventListener("click", () => { S.filtersOpen = !S.filtersOpen; render(); });
 $("addBtn").addEventListener("click", () => openForm());
 setColorBlind(store.get("lb-cb", false));
 $("buzonBtn").addEventListener("click", () => sb ? openBuzon() : toast("Falta configurar Supabase"));

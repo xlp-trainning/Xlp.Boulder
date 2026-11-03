@@ -33,6 +33,8 @@ La estética sale de la pared del rocódromo: cinta de carrocero para los nivele
   - Los números grandes van en condensada (`.kpi-n`, `.ses-kpis`, `.today-chip b`, `.rk-pts`).
 - **Composición**:
   - Hoy: un solo bloque héroe y, debajo, listas.
+  - Bloques: encima de la lista solo van las barras de nivel, las pestañas y una fila con el buscador y «Filtros» (orden, estilo, equipador y presa en un panel que se abre). La lista empieza en la primera pantalla del móvil. En las filas, los estilos y el equipador van como texto, sin recuadro.
+  - Títulos de sección en frase normal y negrita (`.today-head`), nunca en mayúsculas pequeñas. Las mayúsculas espaciadas quedan para el muro y la marca.
   - Bloques y demás listas: filas densas separadas por una línea (`.grid` con `gap: 1px` sobre `--line`, dos columnas desde 768 px), nunca tarjetas iguales.
   - Momentos a pantalla completa: sesión, celebración (`cheer()` en `progreso.js`), Tu mes y bienvenida.
 - **Iconos**: `ico(nombre, clase)` de `icons.js` (trazo de 2 px, estilo Lucide). En el HTML fijo, `<span data-ico="nombre">`. En los lienzos de historias, `drawIco()`.

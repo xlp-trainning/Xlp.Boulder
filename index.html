@@ -88,17 +88,22 @@
           <button data-view="fav" aria-pressed="false">Favoritos</button>
         </div>
       </div>
-      <div class="row">
-        <label class="search-wrap"><span data-ico="search"></span><input class="search" id="q" type="search" placeholder="Buscar por nombre, sector o beta…" aria-label="Buscar"></label>
-        <select class="sort" id="sort" aria-label="Ordenar">
+      <div class="row filter-row">
+        <label class="search-wrap"><span data-ico="search"></span><input class="search" id="q" type="search" placeholder="Buscar bloque" aria-label="Buscar"></label>
+        <button class="btn filter-btn" id="filterBtn" aria-expanded="false" aria-controls="filterPanel"><span data-ico="sliders"></span><span id="filterLbl">Filtros</span></button>
+      </div>
+      <div class="filter-panel" id="filterPanel" hidden>
+        <label class="field-inline"><span class="label">Orden</span>
+        <select class="sort" id="sort">
           <option value="new">Más recientes</option>
           <option value="gradeAsc">Más fáciles primero</option>
           <option value="gradeDesc">Más difíciles primero</option>
           <option value="rating">Mejor puntuados</option>
-        </select>
+        </select></label>
+        <div class="row" id="styleChips"></div>
+        <div class="row" id="colorChips"></div>
       </div>
-      <div class="row" id="styleChips"></div>
-      <div class="row" id="colorChips"></div>
+      <div class="row active-filters" id="activeFilters" hidden></div>
     </section>
 
     <main id="list"></main>

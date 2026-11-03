@@ -104,7 +104,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: var(--r-1); }
 .is-wall :focus-visible, .wl :focus-visible, .wrapped :focus-visible { outline-color: var(--tape); }
-.label { font-size: var(--fs-1); font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.label { font-size: var(--fs-1); font-weight: 700; color: var(--muted); }   /* frase normal; solo el muro y la marca van en mayúsculas */
+.is-wall .label, .brand .label { font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 .mono { font-family: var(--f-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; }
 .note { font-size: var(--fs-2); color: var(--muted); }
 .err { font-size: var(--fs-2); color: var(--danger); font-weight: 600; }
@@ -230,7 +231,7 @@ body[data-screen="hoy"] #sessionBtn:not(.primary) { display: none; }   /* en «H
 .dist { display: flex; flex-direction: column; gap: var(--s-3); }
 .dist-head { display: flex; flex-wrap: wrap; gap: 4px var(--s-4); align-items: flex-end; justify-content: space-between; }
 .dist-head .total { display: flex; align-items: baseline; gap: var(--s-2); font-family: var(--f-display); font-weight: 900; font-size: var(--fd-4); line-height: .82; font-variant-numeric: tabular-nums; }
-.dist-head .total small { font-family: var(--f-body); font-size: var(--fs-1); font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.dist-head .total small { font-family: var(--f-body); font-size: var(--fs-2); font-weight: 700; color: var(--muted); }
 .dist-head .note { font-size: var(--fs-1); }
 .bars-scroll { overflow-x: auto; scrollbar-width: none; }
 .bars { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(52px, 1fr); gap: 6px; align-items: end; height: 132px; min-width: max-content; }
@@ -256,6 +257,17 @@ body[data-screen="hoy"] #sessionBtn:not(.primary) { display: none; }   /* en «H
 .filters { display: flex; flex-direction: column; gap: var(--s-3); }
 .filters > .row { gap: var(--s-2); }
 .filters > .row .label { margin-right: 2px; }
+/* buscador + «Filtros»: el resto va en un panel que se abre, así la lista empieza en la primera pantalla */
+.filter-row { flex-wrap: nowrap; }
+.filter-btn { flex: none; }
+.filter-btn.on { border-color: var(--ink); }
+.filter-panel { display: flex; flex-direction: column; gap: var(--s-3); }
+.filter-panel[hidden], .active-filters[hidden] { display: none; }
+.field-inline { display: flex; align-items: center; gap: var(--s-3); }
+.active-filters { flex-wrap: nowrap; justify-content: space-between; margin-top: calc(-1 * var(--s-2)); }
+.af-bits { font-size: var(--fs-2); font-weight: 700; color: var(--ink-2); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body:not([data-screen="hoy"]) #installBanner { display: none; }   /* el aviso de instalar, solo en Hoy */
+@media (max-width: 767px) { #sessionBtn:not(.primary) { display: none; } }   /* en el móvil se empieza desde Hoy; la sesión activa sigue en la barra */
 select.sort { padding-right: var(--s-8); }
 #styleChips, #colorChips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: calc(-1 * var(--s-4)); padding-inline: var(--s-4); }
 #styleChips::-webkit-scrollbar, #colorChips::-webkit-scrollbar { display: none; }
@@ -291,6 +303,11 @@ select.sort { padding-right: var(--s-8); }
 .hold .dot { width: 10px; height: 10px; }
 .styles { display: flex; flex-wrap: wrap; gap: 4px; }
 .tag { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); border: 1px solid var(--line-2); padding: 1px 6px; border-radius: var(--r-1); }
+/* en las filas, los estilos y el equipador son texto: la cinta y el nombre mandan */
+.card .styles { gap: 0 5px; }
+.card .tag { border: 0; padding: 0; text-transform: none; letter-spacing: 0; font-size: var(--fs-2); font-weight: 600; }
+.card .tag + .tag::before { content: "· "; color: var(--muted); }
+.meta .xlp-badge { border: 0; background: none; padding: 0; font-size: var(--fs-2); font-weight: 600; letter-spacing: 0; color: var(--muted); }
 .stars-line { display: flex; align-items: center; gap: 6px; font-size: var(--fs-2); color: var(--muted); flex-wrap: wrap; }
 .stars-line .s { color: var(--star); letter-spacing: 1px; }
 .sent-badge, .proj-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 11.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-text); }
@@ -300,7 +317,7 @@ select.sort { padding-right: var(--s-8); }
 .new-badge { flex: none; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; background: var(--tape); color: var(--tape-ink); padding: 3px 10px 3px 7px; line-height: 1.3; clip-path: var(--cut-end); }
 .thumb { width: 68px; height: 68px; object-fit: cover; display: block; border-radius: var(--r-2); background: var(--bg-2); align-self: center; }
 .rec { display: flex; flex-direction: column; min-width: 0; background: var(--surface); }
-.rec-why { padding: var(--s-3) var(--s-4) 0 calc(54px + var(--s-6)); font-size: 11.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-text); }
+.rec-why { padding: var(--s-3) var(--s-4) 0 calc(54px + var(--s-6)); font-size: var(--fs-2); font-weight: 700; color: var(--accent-text); }
 .rec .card { padding-top: var(--s-2); }
 
 /* =========================================================== 7 · vacío, error y esqueleto */
@@ -662,6 +679,8 @@ body.has-session-bar .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + 84
 .today-alert > span:first-child .ico { color: var(--accent-text); margin-top: 1px; }
 .today-alert .go { display: inline-flex; align-items: center; gap: 4px; color: var(--accent-text); font-weight: 800; white-space: nowrap; }
 .today-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-2); }
+/* títulos de sección: frase normal, en negrita y en tinta */
+.today-head > .label, .lg-head > .label { font-size: var(--fs-4); font-weight: 800; color: var(--ink); letter-spacing: -.005em; }
 .today-head .linkbtn { padding: 0; min-height: 0; font-size: 14px; color: var(--accent-text); font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 2px; }
 .today-head .linkbtn .ico { width: 16px; height: 16px; }
 
