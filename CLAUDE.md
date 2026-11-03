@@ -50,3 +50,16 @@ La estética sale de la pared del rocódromo: cinta de carrocero para los nivele
 - **Al cambiar estilos**:
   - Sube la versión `CACHE` de `sw.js`.
   - Prueba a 360, 390 y 768 px en claro y oscuro (y con letra grande).
+
+## Skill de diseño · taste-skill
+- Instalada en `.claude/skills/taste-skill/` (de [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill), licencia MIT, commit 12af471). Se usa para revisar y pulir pantallas, no para rediseñar la app desde cero.
+- **Manda «la cinta de salida».** La app es una *app screen*: sigue `references/app-screens.md`, usa `draw.mjs --app --keep palette,type` y respeta los tokens, tipografías e iconos de arriba.
+- Choques conocidos que son decisiones de marca y se mantienen (en el inspector, `--allow` para esa regla):
+  - JetBrains Mono en fechas y datos.
+  - Big Shoulders en mayúsculas.
+  - Las líneas de 1 px entre filas (`.grid`).
+  - Las sombras `--sh-*`.
+  - La cinta girada.
+  - Los sectores numerados, que son nombres reales.
+- Para revisar: `node .claude/skills/taste-skill/scripts/lint.mjs <archivos>` y `node .claude/skills/taste-skill/scripts/inspect.mjs index.html --app`. Requiere Node 22 y Chromium.
+- `assets.mjs` busca imágenes en archivos públicos y necesita red. No lo uses sin que el usuario lo pida.
