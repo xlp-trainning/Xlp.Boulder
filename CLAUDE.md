@@ -26,6 +26,7 @@ Abstracto y moderno: superficies planas, radios cortos y color a bloques. El mot
   - Sombras: `--sh-1` y `--sh-2` valen `none` (en reposo nada flota); `--sh-3` solo para hojas y diálogos. Tiempos: `--d-1` 150 ms, `--d-2` 200 ms, `--d-3` 250 ms, con `--ease`.
   - Tamaños táctiles: `--tap` 44 px, `--tap-lg` 52 px, `--tap-xl` 64 px (los botones del modo sesión).
 - **Formas**: `--cut-diag` (borde de abajo en diagonal: paneles del muro y franjas del panel), `--cut-v` (final en V: la cinta del nivel en las filas), `--cut-top` (barras de la tira de niveles), `--cut-end` (muesca: «Nuevo», ligas, barras de progreso) y `--torn` (cinta rasgada y girada 1,5–2°: etiqueta del rocódromo, nivel en la ficha, avisos de la bienvenida). Gira solo lo que es «cinta pegada»; el resto va recto.
+- **Logo**: se mantiene el original (la X de dos tiras de cinta, amarilla y verde azulada #4CC3A8, sobre #18201E), en la cabecera, el sello Xlp, las historias y los iconos. No lo cambies por la paleta nueva.
 - **Sin texturas** (`--grain: none`). La clase `.is-wall` convierte cualquier zona en «muro»: panel liso #15171C en los dos temas, que redefine los tokens dentro.
   - Se usa en los momentos de impacto: portada de Hoy (`.today-hero`), tira de niveles de Bloques (`.dist`), modo sesión (`.session`), Tu mes (`.wrapped`) y bienvenida (`.wl`).
   - **El panel geométrico** aparece encima de la tira de niveles, en la bienvenida y como franja al abrir cada página (sección 21, `--band`). No lo pongas detrás de texto ni en las listas.

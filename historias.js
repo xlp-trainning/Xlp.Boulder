@@ -52,7 +52,7 @@ function drawMark(x, cx, cy, s) {
   x.save(); x.translate(cx, cy);
   x.fillStyle = "#26302D"; x.beginPath(); x.roundRect(-s / 2, -s / 2, s, s, s * .22); x.fill();
   const tape = (rot, color) => { x.save(); x.rotate(rot); x.fillStyle = color; x.beginPath(); x.roundRect(-s * .33, -s * .09, s * .66, s * .18, s * .03); x.fill(); x.restore(); };
-  x.translate(-s * .04, -s * .04); tape(Math.PI / 4, "#F5CE1B"); tape(-Math.PI / 4, "#3DD6A3"); x.translate(s * .04, s * .04);
+  x.translate(-s * .04, -s * .04); tape(Math.PI / 4, "#F5CE1B"); tape(-Math.PI / 4, "#4CC3A8"); x.translate(s * .04, s * .04);
   x.fillStyle = STORY.ink; x.beginPath(); x.arc(s * .32, s * .32, s * .085, 0, Math.PI * 2); x.fill();
   x.restore();
 }
