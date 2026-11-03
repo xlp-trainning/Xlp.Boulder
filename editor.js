@@ -353,6 +353,7 @@ function openHoldEditor({ source, color }) {
       const font = Math.round(30 * sc * 1.4);
       ctx.font = `800 ${font}px Figtree, system-ui, sans-serif`;
       for (const h of holds) {
+        if (h.gone) continue;
         const cx = h.x + h.w / 2, cy = h.y + h.h / 2, rad = Math.max(h.w, h.h) / 2 + 22 * sc * 1.2;
         if (h.state === "off") {
           if (forExport) continue;
@@ -390,7 +391,7 @@ function openHoldEditor({ source, color }) {
       const on = holds.filter(h => h.state !== "off");
       const n = s => holds.filter(h => h.state === s).length;
       info.textContent = sampling ? "Toca el centro de una presa del bloque para aprender su color."
-        : drawMode && drawKind === "volume" ? "Toca el volumen y su forma se busca sola. Si no sale bien, rodéalo con el dedo."
+        : drawMode && drawKind === "volume" ? "Modo volumen: toca cada volumen y su forma se busca sola (o rodéalo con el dedo). Tocar uno marcado lo quita. Pulsa «Volumen» para terminar."
         : drawMode ? "Paso 1 · Rodea con el dedo la zona a analizar, o arrastra en diagonal para marcar un rectángulo."
         : !chosen ? "Paso 2 · Elige el color de las presas del bloque."
         : `${on.length} ${on.length === 1 ? "presa" : "presas"} · ${n("start")} de salida · ${n("top")} de top` + (samples.length ? ` · color afinado (${samples.length})` : "");
@@ -466,17 +467,23 @@ function openHoldEditor({ source, color }) {
       // Volumen con un toque: se busca solo su forma
       if (drawKind === "volume" && (pts.length < 3 || (bw < 30 * sc && bh < 30 * sc))) {
         const [tx, ty] = pts[0].map(Math.round), cx = Math.min(W - 1, Math.max(0, tx)), cy = Math.min(H - 1, Math.max(0, ty));
-        drawKind = "zone"; drawZoneBtns();
+        stayVolume();
         const there = lab[cy * W + cx];
-        if (there >= 0 && holds[there].volume) { draw(); return toast("Ese volumen ya está marcado. Tócalo para marcarlo como salida o top."); }
+        // Tocar un volumen ya marcado lo quita (para deshacer un toque equivocado)
+        if (there >= 0 && holds[there].volume) {
+          const h = holds[there]; volumes = volumes.filter(v => v !== h.volume);
+          for (let i = 0; i < lab.length; i++) if (lab[i] === there) lab[i] = -1;
+          h.gone = true; h.state = "off"; relabel(); draw(); return toast("Volumen quitado");
+        }
         if (!inZone(cy * W + cx)) { draw(); return toast("Ese punto está fuera del muro marcado"); }
         const found = autoVolume(cx, cy);
-        if (!found) { draw(); return toast("No encuentro bien el volumen ahí. Pulsa «Volumen» y toca más al centro, o rodéalo con el dedo."); }
+        if (!found) { draw(); return toast("No encuentro bien el volumen ahí. Toca más al centro o rodéalo con el dedo."); }
         const v = { ...found, state: "normal" }; volumes.push(v);
         const n = holds.length; addVolume(v);
         if (holds.length === n) { volumes.pop(); draw(); return toast("Ese volumen queda fuera de la zona o encima de otras presas."); }
-        relabel(); draw(); return toast("Volumen añadido. Tócalo para marcarlo como salida o top.");
+        relabel(); draw(); return toast("Volumen añadido. Toca otro, o pulsa «Volumen» para terminar.");
       }
+      if (drawKind === "volume" && (pts.length < 2 || bw < 30 * sc || bh < 30 * sc)) { stayVolume(); draw(); return toast("Trazo demasiado pequeño. Toca el volumen o rodéalo con el dedo."); }
       if (pts.length < 2 || bw < 30 * sc || bh < 30 * sc) {
         drawMode = drawKind === "zone" && !zoneReady; drawKind = "zone"; canvas.classList.toggle("drawing", drawMode); drawZoneBtns(); draw();
         return toast("Trazo demasiado pequeño. Rodéalo con el dedo o arrastra en diagonal.");
@@ -490,9 +497,9 @@ function openHoldEditor({ source, color }) {
       if (drawKind === "volume") {
         const v = { pts, state: "normal" }; volumes.push(v);
         const n = holds.length; addVolume(v);
-        drawKind = "zone"; drawZoneBtns();
+        stayVolume();
         if (holds.length === n) { volumes.pop(); draw(); return toast("Ese volumen queda fuera de la zona o encima de otras presas."); }
-        relabel(); draw(); return toast("Volumen añadido. Tócalo para marcarlo como salida o top.");
+        relabel(); draw(); return toast("Volumen añadido. Toca otro, o pulsa «Volumen» para terminar.");
       }
       zonePts = pts;
       const oc = document.createElement("canvas"); oc.width = W; oc.height = H;
@@ -507,10 +514,13 @@ function openHoldEditor({ source, color }) {
     canvas.addEventListener("pointercancel", endDraw);
     const zoneBtns = el("div", { class: "actions ed-tools" });
     const setDrawMode = (on, kind = "zone") => { drawMode = on; drawKind = kind; canvas.classList.toggle("drawing", on); drawZoneBtns(); updateInfo(); };
+    // El modo volumen sigue activo hasta que se vuelve a pulsar «Volumen»
+    function stayVolume() { drawMode = true; drawKind = "volume"; canvas.classList.add("drawing"); drawZoneBtns(); updateInfo(); }
     const wholePhoto = () => { zone = null; zonePts = []; zoneReady = true; walls = null; setDrawMode(false); if (chosen) run(); else draw(); };
     function drawZoneBtns() {
       zoneBtns.replaceChildren(...(drawMode && drawKind === "volume"
-        ? [el("button", { type: "button", class: "btn small", onclick: () => setDrawMode(false) }, "Cancelar")]
+        ? [el("button", { type: "button", class: "btn small primary", "aria-pressed": "true", onclick: () => setDrawMode(false) }, ico("layers", "sm"), "Volumen"),
+           el("span", { class: "note", text: "Activo: pulsa para terminar" })]
         : drawMode
         ? [el("button", { type: "button", class: "btn small", onclick: wholePhoto }, "Analizar toda la foto"),
            zoneReady ? el("button", { type: "button", class: "btn small", onclick: () => setDrawMode(false) }, "Cancelar") : null]
