@@ -97,9 +97,14 @@ En un par de minutos la web queda en `https://xlp-trainning.github.io/Xlp.Boulde
 
 Si el repositorio o el dominio son otros, cambia la dirección de `og:image` en `index.html`: es la imagen (`og.png`) que sale al compartir el enlace en Instagram o WhatsApp.
 
-## Añadir otro equipador
+## Equipadores
 
-Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
+Hay un **máster** (el dueño de la web) y los equipadores que él quiera. Necesita `supabase/014-equipadores.sql`; quien ya era equipador al ejecutarlo queda como máster, con el nombre «Xlp».
+
+- **Dar acceso a un equipador nuevo:** él crea su cuenta en la web, en «Acceso equipador» → «Crear cuenta de equipador». Después, el máster va a **Equipadores** → «Máster · equipadores», escribe su email y el nombre con el que firmará sus bloques, y pulsa «Dar acceso». Para que el registro funcione, en Supabase → **Authentication → Sign In / Providers → Email** tiene que estar activado «Allow new users to sign up». Si además está «Confirm email», le llega un email para confirmar la cuenta; el enlace vuelve a la web si en **Authentication → URL Configuration** la «Site URL» es la dirección de la web.
+- **Qué puede hacer cada uno:** cualquier equipador crea, edita, desmonta y borra cualquier bloque, y ve las estadísticas y el buzón. Solo el máster cambia el plano y los sectores, pone PIN a apodos y da, renombra o quita equipadores.
+- **Firma de los bloques:** cada bloque lleva quién lo ha equipado («Equipado por …», en el formulario del bloque). Al quitar a un equipador, sus bloques se quedan sin firma.
+- **Página Equipadores (pública):** cada equipador con sus bloques abiertos, la puntuación media, encadenados, % de flash, sensación (blando/justo/duro), el mejor valorado y el más encadenado. Los equipadores ven además proyectos, intentos y comentarios, y en Estadísticas pueden filtrar por equipador.
 
 ## Archivos
 
@@ -134,6 +139,8 @@ Crea su usuario en **Authentication → Users** y repite el paso 4 con su email.
 | `supabase/011-quitar-sectores.sql` | quita de Patraix Sala 1 · Pared izquierda, Sala 3 · Pared baja y Sala 3 · Celosía (ejecutar una vez) |
 | `supabase/012-sectores-numerados.sql` | Patraix con los 40 sectores numerados (1–9 sala 1, 10–20 sala 2, 21–38 sala 3, 39–40 terraza) (ejecutar una vez) |
 | `supabase/013-talonajes-empeines.sql` | la etiqueta «Talonajes» pasa a «Talonajes/Empeines» (ejecutar una vez) |
+| `supabase/014-equipadores.sql` | varios equipadores con nombre y un máster, firma de cada bloque y permisos (ejecutar una vez) |
+| `equipadores.js` | página Equipadores, sello de cada equipador y gestión del máster |
 | `supabase/003-progreso.sql` | añade flash y fecha de encadenado a los votos (ejecutar una vez) |
 | `supabase/004-ranking.sql` | ranking por ligas: apodos y cálculo del ranking (ejecutar una vez) |
 | `supabase/005-sello.sql` | añade el sello Xlp a los bloques (ejecutar una vez) |

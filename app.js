@@ -55,7 +55,7 @@ const S = {
   comments: {}, drafts: {},
   session: null, isSetter: false,
   page: "bloques", view: "new", level: null, sector: null, styles: new Set(), colors: new Set(), q: "", sort: "new",
-  xlp: false, drawingSector: null, mapSel: null, loaded: false, error: null,
+  setter: null, isMaster: false, drawingSector: null, mapSel: null, loaded: false, error: null,
 };
 const $ = id => document.getElementById(id);
 const el = (tag, attrs = {}, ...kids) => {
@@ -110,6 +110,7 @@ async function loadAll() {
     sb.rpc("block_stats"),
     sb.from("sectors").select("*").eq("gym_id", S.gym).order("name"),
     sb.rpc("first_sends", { p_gym: S.gym }),
+    loadSetters(),
   ]);
   if (b.error) throw b.error;
   // «Talonajes» pasó a llamarse «Talonajes/Empeines» (supabase/013): los bloques aún sin actualizar se leen ya con el nombre nuevo
@@ -133,7 +134,10 @@ async function loadSession() {
   if (S.session && !S.session.user.is_anonymous) {
     const r = await sb.rpc("is_setter");
     S.isSetter = r.data === true;
-  }
+    // Sin el 014 ejecutado no existe is_master: el equipador de siempre sigue pudiendo con todo
+    const m = S.isSetter ? await sb.rpc("is_master") : { data: false };
+    S.isMaster = S.isSetter && (m.error ? true : m.data === true);
+  } else S.isMaster = false;
   $("addBtn").hidden = !S.isSetter;
   document.querySelector('[data-page="stats"]').hidden = !S.isSetter;
   document.querySelector('[data-page="buzon"]').hidden = !S.isSetter;
@@ -196,8 +200,8 @@ function tape(b, short) {
 }
 // Sello Xlp de los bloques equipados por el dueño de la web: la X del logo y «Xlp»
 const XLP_MARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#1C2422"/><g transform="translate(11 11)"><rect x="-7" y="-1.9" width="14" height="3.8" rx=".8" fill="#F5CE1B" transform="rotate(45)"/><rect x="-7" y="-1.9" width="14" height="3.8" rx=".8" fill="#4CC3A8" transform="rotate(-45)"/></g><circle cx="18.6" cy="18.6" r="2" fill="#F8FAF9"/></svg>';
-function xlpBadge(iconOnly, label = "Xlp") {
-  const s = el("span", { class: "xlp-badge" + (iconOnly ? " icon" : ""), title: "Equipado por Xlp", "aria-label": iconOnly ? "Equipado por Xlp" : null });
+function xlpBadge(iconOnly, label = "Xlp", who = "Xlp") {
+  const s = el("span", { class: "xlp-badge" + (iconOnly ? " icon" : ""), title: `Equipado por ${who}`, "aria-label": iconOnly ? `Equipado por ${who}` : null });
   s.innerHTML = XLP_MARK; if (!iconOnly) s.append(label);
   return s;
 }
@@ -225,7 +229,7 @@ function card(b) {
     tape(b, true),
     el("div", { class: "card-body" },
       el("div", { class: "card-top" }, el("h3", { text: title(b) }),
-        b.xlp ? xlpBadge() : null,
+        setterBadge(setterOf(b)),
         isNew(b) ? el("span", { class: "new-badge", text: "Nuevo" }) : null,
         b.active ? null : el("span", { class: "off-badge", text: "Desmontado" }),
         fav ? el("span", { class: "fav-ind", title: "En favoritos" }, ico("heart", "sm fill")) : null),
@@ -248,7 +252,7 @@ function visible() {
     if (v === "proj" && !(S.mine[b.id]?.project && !S.mine[b.id]?.sent)) return false;
     if (S.level && b.level !== S.level) return false;
     if (S.sector && b.sector !== S.sector) return false;
-    if (S.xlp && !b.xlp) return false;
+    if (S.setter && b.setter_id !== S.setter) return false;
     if (S.styles.size && ![...S.styles].every(s => (b.styles || []).includes(s))) return false;
     if (S.colors.size && !S.colors.has(b.hold_color)) return false;
     if (S.q) {
@@ -294,8 +298,10 @@ function renderChips() {
   const styleChip = s => el("button", { class: "chip", "aria-pressed": S.styles.has(s) ? "true" : "false", onclick: () => { S.styles.has(s) ? S.styles.delete(s) : S.styles.add(s); render(); } }, s);
   sc.append(el("span", { class: "label", text: "Estilo" }), ...CLIMB_STYLES.map(styleChip), el("span", { class: "label", text: "Agarre" }), ...GRIPS.map(styleChip));
   const cc = $("colorChips"); cc.replaceChildren();
-  if (S.blocks.some(b => b.xlp)) cc.append(el("button", { class: "chip", "aria-pressed": S.xlp ? "true" : "false", onclick: () => { S.xlp = !S.xlp; render(); } },
-    xlpBadge(true), "Equipados por Xlp"));
+  // Un chip por equipador con bloques en este rocódromo
+  const withBlocks = EQ.list.filter(x => S.blocks.some(b => b.setter_id === x.user_id));
+  if (withBlocks.length) cc.append(el("span", { class: "label", text: "Equipador" }), ...withBlocks.map(x => el("button", { class: "chip", "aria-pressed": S.setter === x.user_id ? "true" : "false",
+    onclick: () => { S.setter = S.setter === x.user_id ? null : x.user_id; render(); } }, setterBadge(x, true), x.name)));
   if (S.sector) cc.append(el("span", { class: "label", text: "Sector" }),
     el("button", { class: "chip", "aria-pressed": "true", "aria-label": `Quitar el filtro de sector ${S.sector}`, onclick: () => { S.sector = null; render(); } }, S.sector, ico("x", "sm")));
   const used = new Set(S.blocks.map(b => b.hold_color).filter(Boolean));
@@ -303,8 +309,8 @@ function renderChips() {
   Object.entries(COLORS).filter(([k]) => used.has(k)).forEach(([k, c]) => cc.append(el("button", { class: "chip", "aria-pressed": S.colors.has(k) ? "true" : "false",
     onclick: () => { S.colors.has(k) ? S.colors.delete(k) : S.colors.add(k); render(); } },
     colorDot(k, c.hex), c.name)));
-  const filtering = S.level || S.sector || S.xlp || S.styles.size || S.colors.size || S.q;
-  if (filtering) cc.append(el("button", { class: "clear", onclick: () => { S.level = null; S.sector = null; S.xlp = false; S.styles.clear(); S.colors.clear(); S.q = ""; $("q").value = ""; render(); } }, "Quitar filtros"));
+  const filtering = S.level || S.sector || S.setter || S.styles.size || S.colors.size || S.q;
+  if (filtering) cc.append(el("button", { class: "clear", onclick: () => { S.level = null; S.sector = null; S.setter = null; S.styles.clear(); S.colors.clear(); S.q = ""; $("q").value = ""; render(); } }, "Quitar filtros"));
   cc.hidden = !cc.firstChild;
 }
 
@@ -322,11 +328,11 @@ function renderBloques() {
     : S.view === "fav" ? ["Sin favoritos", "Abre un bloque y toca «Guardar» para tenerlo aquí."]
     : S.view === "proj" ? ["Sin proyectos", "Abre un bloque que estés probando y toca «Es mi proyecto». Cuando lo encadenes, sale de aquí."]
     : S.view === "sent" ? ["Aún no has encadenado nada", "Cuando marques un bloque como encadenado o flash, sale de «Abiertos» y lo tienes aquí."]
-    : S.view === "open" && !S.level && !S.sector && !S.xlp && !S.styles.size && !S.colors.size && !S.q && S.blocks.some(b => b.active) ? ["¡Todo encadenado!", "Has encadenado todos los bloques abiertos. Vuelve cuando el equipador monte bloques nuevos."]
+    : S.view === "open" && !S.level && !S.sector && !S.setter && !S.styles.size && !S.colors.size && !S.q && S.blocks.some(b => b.active) ? ["¡Todo encadenado!", "Has encadenado todos los bloques abiertos. Vuelve cuando el equipador monte bloques nuevos."]
     : S.view === "new" ? ["Nada nuevo esta semana", `Aquí salen los bloques montados en los últimos ${NEW_DAYS} días.`]
     : ["Nada con estos filtros", "Prueba a quitar algún nivel, sector, estilo o color."];
   list.replaceChildren(emptyBox(h, p, none && S.isSetter ? el("button", { class: "btn primary", onclick: () => openForm() }, ico("plus"), "Nuevo bloque")
-    : !none && S.view === "open" ? el("button", { class: "btn", onclick: () => { S.level = null; S.sector = null; S.xlp = false; S.styles.clear(); S.colors.clear(); S.q = ""; $("q").value = ""; render(); } }, "Quitar filtros") : null));
+    : !none && S.view === "open" ? el("button", { class: "btn", onclick: () => { S.level = null; S.sector = null; S.setter = null; S.styles.clear(); S.colors.clear(); S.q = ""; $("q").value = ""; render(); } }, "Quitar filtros") : null));
 }
 
 /* ---------- página: mapa ---------- */
@@ -414,7 +420,8 @@ function renderMapa() {
         el("span", { class: "note", text: `${openBy[n] || 0} abiertos` + (newBy[n] ? ` · ${newBy[n]} nuevos` : "") + (sectorAge(n) ? ` · ${ageText(sectorAge(n).days)}` : "") }))))));
   } else if (!S.isSetter) kids.push(emptyBox("Sin sectores todavía", "Cuando el equipador apunte los sectores de la sala, aparecerán aquí."));
 
-  if (S.isSetter) kids.push(mapEditor());
+  if (S.isMaster) kids.push(mapEditor());
+  else if (S.isSetter && orphanSectors().length) kids.push(orphanBox());
   root.replaceChildren(...kids);
 }
 
@@ -446,12 +453,16 @@ function lassoOn(plan, done) {
   layer.addEventListener("pointerup", end); layer.addEventListener("pointercancel", end);
 }
 
+// Aviso al equipador: bloques abiertos con un sector que ya no está en el plano
+function orphanBox() {
+  const orphans = orphanSectors();
+  return el("div", { class: "banner orphan-box" },
+    el("span", { class: "banner-msg" }, ico("pin"), el("span", { text: `${orphans.reduce((a, [, n]) => a + n, 0)} bloques abiertos tienen un sector que ya no está en el plano. Ábrelos, toca «Editar» y elige su zona.` })),
+    el("div", { class: "row" }, orphans.map(([name, n]) => el("button", { class: "btn small", onclick: () => goSector(name) }, `${name} · ${n}`))));
+}
 function mapEditor() {
   const box = el("div", { class: "section editor" }, el("span", { class: "label", text: "Equipador · plano y sectores" }));
-  const orphans = orphanSectors();
-  if (orphans.length) box.append(el("div", { class: "banner orphan-box" },
-    el("span", { class: "banner-msg" }, ico("pin"), el("span", { text: `${orphans.reduce((a, [, n]) => a + n, 0)} bloques abiertos tienen un sector que ya no está en el plano. Ábrelos, toca «Editar» y elige su zona.` })),
-    el("div", { class: "row" }, orphans.map(([name, n]) => el("button", { class: "btn small", onclick: () => goSector(name) }, `${name} · ${n}`)))));
+  if (orphanSectors().length) box.append(orphanBox());
   const file = el("input", { type: "file", accept: "image/*,.svg", id: "map-file", hidden: true, onchange: async () => {
     const f = file.files[0]; if (!f) return;
     toast("Subiendo plano…");
@@ -538,6 +549,7 @@ function render() {
   document.querySelectorAll("[data-page]").forEach(b => b.setAttribute("aria-current", b.dataset.page === S.page ? "page" : "false"));
   document.querySelectorAll(".page").forEach(p => p.hidden = p.id !== "page-" + page);
   markWrapped(); markBuzon(); markInstall(); markSession(); markGroups();
+  document.querySelector('[data-page="equipadores"]').hidden = !EQ.list.length;
   if (page === "bloques") return renderBloques();
   if (S.page === "mapa") renderMapa();
   if (S.page === "hoy") renderHoy();
@@ -546,6 +558,7 @@ function render() {
   if (S.page === "progreso") renderProgreso();
   if (S.page === "stats") renderStats();
   if (S.page === "buzon") renderBuzon();
+  if (S.page === "equipadores") renderEquipadores();
 }
 
 /* ---------- hoja lateral ---------- */
@@ -752,7 +765,7 @@ function openDetail(id) {
     el("div", { class: "hero-tag" }, tape(b),
       el("div", { class: "info" },
         el("h2", { text: title(b) }),
-        b.xlp ? xlpBadge(false, "Equipado por Xlp") : null,
+        setterOf(b) ? el("button", { class: "linkbtn setter-link", onclick: () => { const x = setterOf(b); if (!x.user_id) return; closeSheet(); EQ.sel = x.user_id; setPage("equipadores"); } }, setterBadge(setterOf(b), false, true)) : null,
         el("div", { class: "meta" }, b.sector ? el("button", { class: "linkbtn", onclick: () => { closeSheet(); goSector(b.sector); } }, b.sector) : null, holdMeta(b),
           b.set_date ? el("span", { class: "mono", text: "Montado " + fmtDate(b.set_date) }) : null,
           !b.active && b.removed_date ? el("span", { class: "mono", text: "Desmontado " + fmtDate(b.removed_date) }) : null),
@@ -911,8 +924,13 @@ function openForm(b) {
   const fVideo = inp("f-video", b?.video, { type: "url", placeholder: "https://…" });
   const fBeta = el("textarea", { id: "f-beta", maxlength: "4000", placeholder: "Salida de pies en las regletas negras, mano izquierda al romo grande, talón derecho y lance al top…" });
   fBeta.value = b?.beta || "";
+  // Quién lo ha equipado: por defecto, quien lo crea. Sin el 014 ejecutado, la casilla de siempre («Equipado por mí»)
+  const me = S.session?.user.id;
   const fXlp = el("input", { type: "checkbox", id: "f-xlp" });
   fXlp.checked = edit ? !!b.xlp : store.get("lb-xlp-default", true);
+  const fSetter = el("select", { id: "f-setter", class: "sort" },
+    el("option", { value: "", text: "Sin apuntar" }),
+    EQ.list.map(x => el("option", { value: x.user_id, text: x.name + (x.user_id === me ? " (tú)" : ""), selected: (edit ? b.setter_id : me) === x.user_id })));
   const saveBtn = el("button", { class: "btn primary", type: "submit" }, edit ? "Guardar cambios" : "Añadir bloque");
 
   const form = el("form", { class: "f", onsubmit: async e => {
@@ -927,7 +945,8 @@ function openForm(b) {
     const sector = fSector.value.trim();
     const body = { ...(edit ? {} : { gym_id: S.gym }), name: fName.value.trim(), level: d.level, hold_color: d.color, sector, styles: d.styles,
       set_date: fDate.value || today(), beta: fBeta.value.trim(), video, photo_path, xlp: fXlp.checked };
-    if (!edit) store.set("lb-xlp-default", fXlp.checked);
+    if (EQ.list.length) { body.setter_id = fSetter.value || null; body.xlp = !!setterById(body.setter_id)?.is_master; }
+    else if (!edit) store.set("lb-xlp-default", fXlp.checked);
     const save = () => edit ? sb.from("blocks").update(body).eq("id", b.id).select().single() : sb.from("blocks").insert(body).select().single();
     let { data, error } = await save();
     // Sesión caducada o sin permiso (el cambio no llega a ningún bloque): se renueva la sesión y se prueba otra vez
@@ -953,7 +972,8 @@ function openForm(b) {
     render(); openDetail(data.id);
   } },
     el("div", { class: "field" }, el("span", { class: "label", text: "Nivel (de fácil a difícil)" }), lvBox),
-    el("label", { class: "xlp-check" }, fXlp, xlpBadge(true), el("span", {}, el("strong", { text: "Equipado por mí" }), el("span", { class: "note", text: "Lleva el sello Xlp en la web" }))),
+    EQ.list.length ? el("label", { class: "field" }, el("span", { class: "label", text: "Equipado por" }), fSetter, el("span", { class: "note", text: "Su nombre sale en el bloque y en «Equipadores»." }))
+      : el("label", { class: "xlp-check" }, fXlp, xlpBadge(true), el("span", {}, el("strong", { text: "Equipado por mí" }), el("span", { class: "note", text: "Lleva el sello Xlp en la web" }))),
     el("div", { class: "field" }, el("span", { class: "label", text: "Foto del bloque (opcional)" }), photoBox),
     el("div", { class: "field" }, el("span", { class: "label", text: "Color de presa (opcional)" }), sw),
     el("label", { class: "field" }, el("span", { class: "label", text: "Nombre (opcional)" }), fName),
@@ -971,27 +991,51 @@ function openForm(b) {
   sheet(head(edit ? "Editar bloque" : "Nuevo bloque", true), form);
 }
 
-function openLogin() {
+function openLogin(mode = "login") {
   const errBox = el("div", { class: "err", hidden: true });
   const email = el("input", { id: "l-email", type: "email", autocomplete: "username", required: true });
-  const pass = el("input", { id: "l-pass", type: "password", autocomplete: "current-password", required: true });
-  const go = el("button", { class: "btn primary", type: "submit" }, "Entrar");
-  sheet(head("Acceso equipador", true),
-    el("p", { class: "note", text: "Solo para el equipo que monta los bloques. Para puntuar y guardar favoritos no hace falta cuenta." }),
+  const pass = el("input", { id: "l-pass", type: "password", autocomplete: mode === "signup" ? "new-password" : "current-password", required: true, minlength: mode === "signup" ? "8" : null });
+  const go = el("button", { class: "btn primary", type: "submit" }, mode === "signup" ? "Crear cuenta" : "Entrar");
+  const fail = m => { errBox.textContent = m; errBox.hidden = false; go.disabled = false; };
+  sheet(head(mode === "signup" ? "Crear cuenta de equipador" : "Acceso equipador", true),
+    el("p", { class: "note", text: mode === "signup"
+      ? "Crea tu cuenta con tu email y una contraseña. Después, el máster te da acceso con ese email y ya puedes entrar como equipador."
+      : "Solo para el equipo que monta los bloques. Para puntuar y guardar favoritos no hace falta cuenta." }),
     el("form", { class: "f", onsubmit: async e => {
       e.preventDefault(); go.disabled = true; errBox.hidden = true;
       // La identidad anónima de este móvil (apodo, grupos, encadenados) se guarda para volver a ella al salir
       if (S.session?.user.is_anonymous) store.set("lb-anon-rt", S.session.refresh_token);
+      if (mode === "signup") {
+        if (pass.value.length < 8) return fail("La contraseña tiene que tener al menos 8 caracteres.");
+        const { data, error } = await sb.auth.signUp({ email: email.value.trim(), password: pass.value });
+        if (error) return fail(/registered|exists/i.test(error.message) ? "Ya hay una cuenta con ese email. Entra con ella en «Acceso equipador»." : /password/i.test(error.message) ? "La contraseña no vale: prueba con una más larga." : /signups? not allowed|disabled/i.test(error.message) ? "El registro está desactivado en Supabase. Pide al máster que lo active." : "No se pudo crear la cuenta. Inténtalo de nuevo.");
+        const confirm = !data.session;
+        // Hasta que el máster le dé acceso, la cuenta no sirve de nada: el móvil vuelve a su identidad de siempre
+        if (data.session) { await sb.auth.signOut({ scope: "local" }); await restoreAnon(); }
+        await refresh();
+        return sheet(head("Cuenta creada", true), el("div", { class: "intro" },
+          confirm ? el("p", {}, "Te hemos enviado un email a ", el("strong", { text: email.value.trim() }), " para confirmar la cuenta. Ábrelo y pulsa el enlace.") : null,
+          el("p", {}, "Ahora pide al máster que te dé acceso de equipador con este email: ", el("strong", { text: email.value.trim() }), "."),
+          el("p", { text: "Cuando te avise, entra en «Acceso equipador» con tu email y tu contraseña." })),
+          el("div", { class: "actions" }, el("button", { class: "btn primary", onclick: closeSheet }, "Entendido")));
+      }
       const { error } = await sb.auth.signInWithPassword({ email: email.value.trim(), password: pass.value });
       go.disabled = false;
-      if (error) { errBox.textContent = "Email o contraseña incorrectos."; errBox.hidden = false; return; }
+      if (error) return fail(/confirm/i.test(error.message) ? "Primero confirma tu cuenta con el email que te llegó al crearla." : "Email o contraseña incorrectos.");
       await refresh();
       closeSheet();
-      toast(S.isSetter ? "Modo equipador activado" : "Esta cuenta no es de equipador");
+      toast(S.isSetter ? "Modo equipador activado" : "Tu cuenta aún no tiene acceso de equipador. Pide al máster que te lo dé.");
     } },
       el("label", { class: "field" }, el("span", { class: "label", text: "Email" }), email),
-      el("label", { class: "field" }, el("span", { class: "label", text: "Contraseña" }), pass),
-      errBox, el("div", { class: "actions" }, go)));
+      el("label", { class: "field" }, el("span", { class: "label", text: mode === "signup" ? "Contraseña (8 caracteres o más)" : "Contraseña" }), pass),
+      errBox, el("div", { class: "actions" }, go)),
+    el("button", { class: "linkbtn", type: "button", onclick: () => openLogin(mode === "signup" ? "login" : "signup") },
+      mode === "signup" ? "Ya tengo cuenta: entrar" : "¿Eres equipador y aún no tienes cuenta? Crear cuenta de equipador"));
+}
+// Vuelve la identidad anónima que tenía este móvil antes de entrar como equipador
+async function restoreAnon() {
+  const rt = store.get("lb-anon-rt", null);
+  if (rt) { const r = await sb.auth.refreshSession({ refresh_token: rt }); if (!r.error) S.session = r.data.session; store.set("lb-anon-rt", null); }
 }
 
 /* ---------- escrituras de los escaladores ---------- */
@@ -1057,7 +1101,10 @@ async function removeBlock(b) {
 }
 
 /* ---------- arranque ---------- */
-document.querySelectorAll("[data-page]").forEach(b => b.addEventListener("click", () => setPage(b.dataset.page)));
+document.querySelectorAll("[data-page]").forEach(b => b.addEventListener("click", () => {
+  if (b.dataset.page === "equipadores") EQ.sel = null;   // la pestaña abre siempre la lista de equipadores
+  setPage(b.dataset.page);
+}));
 document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => { S.view = b.dataset.view; store.set("lb-view", S.view); render(); }));
 $("q").addEventListener("input", e => { S.q = e.target.value.trim(); render(); });
 $("sort").addEventListener("change", e => { S.sort = e.target.value; render(); });
@@ -1073,9 +1120,7 @@ $("loginBtn").addEventListener("click", async () => {
   if (!sb) return;
   if (S.session && !S.session.user.is_anonymous) {
     await sb.auth.signOut({ scope: "local" });
-    // Vuelve la identidad anónima que tenía este móvil antes de entrar como equipador
-    const rt = store.get("lb-anon-rt", null);
-    if (rt) { const r = await sb.auth.refreshSession({ refresh_token: rt }); if (!r.error) S.session = r.data.session; store.set("lb-anon-rt", null); }
+    await restoreAnon();
     await refresh(); toast("Sesión cerrada");
   }
   else openLogin();

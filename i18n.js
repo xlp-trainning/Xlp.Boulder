@@ -398,10 +398,37 @@ I18N_RX.unshift(...I18N_RX.map(([rx, f]) => {
   return src === rx.source ? null : [new RegExp(src, rx.flags.includes("u") ? rx.flags : rx.flags + "u"), m => { const r = f(m); return r == null ? r : r.replace(EMOJI_HEAD, ""); }];
 }).filter(Boolean));
 I18N_RX.unshift([/^(\d+) (presas?) · (\d+) de salida · (\d+) de top · color afinado \((\d+)\)$/, m => `${m[1]} ${m[1] === "1" ? "hold" : "holds"} · ${m[3]} start · ${m[4]} top · colour tuned (${m[5]})`]);
+I18N_RX.unshift([/^Equipado por (.+)$/, m => `Set by ${m[1]}`], [/^(.+) ya es equipador$/, m => `${m[1]} is now a setter`],
+  [/^Quién equipa los bloques de (.+) y cómo los valora la gente\. Toca un equipador para ver todos sus bloques\.$/, m => `Who sets the problems at ${m[1]} and how people rate them. Tap a setter to see all their problems.`],
+  [/^(\d+) (bloques abiertos|bloque abierto) en (.+) · (\d+) equipados? en total$/, m => `${m[1]} open ${m[1] === "1" ? "problem" : "problems"} at ${m[3]} · ${m[4]} set in total`],
+  [/^Sus bloques abiertos · (\d+)$/, m => `Their open problems · ${m[1]}`], [/^Estilos que más equipa: (.+)$/, m => `Styles they set most: ${m[1].replace(/([^,(]+?) \((\d+)\)/g, (_, w, n) => `${w.startsWith(" ") ? " " : ""}${tw(w.trim())} (${n})`)}`],
+  [/^¿Quitar el acceso de equipador a (.+)\? Sus bloques se quedan, sin su firma\.$/, m => `Remove setter access from ${m[1]}? Their problems stay, without their name.`],
+  [/^Aún no hay bloques de (.+) en este rocódromo\. Se apunta en «Equipado por» al crear o editar un bloque\.$/, m => `No problems by ${m[1]} at this gym yet. Set it in “Set by” when creating or editing a problem.`],
+  [/^(\d+) de (\d+) bloques abiertos son de (.+) \((\d+) %\)\.$/, m => `${m[1]} of ${m[2]} open problems are by ${m[3]} (${m[4]}%).`],
+  [/^Sus bloques: (.+) · los demás: (.+)$/, m => `Their problems: ${m[1]} · the rest: ${m[2]}`]);
 I18N_RX.unshift([/^Sector (.+)$/, m => `Sector ${m[1]}`]);
 I18N_RX.unshift([/^Apuntarme como «(.+)»$/, m => `Join as “${m[1]}”`]);
 I18N_RX.unshift([/^desde el (\d\d\/\d\d\/\d\d)$/, m => `since ${m[1]}`], [/^Abierto desde el (\S+): (.+)$/, m => `Open since ${m[1]}: ${m[2].replace("Hoy", "today").replace(/días?/, x => x === "día" ? "day" : "days").replace("meses", "months")}`]);
-Object.assign(I18N, { "Goma": "Eraser", "Deshacer": "Undo", "Activa: pulsa para terminar": "On: tap to finish",
+Object.assign(I18N, { "Equipadores": "Setters", "Equipador": "Setter", "Equipador · máster": "Setter · master", "Equipado por": "Set by", "Sin apuntar": "Not set", "Todos los equipadores": "All setters",
+  "Sin equipadores todavía": "No setters yet", "Aquí saldrá cada equipador con sus bloques y lo que opina la gente de ellos.": "Each setter will show up here with their problems and what people think of them.",
+  "Su nombre sale en el bloque y en «Equipadores».": "Their name shows on the problem and in “Setters”.", "abiertos": "open", "abierto": "open", "de la sala": "of the gym",
+  "puntuación media": "average rating", "dice «duro»": "say “hard”", "Sin votos de sensación": "No feel votes", "Lo destacado": "Highlights", "El mejor valorado": "Top rated", "El más encadenado": "Most sent",
+  "Para equipadores": "For setters", "Estadísticas completas": "Full stats", "Máster · equipadores": "Master · setters", "Dar acceso": "Give access", "Renombrar": "Rename", "Quitar acceso": "Remove access",
+  "Email de su cuenta": "Their account email", "Nombre que se verá": "Name shown", "Email del equipador": "Setter's email", "Nombre del equipador": "Setter's name", "Nombre con el que firma sus bloques": "Name they sign their problems with",
+  "Ahora mismo no tiene bloques abiertos en este rocódromo.": "No open problems at this gym right now.", "Acceso quitado": "Access removed", "Sin nombre": "No name",
+  "Para dar acceso: el equipador crea su cuenta en «Acceso equipador» → «Crear cuenta de equipador». Luego escribe aquí su email y el nombre con el que firmará sus bloques. Los equipadores pueden crear, editar y borrar cualquier bloque y ver las estadísticas; el plano, los sectores y los equipadores solo los cambias tú.": "To give access: the setter creates their account in “Setter login” → “Create setter account”. Then type their email here and the name they'll sign their problems with. Setters can create, edit and delete any problem and see the stats; only you change the map, sectors and setters.",
+  "No hay ninguna cuenta con ese email. Pídele que la cree primero en «Acceso equipador» (y que la confirme si le llega un email).": "There's no account with that email. Ask them to create it first in “Setter login” (and confirm it if they get an email).",
+  "El nombre tiene que tener entre 2 y 30 letras.": "The name must be 2 to 30 characters.", "El nombre tiene que tener entre 2 y 30 letras": "The name must be 2 to 30 characters", "No se pudo dar acceso. ¿Has ejecutado supabase/014-equipadores.sql?": "Couldn't give access. Have you run supabase/014-equipadores.sql?",
+  "No se pudo cambiar el nombre": "Couldn't change the name", "No se pudo quitar el acceso": "Couldn't remove access",
+  "Crear cuenta de equipador": "Create setter account", "Crear cuenta": "Create account", "Cuenta creada": "Account created", "Contraseña (8 caracteres o más)": "Password (8 characters or more)",
+  "Ya tengo cuenta: entrar": "I already have an account: log in", "¿Eres equipador y aún no tienes cuenta? Crear cuenta de equipador": "Are you a setter without an account? Create setter account",
+  "Crea tu cuenta con tu email y una contraseña. Después, el máster te da acceso con ese email y ya puedes entrar como equipador.": "Create your account with your email and a password. Then the master gives you access with that email and you can log in as a setter.",
+  "La contraseña tiene que tener al menos 8 caracteres.": "The password must be at least 8 characters.", "Ya hay una cuenta con ese email. Entra con ella en «Acceso equipador».": "There's already an account with that email. Log in with it in “Setter login”.",
+  "La contraseña no vale: prueba con una más larga.": "That password won't do: try a longer one.", "El registro está desactivado en Supabase. Pide al máster que lo active.": "Sign-up is turned off in Supabase. Ask the master to turn it on.",
+  "No se pudo crear la cuenta. Inténtalo de nuevo.": "Couldn't create the account. Try again.", "Cuando te avise, entra en «Acceso equipador» con tu email y tu contraseña.": "When they tell you, log in in “Setter login” with your email and password.",
+  "Primero confirma tu cuenta con el email que te llegó al crearla.": "First confirm your account with the email you got when you created it.", "Tu cuenta aún no tiene acceso de equipador. Pide al máster que te lo dé.": "Your account doesn't have setter access yet. Ask the master to give it to you.",
+  "1 bloque abierto no tiene equipador apuntado.": "1 open problem has no setter.", "Entendido": "Got it", "Todos los bloques": "All problems",
+  "Goma": "Eraser", "Deshacer": "Undo", "Activa: pulsa para terminar": "On: tap to finish",
   "Goma: pasa el dedo por lo que sobra para borrarlo. Pulsa «Goma» para terminar.": "Eraser: run your finger over what's not part of the problem to erase it. Tap “Eraser” to finish.",
   "Modo volumen: toca cada volumen y su forma se busca sola (o rodéalo con el dedo). Tocar uno marcado lo quita. Pulsa «Volumen» para terminar.": "Volume mode: tap each volume and its shape is found automatically (or draw round it). Tapping a marked one removes it. Tap “Volume” to finish.",
   "Volumen añadido. Toca otro, o pulsa «Volumen» para terminar.": "Volume added. Tap another, or tap “Volume” to finish.", "Volumen quitado": "Volume removed", "Activo: pulsa para terminar": "On: tap to finish",
@@ -416,7 +443,9 @@ Object.assign(I18N, { "Goma": "Eraser", "Deshacer": "Undo", "Activa: pulsa para 
   "Toca su zona en el plano o escribe el nombre.": "Tap its area on the map or type the name.", "Ningún sector elegido": "No sector chosen",
   "· sector nuevo, sin zona en el plano": "· new sector, no area on the map", "Desmontado": "Stripped", "bloques encadenados": "problems sent", "bloque encadenado": "problem sent", "días abierto": "days open", "día abierto": "day open", "Hoy": "Today" });
 I18N_N["{n} bloques abiertos tienen un sector que ya no está en el plano. Ábrelos, toca «Editar» y elige su zona."] = "{n} open problems have a sector that is no longer on the map. Open them, tap “Edit” and pick their area.";
-for (const [k, v] of [["{n} meses", "{n} months"], ["{n} días", "{n} days"], ["{n} día", "{n} day"]]) I18N_N[k] ??= v;
+for (const [k, v] of [["{n} bloques abiertos no tienen equipador apuntado.", "{n} open problems have no setter."], ["{n} abiertos · {n} en total", "{n} open · {n} in total"], ["{n} abierto · {n} en total", "{n} open · {n} in total"],
+  ["{n} encadenados", "{n} sends"], ["{n} % al flash", "{n}% flashed"], ["{n} % blando · {n} % justo", "{n}% soft · {n}% fair"], ["{n} votos", "{n} votes"], ["{n} voto", "{n} vote"], ["{n} personas lo tienen como proyecto", "{n} people have it as a project"], ["intentos medios {n}", "average attempts {n}"], ["{n} comentarios", "{n} comments"],
+  ["{n} meses", "{n} months"], ["{n} días", "{n} days"], ["{n} día", "{n} day"]]) I18N_N[k] ??= v;
 I18N_RX.unshift([/^Fuerte: (.+)$/, m => `Strength: ${tw(m[1])}`]);
 Object.assign(I18N, { "Físico": "Physical", "Técnico": "Technical", "Estático": "Static", "físico": "physical", "técnico": "technical", "estático": "static", "Agarre": "Grip", "Agarres": "Grips", "Cazos": "Jugs", "Volúmenes": "Volumes", "cazos": "jugs", "volúmenes": "volumes", "Estilos": "Styles",
   "Estilos de escalada": "Climbing styles", "Tipos de agarre": "Grip types",

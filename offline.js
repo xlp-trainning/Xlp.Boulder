@@ -9,13 +9,14 @@ const outbox = () => store.get("lb-outbox", {});
 // Copia local de los datos del rocódromo (y de lo tuyo) tras cada carga buena
 function saveSnapshot() {
   if (!S.gym || !S.blocks.length) return;
-  store.set(`lb-snap-${S.gym}`, { t: Date.now(), gyms: S.gyms, blocks: S.blocks, stats: S.stats, firsts: S.firsts, sectors: S.sectors, mapPath: S.mapPath });
+  store.set(`lb-snap-${S.gym}`, { t: Date.now(), gyms: S.gyms, blocks: S.blocks, stats: S.stats, firsts: S.firsts, sectors: S.sectors, mapPath: S.mapPath, setters: EQ.list });
   store.set("lb-snap-mine", S.mine);
 }
 function loadSnapshot() {
   const snap = store.get(`lb-snap-${S.gym}`, null) || (() => { const k = Object.keys(localStorage).find(k => k.startsWith("lb-snap-") && k !== "lb-snap-mine"); return k ? store.get(k, null) : null; })();
   if (!snap) return false;
   Object.assign(S, { gyms: snap.gyms, blocks: snap.blocks, stats: snap.stats, firsts: snap.firsts || {}, sectors: snap.sectors || [], mapPath: snap.mapPath || "" });
+  EQ.list = snap.setters || [];
   if (!S.gyms.some(g => g.id === S.gym)) S.gym = S.gyms[0]?.id;
   S.mine = { ...store.get("lb-snap-mine", {}) };
   Object.entries(outbox()).forEach(([id, m]) => S.mine[id] = { ...S.mine[id], ...m });

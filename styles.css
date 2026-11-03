@@ -867,3 +867,13 @@ html.big-text .wordmark .mark { width: clamp(33px, 8vw, 42px); }
 .wl-main.more { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent); }
 .toast { pointer-events: none; }   /* el aviso no tapa lo que hay debajo (p. ej. la foto en el editor) */
 .ed-tools { flex-wrap: wrap; }   /* zona, toda la foto, volumen, goma, afinar… caben en dos líneas en el móvil */
+/* equipadores: sello con la inicial, lista y enlace desde la ficha */
+.setter-ini { width: 16px; height: 16px; display: inline-grid; place-items: center; border-radius: 4px; background: var(--accent); color: var(--accent-ink); font: 900 10px/1 var(--f-display); flex: none; }
+.xlp-badge.icon .setter-ini { width: 18px; height: 18px; font-size: 11px; }
+.hero-tag .info .setter-ini, .g-name .setter-ini { width: 22px; height: 22px; font-size: 13px; }
+.setter-row { width: 100%; border: 0; text-align: left; color: var(--ink); grid-template-columns: 44px 1fr auto auto; transition: background-color var(--d-1); }
+.setter-row:hover { background: var(--surface-2); }
+.setter-mix .lvmix { width: 72px; }
+@media (max-width: 420px) { .setter-mix { display: none; } .setter-row { grid-template-columns: 44px 1fr auto; } }
+.linkbtn.setter-link { align-self: flex-start; padding: 0; min-height: 0; text-decoration: none; }
+.g-name .xlp-badge { vertical-align: 4px; }

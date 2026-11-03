@@ -1,4 +1,4 @@
-// Estadísticas del equipador: de todos los bloques o solo de los suyos (sello Xlp),
+// Estadísticas del equipador: de todos los bloques o de los de un equipador (los tuyos, los de otro…),
 // por rocódromo, por sala y por sector. Usa el estado y las utilidades de app.js.
 
 const ST = { scope: store.get("lb-st-scope", "all"), group: store.get("lb-st-group", "sala"), all: null, loading: false };
@@ -35,8 +35,10 @@ function groupRow(name, list, onclick) {
 function renderStats() {
   const root = $("page-stats");
   if (!ST.all && !ST.loading) loadAllBlocks();
-  const mineOnly = ST.scope === "mine";
-  const inScope = b => !mineOnly || b.xlp;
+  // Qué bloques: todos, o los de un equipador («mine» es el de antes del 014: los del sello Xlp)
+  if (ST.scope !== "all" && ST.scope !== "mine" && !setterById(ST.scope)) ST.scope = "all";
+  const mineOnly = ST.scope !== "all", who = setterById(ST.scope) || (ST.scope === "mine" ? setterById(S.session?.user.id) : null);
+  const inScope = b => !mineOnly || (who ? b.setter_id === who.user_id : b.xlp);
   const pool = S.blocks.filter(inScope);
   const open = pool.filter(b => b.active);
   const st = id => statsFor(id);
@@ -49,7 +51,7 @@ function renderStats() {
   const table = (cols, rows) => el("div", { class: "table-scroll" }, el("table", {},
     el("thead", {}, el("tr", {}, cols.map(c => el("th", { text: c })))),
     el("tbody", {}, rows)));
-  const blockCell = b => el("td", {}, el("button", { class: "linkbtn strong", onclick: () => openDetail(b.id) }, levelDot(b.level), " ", title(b), b.xlp && !mineOnly ? xlpBadge(true) : null));
+  const blockCell = b => el("td", {}, el("button", { class: "linkbtn strong", onclick: () => openDetail(b.id) }, levelDot(b.level), " ", title(b), !mineOnly ? setterBadge(setterOf(b), true) : null));
 
   // Por zona: rocódromos, salas o sectores
   const zoneCols = ["", "Abiertos", "Niveles", "Media", "Encad.", "Encad./bloque", "Desmont."];
@@ -92,19 +94,25 @@ function renderStats() {
   const talked = open.filter(b => commentsBy[b.id]).sort((a, b) => commentsBy[b.id] - commentsBy[a.id]).slice(0, 5);
 
   // Solo los míos: cuánto pesan en la sala y cómo gustan frente al resto
-  const allOpen = S.blocks.filter(b => b.active), others = allOpen.filter(b => !b.xlp), avgOthers = wavg(others);
+  const allOpen = S.blocks.filter(b => b.active), others = allOpen.filter(b => !inScope(b)), avgOthers = wavg(others);
+  const isMe = who && who.user_id === S.session?.user.id, whoName = who ? who.name : "Xlp";
   const mineBox = mineOnly ? el("div", { class: "banner st-mine" },
-    el("span", {}, xlpBadge(), ` ${open.length} de ${allOpen.length} bloques abiertos son tuyos (${allOpen.length ? Math.round(open.length / allOpen.length * 100) : 0} %).`),
-    el("span", { text: avgAll && avgOthers ? `Tus bloques: ${avgAll.toFixed(1)} ★ · los demás: ${avgOthers.toFixed(1)} ★` : "" })) : null;
+    el("span", {}, setterBadge(who || setterOf({ xlp: true })), ` ${open.length} de ${allOpen.length} bloques abiertos son ${isMe || !who ? "tuyos" : "de " + whoName} (${allOpen.length ? Math.round(open.length / allOpen.length * 100) : 0} %).`),
+    el("span", { text: avgAll && avgOthers ? `${isMe || !who ? "Tus bloques" : "Sus bloques"}: ${avgAll.toFixed(1)} ★ · los demás: ${avgOthers.toFixed(1)} ★` : "" })) : null;
 
   const tabs = (label, cur, opts, set) => el("div", { class: "tabs", role: "group", "aria-label": label },
     opts.map(([k, t]) => el("button", { "aria-pressed": cur === k ? "true" : "false", onclick: () => set(k) }, t)));
 
   root.replaceChildren(...[
     el("div", { class: "st-controls" },
-      tabs("Qué bloques", ST.scope, [["all", "Todos los bloques"], ["mine", "Solo los míos"]], k => { ST.scope = k; store.set("lb-st-scope", k); renderStats(); })),
+      EQ.list.length
+        ? el("div", { class: "lg-chips", role: "group", "aria-label": "Qué bloques" },
+            el("button", { class: "chip", "aria-pressed": ST.scope === "all" ? "true" : "false", onclick: () => { ST.scope = "all"; store.set("lb-st-scope", "all"); renderStats(); } }, "Todos los bloques"),
+            EQ.list.map(x => el("button", { class: "chip", "aria-pressed": ST.scope === x.user_id ? "true" : "false", onclick: () => { ST.scope = x.user_id; store.set("lb-st-scope", x.user_id); renderStats(); } },
+              setterBadge(x, true), x.user_id === S.session?.user.id ? `${x.name} (tú)` : x.name)))
+        : tabs("Qué bloques", ST.scope, [["all", "Todos los bloques"], ["mine", "Solo los míos"]], k => { ST.scope = k; store.set("lb-st-scope", k); renderStats(); })),
     mineBox,
-    mineOnly && !pool.length ? el("p", { class: "note", text: "Aún no hay bloques con el sello Xlp en este rocódromo. Márcalo al crear o editar un bloque («Equipado por mí»)." }) : null,
+    mineOnly && !pool.length ? el("p", { class: "note", text: who ? `Aún no hay bloques de ${whoName} en este rocódromo. Se apunta en «Equipado por» al crear o editar un bloque.` : "Aún no hay bloques con el sello Xlp en este rocódromo. Márcalo al crear o editar un bloque («Equipado por mí»)." }) : null,
     el("div", { class: "kpis" },
       kpi(open.length, "bloques abiertos"),
       kpi(pool.filter(isNew).length, `montados en ${NEW_DAYS} días`),
@@ -134,7 +142,7 @@ function renderStats() {
     ranking("Poco encadenados (montados hace 14 días o más)", fewSends, b => `${st(b.id).sends} encad.`, "Ningún bloque lleva 14 días montado."),
     ranking("Más proyectados", projected, b => `${st(b.id).projects} probando`, "Nadie lo ha marcado como proyecto todavía."),
     ranking("Con más comentarios", talked, b => `${commentsBy[b.id]} coment.`, "Sin comentarios todavía."),
-    adminPinSection(),
+    S.isMaster ? adminPinSection() : null,
     el("section", { class: "section" }, el("span", { class: "label", text: "Fotos" }),
       el("p", { class: "note", text: "La lista y el mapa usan miniaturas de ~400 px para gastar menos datos de Supabase y cargar antes. Las fotos subidas antes de las miniaturas no la tienen: créalas aquí (basta con hacerlo una vez)." }),
       el("div", { class: "actions" }, el("button", { class: "btn", disabled: THUMBS.busy, onclick: generateThumbs }, THUMBS.busy ? "Generando…" : "Generar miniaturas que faltan")),
