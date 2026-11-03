@@ -143,6 +143,8 @@ function closeWelcome() { store.set("lb-welcome", 1); $("welcomeRoot")?.remove()
 function applyLook() {
   const t = store.get("lb-theme", "auto");
   if (t === "auto") delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
+  // La barra del móvil sigue el tema elegido (en «auto», cada meta vuelve a su color)
+  document.querySelectorAll("meta[data-tc]").forEach(m => m.content = t === "auto" ? m.dataset.tc : t === "dark" ? "#0F1513" : "#E8EDE9");
   document.documentElement.classList.toggle("big-text", !!store.get("lb-big", false));
 }
 function openSettings() {

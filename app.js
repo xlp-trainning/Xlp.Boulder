@@ -220,6 +220,10 @@ const emptyBox = (h, p, btn, error) => el("div", { class: "empty" + (error ? " i
 const skeleton = (n = 5) => el("div", { class: "skel", "aria-busy": "true" }, el("span", { class: "sr-only", text: "Cargando…" }),
   Array.from({ length: n }, () => el("div", { class: "skel-row", "aria-hidden": "true" }, el("i"), el("span", {}, el("i"), el("i"), el("i")))));
 
+// Medidas de los planos, para que la página no salte al cargar la imagen
+const MAP_DIMS = { "mapas/natural-patraix.png": [2150, 1000], "mapas/natural-benimaclet.png": [2663, 1195] };
+const mapDims = () => { const d = MAP_DIMS[S.mapPath]; return d ? { width: String(d[0]), height: String(d[1]) } : {}; };
+
 function card(b) {
   const fav = S.favs.includes(b.id), mine = S.mine[b.id] || {};
   const line = starsLine(statsFor(b.id));
@@ -383,7 +387,7 @@ function renderMapa() {
       svg.append(poly);
     });
     const plan = el("div", { class: "plan" + (drawingSec ? " placing" : "") },
-      el("img", { src: photoUrl(S.mapPath), alt: "Plano de la sala" }), svg,
+      el("img", { src: photoUrl(S.mapPath), alt: "Plano de la sala", ...mapDims() }), svg,
       S.sectors.filter(s => s.x != null && s.y != null).map(s => el("button", {
         class: "pin" + (newBy[s.name] ? " fresh" : "") + (s.name === S.mapSel ? " sel" : ""),
         // Cerca de los bordes, la etiqueta se alinea hacia dentro para que no se corte
@@ -610,11 +614,11 @@ function commentsSection(b) {
   if (!list) loadComments(id).then(() => { if (openId === id) openDetail(id); });
   const myId = S.session?.user.id;
   const d = S.drafts[id] ||= { body: "", video: "" };
-  const nick = el("input", { id: "c-nick", value: store.get("lb-nick", ""), maxlength: "30", placeholder: "Tu apodo", autocomplete: "nickname",
+  const nick = el("input", { id: "c-nick", value: store.get("lb-nick", ""), maxlength: "30", placeholder: "Tu apodo…", "aria-label": "Tu apodo", autocomplete: "nickname", spellcheck: "false",
     oninput: e => store.set("lb-nick", e.target.value) });
   const body = el("textarea", { id: "c-body", maxlength: "1000", placeholder: "Cómo lo hiciste tú: pies, secuencia, el truco del paso clave…", oninput: e => d.body = e.target.value });
   body.value = d.body;
-  const video = el("input", { id: "c-video", type: "url", value: d.video, placeholder: "Enlace a tu vídeo (opcional)", oninput: e => d.video = e.target.value });
+  const video = el("input", { id: "c-video", type: "url", value: d.video, placeholder: "https://instagram.com/… (opcional)", "aria-label": "Enlace a tu vídeo", autocomplete: "off", oninput: e => d.video = e.target.value });
   const myH = store.get("lb-height", null);
   const height = el("input", { id: "c-height", type: "number", min: "120", max: "220", inputmode: "numeric", value: myH || "", placeholder: "Tu altura en cm (opcional)", "aria-label": "Tu altura en centímetros",
     oninput: e => { const v = parseInt(e.target.value, 10); store.set("lb-height", v >= 120 && v <= 220 ? v : null); } });
@@ -865,7 +869,7 @@ function sectorPicker(input) {
   input.addEventListener("input", mark);
   mark();
   return el("div", { class: "sector-pick" }, chosen,
-    el("div", { class: "plan-scroll" }, el("div", { class: "plan" }, el("img", { src: photoUrl(S.mapPath), alt: "Plano de la sala" }), svg, pins.map(([, p]) => p))));
+    el("div", { class: "plan-scroll" }, el("div", { class: "plan" }, el("img", { src: photoUrl(S.mapPath), alt: "Plano de la sala", ...mapDims() }), svg, pins.map(([, p]) => p))));
 }
 
 // Por qué no se ha guardado un bloque, dicho claro (con el código para poder buscarlo)

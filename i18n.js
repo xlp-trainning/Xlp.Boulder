@@ -32,7 +32,7 @@ const I18N = {
   // Lista de bloques
   "Bloques por nivel": "Problems by grade", "bloques abiertos": "open problems", "bloque abierto": "open problem", "bloques desmontados": "stripped problems",
   "De fácil a difícil · toca un nivel para filtrar": "Easy to hard · tap a grade to filter", "Vista": "View", "Abiertos": "Open", "Novedades": "New", "♥ Favoritos": "♥ Favourites", "Proyectos": "Projects", "Desmontados": "Stripped",
-  "Buscar por nombre, sector o beta…": "Search by name, sector or beta…", "Buscar bloque": "Search problems", "Buscar": "Search", "Ordenar": "Sort", "Más recientes": "Newest", "Más fáciles primero": "Easiest first", "Más difíciles primero": "Hardest first", "Mejor puntuados": "Top rated",
+  "Buscar por nombre, sector o beta…": "Search by name, sector or beta…", "Buscar bloque…": "Search problems…", "Tu apodo…": "Your nickname…", "Enlace a tu vídeo": "Link to your video", "https://instagram.com/… (opcional)": "https://instagram.com/… (optional)", "Buscar": "Search", "Ordenar": "Sort", "Más recientes": "Newest", "Más fáciles primero": "Easiest first", "Más difíciles primero": "Hardest first", "Mejor puntuados": "Top rated",
   "Filtros": "Filters", "Orden": "Sort", "Estilo": "Style", "Presa": "Hold", "Sector": "Sector", "Quitar filtros": "Clear filters", "Equipados por Xlp": "Set by Xlp", "Equipado por Xlp": "Set by Xlp",
   "Nuevo": "New", "En favoritos": "In favourites", "Sin puntuar": "Not rated", "Sin puntuar todavía": "Not rated yet", "· Encadenado": "· Sent", "· ⚡ Flash": "· ⚡ Flash", "· Proyecto": "· Project",
   "Cargando…": "Loading…", "Trayendo los bloques de la sala.": "Fetching the gym's problems.", "Sin conexión": "Offline", "Reintentar": "Retry",

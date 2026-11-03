@@ -95,6 +95,7 @@ body {
   padding: calc(env(safe-area-inset-top, 0px) + var(--s-4)) max(var(--s-4), env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + var(--s-8)) max(var(--s-4), env(safe-area-inset-left, 0px));
   -webkit-tap-highlight-color: transparent;
 }
+button, a, [role="button"], input, select, textarea, label { touch-action: manipulation; }   /* sin retraso al tocar */
 [hidden] { display: none !important; }
 img { max-width: 100%; }
 .wrap { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--s-5); }

@@ -13,8 +13,8 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#E8EDE9" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0F1513" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#E8EDE9" media="(prefers-color-scheme: light)" data-tc="#E8EDE9">
+<meta name="theme-color" content="#0F1513" media="(prefers-color-scheme: dark)" data-tc="#0F1513">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
 <link rel="stylesheet" href="styles.css">
-<script>/* tema y letra elegidos en Ajustes, antes de pintar */ try { var t = JSON.parse(localStorage.getItem("lb-theme")); if (t && t !== "auto") document.documentElement.dataset.theme = t; if (JSON.parse(localStorage.getItem("lb-big"))) document.documentElement.classList.add("big-text"); } catch (e) {}</script>
+<script>/* tema y letra elegidos en Ajustes, antes de pintar */ try { var t = JSON.parse(localStorage.getItem("lb-theme")); if (t && t !== "auto") { document.documentElement.dataset.theme = t; document.querySelectorAll("meta[data-tc]").forEach(function (m) { m.content = t === "dark" ? "#0F1513" : "#E8EDE9"; }); } if (JSON.parse(localStorage.getItem("lb-big"))) document.documentElement.classList.add("big-text"); } catch (e) {}</script>
 </head>
 <body>
 <div class="wrap">
@@ -89,7 +89,7 @@
         </div>
       </div>
       <div class="row filter-row">
-        <label class="search-wrap"><span data-ico="search"></span><input class="search" id="q" type="search" placeholder="Buscar bloque" aria-label="Buscar"></label>
+        <label class="search-wrap"><span data-ico="search"></span><input class="search" id="q" type="search" placeholder="Buscar bloque…" aria-label="Buscar"></label>
         <button class="btn filter-btn" id="filterBtn" aria-expanded="false" aria-controls="filterPanel"><span data-ico="sliders"></span><span id="filterLbl">Filtros</span></button>
       </div>
       <div class="filter-panel" id="filterPanel" hidden>
