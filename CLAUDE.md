@@ -65,3 +65,12 @@ La estética sale de la pared del rocódromo: cinta de carrocero para los nivele
   - Los sectores numerados, que son nombres reales.
 - Para revisar: `node .claude/skills/taste-skill/scripts/lint.mjs <archivos>` y `node .claude/skills/taste-skill/scripts/inspect.mjs index.html --app`. Requiere Node 22 y Chromium.
 - `assets.mjs` busca imágenes en archivos públicos y necesita red. No lo uses sin que el usuario lo pida.
+
+## Skill de revisión · web-design-guidelines
+- Está instalada en `.claude/skills/web-design-guidelines/`. Viene de `vercel-labs/agent-skills` y tiene licencia MIT. Revisa accesibilidad, formularios, animación, tipografía, móvil, tema oscuro e idioma, y da los problemas en formato `archivo:línea`.
+- Las reglas están copiadas y fijas en `guidelines.md` (commit 434b7f9). No se descargan de internet. Para actualizarlas, primero se lee el texto nuevo.
+- Las adaptaciones están en su `SKILL.md`:
+  - Sin React: ignora las reglas de hidratación y de `<Link>`.
+  - Español en frase normal, sin «Title Case», y comillas «».
+  - En estilo manda «la cinta de salida».
+  - Guardar el estado en la URL se propone antes de hacerlo.
