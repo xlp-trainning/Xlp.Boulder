@@ -13,10 +13,10 @@
 - Dos rocódromos: Natural Patraix y Natural Benimaclet. Planos en `mapas/`.
 - `editor.js`: editor de la foto del bloque (zona a analizar, presas por color, volúmenes, salida y top).
 
-## Sistema visual · «el panel»
+## Sistema visual
 - **`DESIGN.md`** (en la raíz) describe este sistema en el formato DESIGN.md: colores, tipografía, espacios, formas, componentes, qué hacer y qué no, y el comportamiento por anchos. Léelo antes de tocar la interfaz y actualízalo cuando cambies un token o un componente.
 - No copies el DESIGN.md de otra marca (la colección awesome-design-md): la app tiene su propia identidad.
-Abstracto y moderno: superficies planas, radios cortos y color a bloques. El motivo es el panel geométrico `img/panel.svg` (presas como círculos con agujero, volúmenes como triángulos y cuartos de círculo, regletas como franjas), en coral, cobalto, girasol, menta, lila y tiza sobre #15171C. Las cintas de nivel se mantienen. Todo está en `styles.css` (secciones numeradas) e `icons.js`.
+Plano y moderno: superficies lisas, radios cortos y color a bloques; el color fuerte lo llevan las cintas de nivel y la acción principal (girasol #FFC933). Sin ilustraciones ni patrones de fondo: el panel geométrico de presas y volúmenes se probó y el usuario pidió quitarlo de todas las páginas; no lo vuelvas a poner. Todo está en `styles.css` (secciones numeradas) e `icons.js`.
 
 - **Tokens** (`:root` en `styles.css`). No escribas colores ni medidas sueltos: usa siempre los tokens.
   - Color: `--bg`, `--bg-2`, `--surface`, `--surface-2`, `--ink`, `--ink-2`, `--muted`, `--line`, `--line-2`, `--accent` (negro #15171C en claro; girasol #FFC933 en oscuro y sobre el muro), `--accent-text`, `--accent-soft`, `--tape` (amarillo cinta #F5CE1B: poco, solo para destacar), `--tape-text`, `--danger`, `--star`.
@@ -25,11 +25,10 @@ Abstracto y moderno: superficies planas, radios cortos y color a bloques. El mot
   - Radios cortos (2–10 px): `--r-1` (cinta), `--r-2` (chip), `--r-3` (botón y campo), `--r-4` (panel), `--r-5`.
   - Sombras: `--sh-1` y `--sh-2` valen `none` (en reposo nada flota); `--sh-3` solo para hojas y diálogos. Tiempos: `--d-1` 150 ms, `--d-2` 200 ms, `--d-3` 250 ms, con `--ease`.
   - Tamaños táctiles: `--tap` 44 px, `--tap-lg` 52 px, `--tap-xl` 64 px (los botones del modo sesión).
-- **Formas**: `--cut-diag` (borde de abajo en diagonal: paneles del muro y franjas del panel), `--cut-v` (final en V: la cinta del nivel en las filas), `--cut-top` (barras de la tira de niveles), `--cut-end` (muesca: «Nuevo», ligas, barras de progreso) y `--torn` (cinta rasgada y girada 1,5–2°: etiqueta del rocódromo, nivel en la ficha, avisos de la bienvenida). Gira solo lo que es «cinta pegada»; el resto va recto.
+- **Formas**: `--cut-diag` (borde de abajo en diagonal: la tira de niveles de Bloques), `--cut-v` (final en V: la cinta del nivel en las filas), `--cut-top` (barras de la tira de niveles), `--cut-end` (muesca: «Nuevo», ligas, barras de progreso) y `--torn` (cinta rasgada y girada 1,5–2°: etiqueta del rocódromo, nivel en la ficha, avisos de la bienvenida). Gira solo lo que es «cinta pegada»; el resto va recto.
 - **Logo**: se mantiene el original (la X de dos tiras de cinta, amarilla y verde azulada #4CC3A8, sobre #18201E), en la cabecera, el sello Xlp, las historias y los iconos. No lo cambies por la paleta nueva.
 - **Sin texturas** (`--grain: none`). La clase `.is-wall` convierte cualquier zona en «muro»: panel liso #15171C en los dos temas, que redefine los tokens dentro.
   - Se usa en los momentos de impacto: portada de Hoy (`.today-hero`), tira de niveles de Bloques (`.dist`), modo sesión (`.session`), Tu mes (`.wrapped`) y bienvenida (`.wl`).
-  - **El panel geométrico** aparece encima de la tira de niveles, en la bienvenida y como franja al abrir cada página (sección 21, `--band`). No lo pongas detrás de texto ni en las listas.
 - **Tipografía**:
   - Big Shoulders Display para números tipo marcador y títulos en mayúsculas.
   - Figtree para el texto.
@@ -59,10 +58,9 @@ Abstracto y moderno: superficies planas, radios cortos y color a bloques. El mot
 
 ## Skill de diseño · taste-skill
 - Instalada en `.claude/skills/taste-skill/` (de [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill), licencia MIT, commit 12af471). Se usa para revisar y pulir pantallas, no para rediseñar la app desde cero.
-- **Manda el sistema visual de arriba («el panel»).** La app es una *app screen*: sigue `references/app-screens.md`, usa `draw.mjs --app --keep palette,type` y respeta los tokens, tipografías e iconos de arriba.
+- **Manda el sistema visual de arriba .** La app es una *app screen*: sigue `references/app-screens.md`, usa `draw.mjs --app --keep palette,type` y respeta los tokens, tipografías e iconos de arriba.
 - Choques conocidos que son decisiones de marca y se mantienen (en el inspector, `--allow` para esa regla):
   - Las estrellas ★ de la puntuación (el inspector las cuenta como emoji).
-  - El color que llena la portada de Hoy y las franjas del panel (`colour-sprawl`): se pidió una app llamativa.
   - Big Shoulders en mayúsculas.
   - Las líneas de 1 px entre filas (`.grid`).
   - La cinta girada.
@@ -76,5 +74,5 @@ Abstracto y moderno: superficies planas, radios cortos y color a bloques. El mot
 - Las adaptaciones están en su `SKILL.md`:
   - Sin React: ignora las reglas de hidratación y de `<Link>`.
   - Español en frase normal, sin «Title Case», y comillas «».
-  - En estilo manda el sistema visual («el panel», `DESIGN.md`).
+  - En estilo manda el sistema visual de `DESIGN.md`.
   - Guardar el estado en la URL se propone antes de hacerlo.

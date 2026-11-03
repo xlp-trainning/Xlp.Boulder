@@ -739,9 +739,7 @@ body.has-session-bar .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + 84
 .wl-link-space { height: var(--tap); }
 .wl-art { position: relative; }
 .wl-art-1 { height: min(42vh, 300px); }
-.wl-tapes { position: absolute; inset: 0 0 36px; background: #15171C url("img/panel.svg") 18% 30% / 820px auto; border-radius: var(--r-4); animation: wl-in .5s var(--ease) both; }
-@keyframes wl-in { from { opacity: 0; transform: translateY(12px); } }
-.wl-tapes span { display: none; }
+.wl-tapes { position: absolute; inset: -40px -120px; }
 .wl-tapes span { position: absolute; left: -10%; width: 130%; height: 28px; top: calc(8% + var(--i) * 11%); clip-path: var(--torn);
   transform: rotate(calc(-14deg + var(--i) * 3.5deg)); opacity: .96; animation: wl-tape .6s var(--ease) both; animation-delay: calc(var(--i) * 40ms); }
 @keyframes wl-tape { from { transform: translateX(-30%) rotate(calc(-14deg + var(--i) * 3.5deg)); opacity: 0; } }
@@ -908,12 +906,3 @@ html.big-text .wordmark .mark { width: clamp(33px, 8vw, 42px); }
 @media (max-width: 420px) { .setter-mix { display: none; } .setter-row { grid-template-columns: 44px 1fr auto; } }
 .linkbtn.setter-link { align-self: flex-start; padding: 0; min-height: 0; text-decoration: none; }
 .g-name .xlp-badge { vertical-align: 4px; }
-
-/* =========================================================== 21 · panel geométrico en cada sección */
-/* Una franja del panel (img/panel.svg) abre cada página; cada una enseña otro trozo, y el borde baja en diagonal */
-#page-mapa::before, #page-ranking::before, #page-grupos::before, #page-progreso::before, #page-equipadores::before, #page-stats::before, #page-buzon::before {
-  content: ""; display: block; height: 56px; margin: 0 calc(-1 * var(--s-4)) calc(-1 * var(--s-2));
-  background: #15171C url("img/panel.svg") var(--band, 0%) 40% / 620px auto repeat-x; clip-path: polygon(0 0, 100% 0, 100% 62%, 0 100%);
-}
-#page-ranking { --band: 35%; } #page-grupos { --band: 62%; } #page-progreso { --band: 88%; } #page-equipadores { --band: 18%; } #page-stats { --band: 50%; } #page-buzon { --band: 74%; }
-@media (min-width: 768px) { #page-mapa::before, #page-ranking::before, #page-grupos::before, #page-progreso::before, #page-equipadores::before, #page-stats::before, #page-buzon::before { margin-inline: 0; border-radius: var(--r-4) var(--r-4) 0 0; } }

@@ -24,5 +24,5 @@ Origen: `vercel-labs/agent-skills` (skills/web-design-guidelines, commit 1a2c79d
 
 - Web estática sin compilar (HTML, CSS y JS a mano): ignora las reglas de React, Next.js e hidratación (`useState`, `nuqs`, `suppressHydrationWarning`, `priority`, `<Link>`), salvo su equivalente en DOM.
 - La app está en español: títulos y botones en frase normal, nunca «Title Case». Las comillas son «» en español y “” en inglés.
-- El sistema visual «el panel» (`DESIGN.md` y `CLAUDE.md`) y las notas de la taste-skill mandan sobre el estilo.
+- El sistema visual (`DESIGN.md` y `CLAUDE.md`) y las notas de la taste-skill mandan sobre el estilo.
 - Guardar filtros y pestañas en la URL es un cambio de funcionamiento: propónlo, no lo apliques sin preguntar.

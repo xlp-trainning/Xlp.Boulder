@@ -1,32 +1,23 @@
-# DESIGN.md · Xlp.Boulder — «el panel»
+# DESIGN.md · Xlp.Boulder
 
-Sistema visual de Xlp.Boulder («el panel»), la libreta de bloques de Natural Climb Patraix y Benimaclet. Sigue el formato DESIGN.md (Google Stitch, colección VoltAgent/awesome-design-md): un documento en texto que cualquier agente lee antes de tocar la interfaz.
+Sistema visual de Xlp.Boulder, la libreta de bloques de Natural Climb Patraix y Benimaclet. Sigue el formato DESIGN.md (Google Stitch, colección VoltAgent/awesome-design-md): un documento en texto que cualquier agente lee antes de tocar la interfaz.
 
 Es la descripción **de esta app**, no de otra marca. La fuente de verdad son los tokens de `styles.css` (`:root`) y `LEVELS` en `app.js`; si cambias algo allí, cambia este archivo. Las reglas de trabajo para Claude están en `CLAUDE.md`.
 
 ## Overview
 
-Abstracto y moderno: superficies planas, bordes nítidos y color a bloques. El motivo es **el panel geométrico** (`img/panel.svg`), una rejilla de baldosas que reduce la pared a formas:
-- **presas**: círculos con su agujero, o solo el aro;
-- **volúmenes**: triángulos, medios círculos y cuartos de círculo, a veces con dos caras de distinto color;
-- **regletas**: tres franjas redondeadas.
+Plano y moderno: superficies lisas, radios cortos y color a bloques. El color fuerte lo llevan las cintas de nivel y la acción principal; el resto es tiza, carbón y el muro casi negro. No hay ilustraciones de fondo: se probó un panel geométrico de presas y volúmenes y se retiró a petición del usuario.
 
 Es una app que se usa con el móvil en la mano, entre intento e intento: filas densas, textos cortos, botones grandes y un solo momento de impacto por pantalla.
 
 Tres capas:
 1. **El papel**: blanco tiza liso (o carbón, en tema oscuro). Ahí van listas, filtros y fichas. Sin texturas.
 2. **El muro** (`.is-wall`): panel casi negro #15171C, igual en los dos temas, con el borde de abajo en diagonal (`--cut-diag`). Para los momentos de impacto: la portada de Hoy, la tira de niveles de Bloques, el modo sesión, Tu mes y la bienvenida.
-3. **El color**: el panel geométrico y las cintas de nivel. Fuera de ahí, casi nada lleva color fuerte.
-
-Cada página abre con una franja del panel (sección 21 de `styles.css`), cada una con otro encuadre (`--band`). 
+3. **El color**: las cintas de nivel y la acción principal (girasol #FFC933 sobre lo oscuro). Fuera de ahí, casi nada lleva color fuerte.
 
 ## Colors
 
 Neutros cálidos y suaves, nunca gris ni blanco puros. Cada token existe en claro, en oscuro (dos veces en `styles.css`: `@media (prefers-color-scheme: dark)` y `[data-theme="dark"]`) y dentro del muro.
-
-### Panel geométrico
-
-Coral #FF5A4E · cobalto #2F6BFF · girasol #FFC933 · menta #3DD6A3 · lila #B794F6 · tiza #F3EEE4, sobre #15171C. Dos baldosas vecinas nunca repiten color. Para regenerarlo: `python3 img/panel.py img/panel.svg 3` (el último número es la semilla).
 
 ### Brand & Accent
 
@@ -36,7 +27,7 @@ Coral #FF5A4E · cobalto #2F6BFF · girasol #FFC933 · menta #3DD6A3 · lila #B7
 | `--accent-ink` | #FAF9F7 | #15171C | #15171C | Texto encima del acento |
 | `--accent-text` | #2456D6 | #8FB0FF | #FFC933 | Enlaces y texto destacado |
 | `--tape` | #F5CE1B | #F5CE1B | #F5CE1B | «Nuevo», etiqueta del rocódromo, foco sobre el muro |
-| `--wood` | #FFC933 | #FFC933 | #FFC933 | Girasol del panel (nombre heredado) |
+| `--wood` | #FFC933 | #FFC933 | #FFC933 | Girasol (nombre heredado) |
 
 ### Surface
 
@@ -124,7 +115,7 @@ Plano. En reposo nada flota (`--sh-1` y `--sh-2` valen `none`): se separa por to
 ### Decorative Depth
 
 - Sin texturas ni grano (`--grain: none`), sin degradados de color, sin desenfoques.
-- El único adorno es el panel geométrico, y siempre en su sitio: franja de cada página, tira de niveles y bienvenida. La portada de Hoy lleva la rejilla de tuercas.
+- Sin ilustraciones ni patrones de fondo. La portada de Hoy lleva la rejilla de tuercas del muro.
 
 ## Shapes
 
@@ -136,7 +127,7 @@ Radios cortos: `--r-1` 2px (cinta) · `--r-2` 4px (chip y etiqueta) · `--r-3` 6
 
 | Token | Forma | Dónde |
 |---|---|---|
-| `--cut-diag` | Borde de abajo en diagonal | Los paneles del muro y las franjas del panel |
+| `--cut-diag` | Borde de abajo en diagonal | La tira de niveles de Bloques |
 | `--cut-v` | Final en V | La cinta del nivel en cada fila |
 | `--cut-top` | Muesca arriba | Barras de la tira de niveles |
 | `--cut-end` | Muesca al final | «Nuevo», ligas, barras de progreso |
