@@ -140,6 +140,7 @@ Hay un **máster** (el dueño de la web) y los equipadores que él quiera. Neces
 | `supabase/012-sectores-numerados.sql` | Patraix con los 40 sectores numerados (1–9 sala 1, 10–20 sala 2, 21–38 sala 3, 39–40 terraza) (ejecutar una vez) |
 | `supabase/013-talonajes-empeines.sql` | la etiqueta «Talonajes» pasa a «Talonajes/Empeines» (ejecutar una vez) |
 | `supabase/014-equipadores.sql` | varios equipadores con nombre y un máster, firma de cada bloque y permisos (ejecutar una vez) |
+| `supabase/015-usuarios.sql` | pestaña «Usuarios» del máster: cuántos hay y qué hacen, bloquear (no escribe nada, sale del ranking y sus betas no se ven) y borrar una cuenta (ejecutar una vez, después de 014) |
 | `equipadores.js` | página Equipadores, sello de cada equipador y gestión del máster |
 | `supabase/003-progreso.sql` | añade flash y fecha de encadenado a los votos (ejecutar una vez) |
 | `supabase/004-ranking.sql` | ranking por ligas: apodos y cálculo del ranking (ejecutar una vez) |

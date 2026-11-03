@@ -141,8 +141,11 @@ async function loadSession() {
   $("addBtn").hidden = !S.isSetter;
   document.querySelector('[data-page="stats"]').hidden = !S.isSetter;
   document.querySelector('[data-page="buzon"]').hidden = !S.isSetter;
+  document.querySelector('[data-page="usuarios"]').hidden = !S.isMaster;   // solo el máster gestiona usuarios
   if (!S.isSetter && (S.page === "stats" || S.page === "buzon")) S.page = "bloques";
+  if (!S.isMaster && S.page === "usuarios") S.page = "bloques";
   $("who").textContent = S.isSetter ? "Modo equipador" : "";
+  checkBlocked();   // usuarios.js: aviso si la cuenta está bloqueada
   $("loginBtn").textContent = S.session && !S.session.user.is_anonymous ? "Cerrar sesión de equipador" : "Acceso equipador";
 }
 async function refresh() {
@@ -573,6 +576,7 @@ function render() {
   if (S.page === "stats") renderStats();
   if (S.page === "buzon") renderBuzon();
   if (S.page === "equipadores") renderEquipadores();
+  if (S.page === "usuarios") renderUsuarios();
 }
 
 /* ---------- hoja lateral ---------- */

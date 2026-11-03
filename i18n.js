@@ -460,6 +460,27 @@ Object.assign(I18N, {
   "Abre un bloque y toca «Guardar» para tenerlo aquí.": "Open a problem and tap “Save” to keep it here.",
 });
 
+// Usuarios (máster) y aviso de cuenta bloqueada
+Object.assign(I18N, { "Usuarios": "Users", "Solo para el máster": "Master only", "Esta sección es para quien gestiona la app.": "This section is for whoever runs the app.",
+  "Falta un paso en Supabase": "One step missing in Supabase", "Ejecuta supabase/015-usuarios.sql en el SQL Editor de Supabase y vuelve a abrir esta sección.": "Run supabase/015-usuarios.sql in the Supabase SQL Editor and open this section again.",
+  "Volver a probar": "Try again", "No se pudo cargar": "Couldn't load", "No se pudo cargar la lista de usuarios.": "Couldn't load the user list.", "Actualizar": "Refresh",
+  "Cada móvil cuenta como un usuario. Activo es quien ha entrado, apuntado o votado en ese plazo.": "Each phone counts as one user. Active means they opened the app, logged or rated something in that period.",
+  "móviles en total": "phones in total", "activos esta semana": "active this week", "activos este mes": "active this month", "nuevos esta semana": "new this week",
+  "con apodo": "with a nickname", "en el ranking": "in the ranking", "han encadenado algo": "have sent something", "bloqueados": "blocked",
+  "Con actividad": "With activity", "Buscar por apodo…": "Search by nickname…", "Buscar usuario por apodo": "Search users by nickname", "Nadie con ese apodo.": "Nobody with that nickname.",
+  "Todavía nadie ha apuntado nada.": "Nobody has logged anything yet.", "Qué hace cada cosa": "What each action does", "Bloquear: ": "Block: ", "Borrar: ": "Delete: ",
+  "no puede apuntar encadenados, votar, escribir betas ni al buzón, ni crear o unirse a grupos. Sale del ranking y sus betas dejan de verse. Se puede deshacer.": "they can't log sends, rate, write betas or use the inbox, or create or join groups. They leave the ranking and their betas are hidden. It can be undone.",
+  "elimina la cuenta y todo lo suyo. No se puede deshacer. Sus grupos pasan al miembro más antiguo.": "removes the account and everything in it. It can't be undone. Their groups pass to the oldest member.",
+  "A los equipadores se les gestiona desde Equipadores.": "Setters are managed from Setters.", "PIN": "PIN", "Bloqueado": "Blocked", "Bloquear": "Block", "Desbloquear": "Unblock",
+  "No se pudo bloquear": "Couldn't block", "No se pudo desbloquear": "Couldn't unblock", "Es equipador: quítale antes el acceso en Equipadores": "They're a setter: remove their access in Setters first",
+  "Tu cuenta está bloqueada: puedes ver los bloques, pero no apuntar, votar ni escribir. Si crees que es un error, habla con el personal de la sala.": "Your account is blocked: you can see the problems, but not log, rate or write. If you think this is a mistake, talk to the gym staff.",
+  "sin actividad": "no activity" });
+I18N_RX.unshift([/^(.+) bloqueado$/, m => `${m[1]} blocked`], [/^(.+) desbloqueado$/, m => `${m[1]} unblocked`], [/^(.+) borrado$/, m => `${m[1]} deleted`],
+  [/^Resultados para «(.+)»$/, m => `Results for “${m[1]}”`], [/^Sin apodo · (.+)$/, m => `No nickname · ${m[1]}`], [/^Motivo: (.+)$/, m => `Reason: ${m[1]}`],
+  [/^(\d+) (encadenados?) \((\d+) este mes\)$/, m => `${m[1]} ${m[1] === "1" ? "send" : "sends"} (${m[3]} this month)`], [/^(\d+) (encadenados?)$/, m => `${m[1]} ${m[1] === "1" ? "send" : "sends"}`],
+  [/^(\d+) (betas?)$/, m => `${m[1]} ${m[1] === "1" ? "beta" : "betas"}`], [/^(\d+) (grupos?)$/, m => `${m[1]} ${m[1] === "1" ? "group" : "groups"}`],
+  [/^última actividad hace (\d+) (min|h|días)$/, m => `last active ${m[1]} ${m[2] === "días" ? "days" : m[2]} ago`], [/^última actividad ayer$/, () => "last active yesterday"], [/^última actividad sin actividad$/, () => "no activity yet"]);
+
 // Traductor: frase entera → con números → con nombres → por trozos separados por « · »
 function tr(text) {
   if (LANG === "es" || !text) return text;

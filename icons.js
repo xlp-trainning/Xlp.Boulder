@@ -57,6 +57,8 @@ const ICONS = {
   layers: "M12 3 2.5 8 12 13l9.5-5zM2.5 12.5 12 17.5l9.5-5M2.5 16.5 12 21.5l9.5-5",
   eraser: "M8 20.5h12M4.6 14.6l8.5-8.5a2 2 0 0 1 2.8 0l3.5 3.5a2 2 0 0 1 0 2.8L12 19.8H8.8l-4.2-4.2a.8.8 0 0 1 0-1zM9 10.2l5.3 5.3",
   undo: "M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11",
+  ban: "M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0M5.7 5.7l12.6 12.6",
+  trash: "M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3",
 };
 
 // <svg class="ico"> con el icono pedido. Decorativo por defecto: el texto del botón ya lo dice
