@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Privacy · Xlp.Boulder</title>
+<meta name="theme-color" content="#EEEDE9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#22252C" media="(prefers-color-scheme: dark)">
+<link rel="alternate" hreflang="es" href="privacidad.html">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+  :root { --bg: #EEEDE9; --surface: #FAF9F7; --ink: #15171C; --muted: #5A5955; --line: #DAD7D0; --accent: #2456D6; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #22252C; --surface: #2B2F37; --ink: #F3EEE4; --muted: #ACA9A2; --line: #3D414A; --accent: #8FB0FF; color-scheme: dark; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 Figtree, system-ui, sans-serif;
+    padding: calc(env(safe-area-inset-top, 0px) + 24px) max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px)); }
+  main { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+  h1, h2 { font-family: "Big Shoulders Display", "Arial Narrow", sans-serif; font-weight: 900; text-transform: uppercase; line-height: .95; margin: 0; }
+  h1 { font-size: clamp(40px, 10vw, 56px); } h2 { font-size: 26px; margin-bottom: 8px; }
+  p, ul { margin: 0 0 8px; } ul { padding-left: 20px; } li { margin-bottom: 4px; }
+  .note { color: var(--muted); font-size: 14px; }
+  section { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; }
+  a { color: var(--accent); font-weight: 700; }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .lang { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); text-decoration: none; font-size: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; } td, th { text-align: left; vertical-align: top; padding: 8px 6px; border-top: 1px solid var(--line); } th { width: 34%; }
+  .scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><a href="./">← Back to Xlp.Boulder</a><a class="lang" href="privacidad.html?es" lang="es">Español</a></div>
+  <header>
+    <h1>Privacy</h1>
+    <p class="note">Last updated: 4 November 2026. The Spanish version is the reference text.</p>
+  </header>
+
+  <section>
+    <h2>In short</h2>
+    <ul>
+      <li>We don't ask for your email or name to use the app: each phone gets an anonymous account.</li>
+      <li>We store what you log (sends, ratings, betas…) so the app works, and nothing else.</li>
+      <li>No ads, we don't sell data and we don't use third-party cookies or tracking tools.</li>
+      <li>You can ask us at any time to delete everything about you.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Who is responsible</h2>
+    <p>Mayu Aldavero García, who runs Xlp.Boulder as an individual. Xlp.Boulder is not an official Natural Climb service.</p>
+    <p>Contact for anything privacy-related: <a href="mailto:xlp.boulder@gmail.com">xlp.boulder@gmail.com</a>, or the app's <b>Suggestion box</b>.</p>
+  </section>
+
+  <section>
+    <h2>What we store and why</h2>
+    <div class="scroll"><table>
+      <tr><th>Anonymous phone ID</th><td>To remember your things without asking you to sign up. The app creates it the first time you open it.</td></tr>
+      <tr><th>What you log</th><td>Sends, flashes, attempts, projects, star ratings, how hard it felt and the reach vote. Used for your progress, medals, the ranking and each problem's stats.</td></tr>
+      <tr><th>Nickname and PIN (optional)</th><td>Your nickname shows in the ranking, in your groups and next to your betas. The PIN is stored encrypted and is only used to recover your nickname on another phone.</td></tr>
+      <tr><th>Betas (optional)</th><td>The text, the link to your video if you add one and your height if you choose to give it. Anyone who opens the problem can see them.</td></tr>
+      <tr><th>Groups (optional)</th><td>Which groups you belong to, duels, challenges, reactions and group sessions. Only members of each group can see them.</td></tr>
+      <tr><th>Suggestion box</th><td>What you write, so the gym team can read it and reply.</td></tr>
+      <tr><th>Setters</th><td>Email, password (handled by Supabase, we never see it) and the name they sign their problems with.</td></tr>
+      <tr><th>Technical data</th><td>When you connect, the servers log your IP address and browser type for a limited time, for security.</td></tr>
+    </table></div>
+    <p class="note">Your phone also keeps your preferences (language, theme, text size) and a copy of the problems to use the app without signal. That never leaves the phone and is deleted when you clear the browser data.</p>
+  </section>
+
+  <section>
+    <h2>Legal basis</h2>
+    <ul>
+      <li>To provide the service you use when you log, rate or join a group (Art. 6.1.b GDPR).</li>
+      <li>Optional data (nickname, height, betas, groups) because you choose to add it and can remove it (Art. 6.1.a).</li>
+      <li>Moderation (blocking accounts that cause trouble) and security logs, under our legitimate interest in keeping the app safe and pleasant (Art. 6.1.f).</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Who else is involved</h2>
+    <ul>
+      <li><b>Supabase</b> stores the database and the accounts, as data processor. Servers in the European Union (Ireland).</li>
+      <li><b>GitHub Pages</b> serves the website. GitHub is in the USA and is part of the EU-US Data Privacy Framework.</li>
+    </ul>
+    <p>Fonts and libraries are served from the website itself: no data is sent to Google or other third parties.</p>
+  </section>
+
+  <section>
+    <h2>How long</h2>
+    <p>For as long as your account exists. If you ask us to delete it, everything about you is removed. If you created a group, it passes to its oldest member so the others don't lose it.</p>
+  </section>
+
+  <section>
+    <h2>Your rights</h2>
+    <p>You can ask to see, correct or delete your data, take it with you, restrict its use or object to it. Write to <a href="mailto:xlp.boulder@gmail.com">xlp.boulder@gmail.com</a> or use the Suggestion box, giving your nickname. If you don't have one, write from the Suggestion box on that same phone, so we know which account is yours. We reply within one month.</p>
+    <p>If you're not satisfied, you can complain to the Spanish Data Protection Agency: <a href="https://www.aepd.es" rel="noopener">www.aepd.es</a>.</p>
+  </section>
+
+  <section>
+    <h2>Minors</h2>
+    <p>If you are under 14, use the app with permission from your parent or guardian.</p>
+  </section>
+</main>
+</body>
+</html>

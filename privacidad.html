@@ -2,10 +2,14 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<script>/* Si la app está en inglés, la versión en inglés (salvo que se haya pedido el español con ?es) */
+try { if (!/[?&]es\b/.test(location.search)) { var v = JSON.parse(localStorage.getItem("lb-lang")); var l = (v === "es" || v === "en") ? v : (/^(es|ca|gl|eu)/i.test(navigator.language || "es") ? "es" : "en"); if (l === "en") location.replace("privacy.html" + location.hash); } } catch (e) {}</script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Privacidad · Xlp.Boulder</title>
 <meta name="theme-color" content="#EEEDE9" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#22252C" media="(prefers-color-scheme: dark)">
+<link rel="alternate" hreflang="en" href="privacy.html">
 <link rel="stylesheet" href="fonts/fonts.css">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <style>
@@ -24,11 +28,13 @@
   .back { align-self: flex-start; }
   table { width: 100%; border-collapse: collapse; font-size: 15px; } td, th { text-align: left; vertical-align: top; padding: 8px 6px; border-top: 1px solid var(--line); } th { width: 34%; }
   .scroll { overflow-x: auto; }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .lang { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink) !important; text-decoration: none; font-size: 14px; }
 </style>
 </head>
 <body>
 <main>
-  <a class="back" href="./">← Volver a Xlp.Boulder</a>
+  <div class="top"><a href="./">← Volver a Xlp.Boulder</a><a class="lang" href="privacy.html" lang="en">English</a></div>
   <header>
     <h1>Privacidad</h1>
     <p class="note">Última actualización: 4 de noviembre de 2026</p>

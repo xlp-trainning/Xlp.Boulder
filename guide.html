@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guide · Xlp.Boulder</title>
+<meta name="description" content="Everything you can do in Xlp.Boulder: problems, sends, map, session, ranking, groups, progress and more.">
+<meta name="theme-color" content="#EEEDE9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#22252C" media="(prefers-color-scheme: dark)">
+<link rel="alternate" hreflang="es" href="guia.html">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+  :root { --bg: #EEEDE9; --surface: #FAF9F7; --surface-2: #F1EFEB; --ink: #15171C; --muted: #5A5955; --line: #DAD7D0; --accent: #2456D6; --tape: #F5CE1B; --tape-ink: #1E1A07; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #22252C; --surface: #2B2F37; --surface-2: #343842; --ink: #F3EEE4; --muted: #ACA9A2; --line: #3D414A; --accent: #8FB0FF; color-scheme: dark; } }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 Figtree, system-ui, sans-serif;
+    padding: calc(env(safe-area-inset-top, 0px) + 24px) max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px)); }
+  main { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+  h1, h2 { font-family: "Big Shoulders Display", "Arial Narrow", sans-serif; font-weight: 900; text-transform: uppercase; line-height: .95; margin: 0; }
+  h1 { font-size: clamp(40px, 10vw, 56px); } h2 { font-size: 26px; margin-bottom: 10px; scroll-margin-top: 16px; }
+  h3 { font-size: 17px; margin: 14px 0 4px; }
+  p, ul { margin: 0 0 8px; } ul { padding-left: 20px; } li { margin-bottom: 4px; }
+  .note { color: var(--muted); font-size: 14px; }
+  .lead { font-size: 18px; }
+  section { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; }
+  a { color: var(--accent); font-weight: 700; }
+  .back { align-self: flex-start; }
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .toc a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 4px; background: var(--surface); border: 1px solid var(--line); color: var(--ink); text-decoration: none; font-weight: 700; font-size: 15px; }
+  .kick { display: inline-block; background: var(--tape); color: var(--tape-ink); font-weight: 800; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; padding: 6px 12px; transform: rotate(-1.5deg); margin-bottom: 12px; }
+  .lv { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; padding: 0; list-style: none; }
+  .lv li { margin: 0; font-weight: 800; font-size: 13px; padding: 4px 10px; border-radius: 2px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; } td, th { text-align: left; padding: 6px; border-top: 1px solid var(--line); } td.n { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .lang { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink) !important; text-decoration: none; font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><a href="./">← Back to Xlp.Boulder</a><a class="lang" href="guia.html?es" lang="es">Español</a></div>
+  <header>
+    <span class="kick">App guide</span>
+    <h1>Everything you can do</h1>
+    <p class="lead">Xlp.Boulder is your problem logbook for Natural Climb Valencia and Natural Climb Benimaclet: what's open, what you've sent, how you're doing and what your friends are up to.</p>
+  </header>
+
+  <nav aria-label="Guide sections">
+    <ul class="toc">
+      <li><a href="#empezar">Getting started</a></li><li><a href="#hoy">Today</a></li><li><a href="#bloques">Problems</a></li><li><a href="#ficha">Problem page</a></li>
+      <li><a href="#mapa">Map</a></li><li><a href="#sesion">Session</a></li><li><a href="#ranking">Ranking</a></li><li><a href="#grupos">Groups</a></li>
+      <li><a href="#progreso">My progress</a></li><li><a href="#apodo">Nickname &amp; PIN</a></li><li><a href="#ajustes">Settings</a></li><li><a href="#mas">And more</a></li>
+    </ul>
+  </nav>
+
+  <section id="empezar">
+    <h2>Getting started</h2>
+    <ul>
+      <li><b>No sign-up.</b> Open the link and you're in: the app doesn't ask for your email or name. What you log is stored on your phone and in your anonymous account.</li>
+      <li><b>Install it.</b> Add it to your home screen and it opens full screen, like an app. Under “Install the app” (at the bottom or in Settings) you'll find the steps for iPhone and Android.</li>
+      <li><b>Pick your gym</b> at the top: Valencia or Benimaclet. Each has its own problems, map and ranking.</li>
+      <li>If a word doesn't ring a bell (send, flash, beta…), Settings has <b>“What each thing means”</b>.</li>
+    </ul>
+  </section>
+
+  <section id="hoy">
+    <h2>Today</h2>
+    <p>The screen to open when you arrive at the gym.</p>
+    <ul>
+      <li><b>Your scoreboard:</b> week streak, points this month, sends and your real level.</li>
+      <li><b>Start session</b> and <b>Gym map</b>, one tap away.</li>
+      <li><b>Alerts:</b> a session in progress, a friend who has started climbing, a duel challenge, your monthly recap, or that you're about to lose your streak.</li>
+      <li>This week's <b>new problems</b>, <b>your next challenge</b> (problems at your level, one step harder or a style that's new to you) or <b>your weekly plan</b>, <b>your projects</b> and the latest from <b>your groups</b>.</li>
+    </ul>
+  </section>
+
+  <section id="bloques">
+    <h2>Problems</h2>
+    <h3>Grades</h3>
+    <p>Each problem has tape in its grade colour, from easiest to hardest:</p>
+    <ul class="lv" aria-label="Grades">
+      <li style="background:#1E63D6;color:#fff">Blue</li><li style="background:#2E9D45;color:#0B1A10">Green</li><li style="background:#F07A1A;color:#1B120A">Orange</li><li style="background:#F5CE1B;color:#1B1A10">Yellow</li>
+      <li style="background:#7B3FB8;color:#fff">Purple</li><li style="background:#D7262C;color:#fff">Red</li><li style="background:#1C1C1E;color:#fff">Black</li><li style="background:#F4F4F2;color:#1C1C1E;border:1px solid #1C1C1E">Comp</li>
+    </ul>
+    <p>The bars at the top show how many there are of each colour. Tap one to see only that grade.</p>
+    <h3>Tabs</h3>
+    <ul>
+      <li><b>New:</b> set in the last 7 days.</li>
+      <li><b>Open:</b> what you still have to send.</li>
+      <li><b>Projects:</b> the ones you're working on.</li>
+      <li><b>Sent:</b> what you've done, including problems that have been stripped.</li>
+      <li><b>Favourites:</b> the ones you've saved with the heart.</li>
+    </ul>
+    <h3>Search and filters</h3>
+    <p>Search by name, sector or beta. In <b>Filters</b> you can sort (newest, easiest, hardest, top rated) and filter by style (slab, overhang, roof, dynamic…), by hold type (crimps, slopers, jugs…), by setter and by hold colour.</p>
+  </section>
+
+  <section id="ficha">
+    <h2>A problem's page</h2>
+    <p>Tap any problem to open it.</p>
+    <ul>
+      <li>A <b>photo</b> with the holds, the start and the top marked.</li>
+      <li><b>Who set it</b>, when, which sector it's in and the <b>setter's beta</b>.</li>
+      <li><b>Sent</b> or <b>Flash</b> (first go): tap the one that applies. When you send, the screen celebrates and you earn points.</li>
+      <li><b>Attempts:</b> log each go with + and −.</li>
+      <li><b>Your rating</b> from one to five stars, whether it feels <b>soft, fair or hard</b> for its colour, and whether it suits <b>short, tall or anyone</b>.</li>
+      <li><b>It's my project</b>, to keep it handy; and the heart, to save it to favourites.</li>
+      <li><b>People's betas:</b> share how you did it, with a link to your video and your height if you like. Betas from people your height are highlighted.</li>
+      <li><b>First to send it</b> (among people in the ranking) and, if you have groups, which of your friends have sent it or are trying it.</li>
+      <li><b>Share</b> the problem, or make an Instagram <b>story</b> when you send it.</li>
+    </ul>
+  </section>
+
+  <section id="mapa">
+    <h2>Map</h2>
+    <ul>
+      <li>The gym plan with its <b>numbered sectors</b> and how many open problems each has. Sectors with new problems are in green.</li>
+      <li>Tap a sector to see its problems and <b>how many days it has been open</b>, and jump to the list with “See in the list”.</li>
+    </ul>
+  </section>
+
+  <section id="sesion">
+    <h2>Session mode</h2>
+    <p>To log while you climb, without wasting time.</p>
+    <ul>
+      <li>Full screen with big buttons: <b>+1</b> for each attempt, <b>✓</b> sent and <b>⚡</b> flash.</li>
+      <li>Filter by sector or grade so you only see what you're trying.</li>
+      <li>At the top, the session time, sends, flashes, attempts and points. You can minimise it and keep using the app.</li>
+      <li>When you finish, a session summary you can share.</li>
+    </ul>
+  </section>
+
+  <section id="ranking">
+    <h2>Ranking</h2>
+    <ul>
+      <li><b>Join with one tap</b> and a nickname. If you don't join, nobody sees what you do.</li>
+      <li><b>Leagues by colour:</b> you compete with people who climb like you. Your league is the hardest colour you've sent 10 problems of, and you never drop down.</li>
+      <li><b>Monthly points:</b> everything resets on the 1st. You can also see last month.</li>
+      <li><b>Go to my position</b> takes you straight to your row.</li>
+    </ul>
+    <table aria-label="Points per grade">
+      <tr><th>Grade</th><td class="n">Blue 1</td><td class="n">Green 2</td><td class="n">Orange 3</td><td class="n">Yellow 4</td></tr>
+      <tr><th></th><td class="n">Purple 5</td><td class="n">Red 6</td><td class="n">Black 7</td><td class="n">Comp 8</td></tr>
+    </table>
+    <p class="note">A flash is worth half as much again (for example, a red on the first go is worth 9).</p>
+  </section>
+
+  <section id="grupos">
+    <h2>Groups</h2>
+    <ul>
+      <li><b>Create a group</b> with your crew or <b>join with a code</b>. To invite people, share the link on WhatsApp.</li>
+      <li><b>Group ranking</b> by week, month or all time.</li>
+      <li><b>Activity:</b> who has sent what, with reactions 🔥 👏 💪.</li>
+      <li><b>Duels:</b> challenge someone to a week of points (most points wins) or to a specific problem (first to send it wins).</li>
+      <li><b>Group challenges:</b> a goal for the whole group, with its progress bar.</li>
+      <li><b>Group projects:</b> what everyone is trying, so you can work on them together.</li>
+      <li><b>Group session:</b> start one and your friends can join; at the end, everyone's summary.</li>
+    </ul>
+  </section>
+
+  <section id="progreso">
+    <h2>My progress</h2>
+    <ul>
+      <li><b>Points, streak</b> (weeks in a row sending something), sends, flashes and your highest grade.</li>
+      <li><b>Medals:</b> first flash, 10 and 50 sends, 100 points, a freshly set problem, a whole sector, 6 different styles, 4- and 12-week streaks…</li>
+      <li><b>Real level:</b> your level based on what you send and how hard people find each problem.</li>
+      <li><b>Your climber profile:</b> two spider charts, one for styles (slab, overhang, power, technical, static and dynamic) and one for holds, to see your strengths and weaknesses.</li>
+      <li><b>Weekly plan:</b> real problems at the gym to work on your weak spot.</li>
+      <li><b>Your month:</b> at the end of each month, a recap in screens you can share as stories.</li>
+    </ul>
+  </section>
+
+  <section id="apodo">
+    <h2>Nickname, PIN and changing phones</h2>
+    <ul>
+      <li>Your <b>nickname</b> is what others see in the ranking, in your groups and on your betas.</li>
+      <li>Give it a <b>PIN</b> and you can recover your nickname, progress and groups on any phone (in Groups, Ranking or Settings: “Already have a nickname? Recover it with your PIN”). The app will remind you once you have a few sends.</li>
+      <li>To move your things from the browser to the installed app, use <b>“Install the app · move my progress”</b>: you copy a code in one place and paste it in the other.</li>
+    </ul>
+  </section>
+
+  <section id="ajustes">
+    <h2>Settings</h2>
+    <ul>
+      <li><b>Language:</b> Spanish or English (also with the ES/EN button at the top).</li>
+      <li><b>Theme:</b> light, dark or same as your phone.</li>
+      <li><b>Large text</b> for easier reading.</li>
+      <li><b>Colour-blind mode:</b> every grade and hold colour also shows its abbreviation.</li>
+    </ul>
+  </section>
+
+  <section id="mas">
+    <h2>And more</h2>
+    <ul>
+      <li><b>No signal:</b> the app opens with what it last saved. What you log stays on your phone and uploads by itself when you're back online.</li>
+      <li><b>Suggestion box:</b> ideas, problems you love, something that doesn't work… they reply inside the app.</li>
+      <li><b>Setters:</b> who sets the problems, how many they have open and how people rate them.</li>
+      <li><b>Privacy:</b> what data is stored and how to ask for it to be deleted, on <a href="privacy.html">the privacy page</a>.</li>
+    </ul>
+  </section>
+
+  <p class="note">Missing something or something unclear? Tell us in the app's Suggestion box.</p>
+</main>
+</body>
+</html>
