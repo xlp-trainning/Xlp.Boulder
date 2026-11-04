@@ -77,7 +77,7 @@ async function bzDelete(m) {
 
 function renderBuzon() {
   const root = $("page-buzon");
-  const gymName = id => S.gyms.find(g => g.id === id)?.name.replace(/^Natural /, "") || "";
+  const gymName = id => gymShort(S.gyms.find(g => g.id === id)?.name || "");
   const archived = m => m.status === "hecho";
   const list = BZ.list.filter(m => BZ.filter === "archive" ? archived(m) : !archived(m));
   const item = m => el("article", { class: "bz-item" + (m.status === "nuevo" || BZ.fresh.has(m.id) ? " new" : "") },

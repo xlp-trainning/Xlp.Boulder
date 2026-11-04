@@ -1,6 +1,6 @@
 # DESIGN.md · Xlp.Boulder
 
-Sistema visual de Xlp.Boulder, la libreta de bloques de Natural Climb Patraix y Benimaclet. Sigue el formato DESIGN.md (Google Stitch, colección VoltAgent/awesome-design-md): un documento en texto que cualquier agente lee antes de tocar la interfaz.
+Sistema visual de Xlp.Boulder, la libreta de bloques de Natural Climb Valencia y Natural Climb Benimaclet. Sigue el formato DESIGN.md (Google Stitch, colección VoltAgent/awesome-design-md): un documento en texto que cualquier agente lee antes de tocar la interfaz.
 
 Es la descripción **de esta app**, no de otra marca. La fuente de verdad son los tokens de `styles.css` (`:root`) y `LEVELS` en `app.js`; si cambias algo allí, cambia este archivo. Las reglas de trabajo para Claude están en `CLAUDE.md`.
 

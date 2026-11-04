@@ -1,4 +1,4 @@
-# Natural Patraix · sectores reales
+# Natural Climb Valencia · sectores reales
 
 Lo que ha contado el equipador (02/11/2026), para acercar el mapa a la realidad. Ya está puesto en el plano
 (`mapas/sectores.py`, `mapas/sectores.json` y `supabase/012-sectores-numerados.sql`). En el plano cada sector se ve

@@ -74,7 +74,7 @@ const WELCOME = [
         el("div", { class: "wl-logo" }, mark, el("span", {}, "XLP", el("i", { text: "." }), "BOULDER")));
     },
     kicker: "Bienvenido", title: null,
-    body: () => el("p", { class: "wl-lead", text: "Todos los bloques de Natural Climb Patraix y Natural Climb Benimaclet." }) },
+    body: () => el("p", { class: "wl-lead", text: "Todos los bloques de Natural Climb Valencia y Natural Climb Benimaclet." }) },
   { art: () => {
       // Una ficha de bloque de mentira: así se apunta
       const y = lvl("amarillo");
@@ -173,7 +173,8 @@ function openSettings() {
         el("button", { class: "btn", onclick: () => openInstall() }, ico("phone"), "Instalar · pasar mi progreso"),
         el("button", { class: "btn", onclick: () => { closeSheet(); openWelcome(); } }, "Ver la bienvenida otra vez"),
         el("button", { class: "btn", onclick: () => openGlossary() }, ico("bulb"), "Qué significa cada cosa"),
-        el("a", { class: "btn", href: "privacidad.html" }, ico("lock"), "Privacidad")))));
+        el("a", { class: "btn", href: "privacidad.html" }, ico("lock"), "Privacidad"),
+        el("a", { class: "btn", href: "guia.html" }, ico("map"), "Guía de la app")))));
 }
 
 applyLook();

@@ -1,6 +1,6 @@
 # Xlp.Boulder
 
-**Xlp.Boulder** es la web pública con los bloques de **Natural Patraix** y **Natural Benimaclet**, con un selector arriba para cambiar de rocódromo. Los bloques van por nivel (Azul → Verde → Naranja → Amarillo → Morado → Rojo → Negro → Compe) y estilo.
+**Xlp.Boulder** es la web pública con los bloques de **Natural Climb Valencia** y **Natural Climb Benimaclet**, con un selector arriba para cambiar de rocódromo. Los bloques van por nivel (Azul → Verde → Naranja → Amarillo → Morado → Rojo → Negro → Compe) y estilo.
 
 - **Cualquiera** la abre sin registrarse y puede:
   - ver los bloques con su foto y la beta;
@@ -134,7 +134,7 @@ Hay un **máster** (el dueño de la web) y los equipadores que él quiera. Neces
 | `supabase/schema.sql` | tablas y reglas de acceso |
 | `manifest.webmanifest`, `icon*` | instalación en la pantalla de inicio, con el logo de Xlp.Boulder |
 | `og.png` | imagen de vista previa al compartir el enlace |
-| `mapas/` | planos de Natural Patraix y Natural Benimaclet (PNG, SVG y el script que los genera) y `sectores.py`, que calcula las zonas de los sectores |
+| `mapas/` | planos de Natural Climb Valencia y Natural Climb Benimaclet (PNG, SVG y el script que los genera) y `sectores.py`, que calcula las zonas de los sectores |
 | `supabase/002-sectores.sql` | crea los sectores de los dos planos con sus zonas (ejecutar una vez) |
 | `supabase/011-quitar-sectores.sql` | quita de Patraix Sala 1 · Pared izquierda, Sala 3 · Pared baja y Sala 3 · Celosía (ejecutar una vez) |
 | `supabase/012-sectores-numerados.sql` | Patraix con los 40 sectores numerados (1–9 sala 1, 10–20 sala 2, 21–38 sala 3, 39–40 terraza) (ejecutar una vez) |
@@ -142,6 +142,7 @@ Hay un **máster** (el dueño de la web) y los equipadores que él quiera. Neces
 | `supabase/014-equipadores.sql` | varios equipadores con nombre y un máster, firma de cada bloque y permisos (ejecutar una vez) |
 | `supabase/015-usuarios.sql` | pestaña «Usuarios» del máster: cuántos hay y qué hacen, bloquear (no escribe nada, sale del ranking y sus betas no se ven) y borrar una cuenta (ejecutar una vez, después de 014) |
 | `supabase/016-grupo-prueba.sql` | marca a quien entra con el enlace `…/Xlp.Boulder/?prueba` y lo enseña en Usuarios (ejecutar una vez, después de 015) |
+| `supabase/017-nombres-rocodromos.sql` | nombres oficiales: Natural Climb Valencia y Natural Climb Benimaclet (ejecutar una vez) |
 | `equipadores.js` | página Equipadores, sello de cada equipador y gestión del máster |
 | `supabase/003-progreso.sql` | añade flash y fecha de encadenado a los votos (ejecutar una vez) |
 | `supabase/004-ranking.sql` | ranking por ligas: apodos y cálculo del ranking (ejecutar una vez) |

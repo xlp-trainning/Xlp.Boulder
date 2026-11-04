@@ -550,16 +550,19 @@ function mapEditor() {
 
 /* ---------- navegación ---------- */
 function setPage(p) { S.page = p; store.set("lb-page", p); render(); }
+// Nombre corto del rocódromo: se quita lo que todos comparten al principio
+// («Natural Climb Valencia» / «Natural Climb Benimaclet» → «Valencia» / «Benimaclet»)
+function gymShort(name) {
+  const words = S.gyms.map(g => (g.name || "").split(" "));
+  let n = 0; while (words.length > 1 && words.every(w => w.length > n + 1 && w[n] === words[0][n])) n++;
+  return n ? (name || "").split(" ").slice(n).join(" ") : (name || "");
+}
 function renderGymPick() {
   const g = currentGym();
   $("gymName").textContent = g?.name || "Rocódromo";
   const box = $("gymPick");
   box.hidden = S.gyms.length < 2;
-  // "Natural Patraix" / "Natural Benimaclet" → "Patraix" / "Benimaclet" si todos comparten la primera palabra
-  const first = S.gyms[0]?.name.split(" ")[0];
-  const short = S.gyms.every(x => x.name.split(" ")[0] === first && x.name.includes(" "));
-  box.replaceChildren(...S.gyms.map(x => el("button", { "aria-pressed": x.id === S.gym ? "true" : "false", onclick: () => setGym(x.id) },
-    short ? x.name.slice(first.length + 1) : x.name)));
+  box.replaceChildren(...S.gyms.map(x => el("button", { "aria-pressed": x.id === S.gym ? "true" : "false", onclick: () => setGym(x.id) }, gymShort(x.name))));
 }
 function render() {
   renderGymPick();

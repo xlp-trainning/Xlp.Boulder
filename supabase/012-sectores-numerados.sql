@@ -1,4 +1,4 @@
--- Natural Patraix con los sectores numerados (02/11/2026), según el equipador:
+-- Natural Climb Valencia con los sectores numerados (02/11/2026), según el equipador:
 --   Sala 1: 1-9 (banda, zigzag y diagonal, repartidos a partes iguales)
 --   Sala 2: 10-11 placa (de abajo arriba), 12-14 isla (al revés del reloj, desde la cara que se ve al entrar), 15-20 la U (de arriba hasta la sala 1)
 --   Sala 3 (se entra por la terraza): 21-22 placa de la derecha = celosía, 23-31 isla grande (al revés del reloj),

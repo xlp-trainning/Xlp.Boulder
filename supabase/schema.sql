@@ -33,8 +33,8 @@ create policy "el equipador cambia los rocódromos" on public.gyms for update to
 grant select on public.gyms to anon, authenticated;
 grant update on public.gyms to authenticated;
 insert into public.gyms (id, name, sort, map_path) values
-  ('patraix', 'Natural Patraix', 1, 'mapas/natural-patraix.png'),
-  ('benimaclet', 'Natural Benimaclet', 2, 'mapas/natural-benimaclet.png')
+  ('patraix', 'Natural Climb Valencia', 1, 'mapas/natural-patraix.png'),
+  ('benimaclet', 'Natural Climb Benimaclet', 2, 'mapas/natural-benimaclet.png')
 on conflict (id) do nothing;
 
 -- Bloques

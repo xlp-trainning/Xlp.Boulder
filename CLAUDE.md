@@ -10,7 +10,7 @@
 ## Proyecto
 - Web estática (HTML, CSS y JS sin compilar) en GitHub Pages: https://xlp-trainning.github.io/Xlp.Boulder/
 - Datos en Supabase (proyecto `przbceryckqmmvocyele`); esquema en `supabase/schema.sql`.
-- Dos rocódromos: Natural Patraix y Natural Benimaclet. Planos en `mapas/`.
+- Dos rocódromos: Natural Climb Valencia y Natural Climb Benimaclet. Planos en `mapas/`.
 - `editor.js`: editor de la foto del bloque (zona a analizar, presas por color, volúmenes, salida y top).
 
 ## Sistema visual

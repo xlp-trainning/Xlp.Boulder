@@ -1,4 +1,4 @@
-# Plano de Natural Benimaclet: la U principal (vista cenital) y la zona alta (esquema a mano).
+# Plano de Natural Climb Benimaclet: la U principal (vista cenital) y la zona alta (esquema a mano).
 # Coordenadas de la vista cenital ampliada x6 (834x528). La zona alta va en un recuadro a la izquierda,
 # al fondo de la U y de cara a ella, como en el esquema.
 import sys

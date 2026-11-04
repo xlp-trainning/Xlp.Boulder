@@ -1,4 +1,4 @@
--- Quita del plano de Natural Patraix tres sectores que ya no existen:
+-- Quita del plano de Natural Climb Valencia tres sectores que ya no existen:
 -- Sala 1 · Pared izquierda, Sala 3 · Pared baja y Sala 3 · Celosía.
 -- Ejecútalo una vez en Supabase → SQL Editor. Los bloques no se tocan.
 

@@ -46,7 +46,7 @@ def to_rows(gym, regs, anchors, vb, label_in_zone=False):
                      "shape": [f(x, y) for x, y in list(r.exterior.coords)[:-1]]})
     return rows
 
-# ---------- Natural Patraix ----------
+# ---------- Natural Climb Valencia ----------
 ns, vb = load("natural-patraix.py"); W = ns["walls"]
 building = unary_union([Polygon(ns["left"]), Polygon(ns["right"])])
 P = lambda k: Polygon(W[k])
@@ -89,7 +89,7 @@ for sala, geoms in tramos:
         n += 1; pat[f"{sala} · {n}"] = g
 rows = to_rows("patraix", regions(building, pat, 55), pat, vb, label_in_zone=True)
 
-# ---------- Natural Benimaclet ----------
+# ---------- Natural Climb Benimaclet ----------
 ns, vb = load("natural-benimaclet.py"); W = ns["walls"]
 building = unary_union([Polygon(ns["hall"]), Polygon(ns["up"])])
 P = lambda k: Polygon(W[k])

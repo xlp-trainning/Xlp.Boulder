@@ -95,7 +95,7 @@ function renderSession(s) {
   };
   root.replaceChildren(el("div", { class: "session is-wall", role: "dialog", "aria-modal": "true", "aria-label": "Sesión de escalada" },
     el("div", { class: "ses-head" },
-      el("div", {}, el("span", { class: "label", text: s.group ? `Sesión en grupo · ${s.group.name}` : `Sesión · ${(currentGym()?.name || "").replace(/^Natural /, "")}` }), el("div", { class: "ses-clock", text: fmtMins(r.mins) })),
+      el("div", {}, el("span", { class: "label", text: s.group ? `Sesión en grupo · ${s.group.name}` : `Sesión · ${gymShort(currentGym()?.name || "")}` }), el("div", { class: "ses-clock", text: fmtMins(r.mins) })),
       el("div", { class: "row" },
         el("button", { class: "btn", onclick: () => { SES.open = false; render(); } }, "Minimizar"),
         el("button", { class: "btn primary", onclick: endSession }, "Terminar"))),

@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guía · Xlp.Boulder</title>
+<meta name="description" content="Todo lo que se puede hacer en Xlp.Boulder: bloques, encadenados, mapa, sesión, ranking, grupos, progreso y más.">
+<meta name="theme-color" content="#EEEDE9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#22252C" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+  :root { --bg: #EEEDE9; --surface: #FAF9F7; --surface-2: #F1EFEB; --ink: #15171C; --muted: #5A5955; --line: #DAD7D0; --accent: #2456D6; --tape: #F5CE1B; --tape-ink: #1E1A07; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #22252C; --surface: #2B2F37; --surface-2: #343842; --ink: #F3EEE4; --muted: #ACA9A2; --line: #3D414A; --accent: #8FB0FF; color-scheme: dark; } }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 Figtree, system-ui, sans-serif;
+    padding: calc(env(safe-area-inset-top, 0px) + 24px) max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px)); }
+  main { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+  h1, h2 { font-family: "Big Shoulders Display", "Arial Narrow", sans-serif; font-weight: 900; text-transform: uppercase; line-height: .95; margin: 0; }
+  h1 { font-size: clamp(40px, 10vw, 56px); } h2 { font-size: 26px; margin-bottom: 10px; scroll-margin-top: 16px; }
+  h3 { font-size: 17px; margin: 14px 0 4px; }
+  p, ul { margin: 0 0 8px; } ul { padding-left: 20px; } li { margin-bottom: 4px; }
+  .note { color: var(--muted); font-size: 14px; }
+  .lead { font-size: 18px; }
+  section { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; }
+  a { color: var(--accent); font-weight: 700; }
+  .back { align-self: flex-start; }
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .toc a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 4px; background: var(--surface); border: 1px solid var(--line); color: var(--ink); text-decoration: none; font-weight: 700; font-size: 15px; }
+  .kick { display: inline-block; background: var(--tape); color: var(--tape-ink); font-weight: 800; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; padding: 6px 12px; transform: rotate(-1.5deg); margin-bottom: 12px; }
+  .lv { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; padding: 0; list-style: none; }
+  .lv li { margin: 0; font-weight: 800; font-size: 13px; padding: 4px 10px; border-radius: 2px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; } td, th { text-align: left; padding: 6px; border-top: 1px solid var(--line); } td.n { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="./">← Volver a Xlp.Boulder</a>
+  <header>
+    <span class="kick">Guía de la app</span>
+    <h1>Todo lo que puedes hacer</h1>
+    <p class="lead">Xlp.Boulder es tu libreta de bloques de Natural Climb Valencia y Natural Climb Benimaclet: qué hay abierto, qué has encadenado, cómo vas y qué hacen tus amigos.</p>
+  </header>
+
+  <nav aria-label="Secciones de la guía">
+    <ul class="toc">
+      <li><a href="#empezar">Empezar</a></li><li><a href="#hoy">Hoy</a></li><li><a href="#bloques">Bloques</a></li><li><a href="#ficha">La ficha</a></li>
+      <li><a href="#mapa">Mapa</a></li><li><a href="#sesion">Sesión</a></li><li><a href="#ranking">Ranking</a></li><li><a href="#grupos">Grupos</a></li>
+      <li><a href="#progreso">Mi progreso</a></li><li><a href="#apodo">Apodo y PIN</a></li><li><a href="#ajustes">Ajustes</a></li><li><a href="#mas">Y además</a></li>
+    </ul>
+  </nav>
+
+  <section id="empezar">
+    <h2>Empezar</h2>
+    <ul>
+      <li><b>Sin registro.</b> Abre el enlace y ya está: la app no pide email ni nombre. Lo que apuntas se guarda en tu móvil y en tu cuenta anónima.</li>
+      <li><b>Instálala.</b> Añádela a la pantalla de inicio y se abrirá a pantalla completa, como una app. En «Instalar la app» (abajo del todo o en Ajustes) tienes los pasos para iPhone y Android.</li>
+      <li><b>Elige tu rocódromo</b> arriba: Valencia o Benimaclet. Cada uno tiene sus bloques, su mapa y su ranking.</li>
+      <li>Si alguna palabra no te suena (encadenar, flash, beta…), en Ajustes tienes <b>«Qué significa cada cosa»</b>.</li>
+    </ul>
+  </section>
+
+  <section id="hoy">
+    <h2>Hoy</h2>
+    <p>La pantalla para abrir al llegar a la sala.</p>
+    <ul>
+      <li><b>Tu marcador:</b> semanas de racha, puntos del mes, encadenados y tu nivel real.</li>
+      <li><b>Empezar sesión</b> y <b>Mapa de la sala</b>, a un toque.</li>
+      <li><b>Avisos:</b> una sesión en marcha, un amigo que ha empezado a escalar, un reto de un duelo, tu resumen del mes, o que vas a perder la racha.</li>
+      <li><b>Novedades</b> de la semana, <b>tu siguiente reto</b> (bloques a tu nivel, un paso más difícil o un estilo nuevo para ti) o <b>tu plan de la semana</b>, <b>tus proyectos</b> y lo último de <b>tus grupos</b>.</li>
+    </ul>
+  </section>
+
+  <section id="bloques">
+    <h2>Bloques</h2>
+    <h3>Los niveles</h3>
+    <p>Cada bloque lleva una cinta del color de su nivel, de más fácil a más difícil:</p>
+    <ul class="lv" aria-label="Niveles">
+      <li style="background:#1E63D6;color:#fff">Azul</li><li style="background:#2E9D45;color:#0B1A10">Verde</li><li style="background:#F07A1A;color:#1B120A">Naranja</li><li style="background:#F5CE1B;color:#1B1A10">Amarillo</li>
+      <li style="background:#7B3FB8;color:#fff">Morado</li><li style="background:#D7262C;color:#fff">Rojo</li><li style="background:#1C1C1E;color:#fff">Negro</li><li style="background:#F4F4F2;color:#1C1C1E;border:1px solid #1C1C1E">Compe</li>
+    </ul>
+    <p>Las barras de arriba dicen cuántos hay de cada color. Toca una para ver solo ese nivel.</p>
+    <h3>Las pestañas</h3>
+    <ul>
+      <li><b>Novedades:</b> lo montado en los últimos 7 días.</li>
+      <li><b>Abiertos:</b> lo que tienes por encadenar.</li>
+      <li><b>Proyectos:</b> los que estás trabajando.</li>
+      <li><b>Encadenados:</b> lo que ya tienes, también los bloques que ya se han desmontado.</li>
+      <li><b>Favoritos:</b> los que has guardado con el corazón.</li>
+    </ul>
+    <h3>Buscar y filtrar</h3>
+    <p>Busca por nombre, sector o beta. En <b>Filtros</b> puedes ordenar (recientes, fáciles, difíciles, mejor puntuados) y filtrar por estilo (placa, desplome, techo, dinámico…), por tipo de presa (regletas, romos, cazos…), por equipador y por color de presa.</p>
+  </section>
+
+  <section id="ficha">
+    <h2>La ficha de un bloque</h2>
+    <p>Toca cualquier bloque para abrirla.</p>
+    <ul>
+      <li><b>Foto</b> con las presas marcadas, la salida y el top.</li>
+      <li><b>Quién lo ha equipado</b>, cuándo se montó, en qué sector está y la <b>beta del equipador</b>.</li>
+      <li><b>Encadenado</b> o <b>Flash</b> (a la primera): toca el que toque. Al encadenar, la pantalla lo celebra y sumas puntos.</li>
+      <li><b>Intentos:</b> apunta cada pegue con + y −.</li>
+      <li><b>Tu puntuación</b> de una a cinco estrellas, si te parece <b>blando, justo o duro</b> para su color, y si va mejor siendo <b>bajo, alto o da igual</b>.</li>
+      <li><b>Es mi proyecto</b>, para tenerlo a mano; y el corazón, para guardarlo en favoritos.</li>
+      <li><b>Betas de la gente:</b> cuenta cómo lo hiciste tú, con enlace a tu vídeo y tu altura si quieres. Las de gente de tu altura se destacan.</li>
+      <li><b>Primero en encadenarlo</b> (entre quien está en el ranking) y, si tienes grupos, cuáles de tus amigos lo tienen o lo están probando.</li>
+      <li><b>Compartir</b> el bloque o crear una <b>historia</b> para Instagram cuando lo encadenas.</li>
+    </ul>
+  </section>
+
+  <section id="mapa">
+    <h2>Mapa</h2>
+    <ul>
+      <li>El plano de la sala con sus <b>sectores numerados</b> y cuántos bloques abiertos hay en cada uno. En verde, los que tienen novedades.</li>
+      <li>Toca un sector para ver sus bloques y <b>cuántos días lleva abierto</b>, y pasa a la lista con «Ver en la lista».</li>
+    </ul>
+  </section>
+
+  <section id="sesion">
+    <h2>Modo sesión</h2>
+    <p>Para apuntar mientras escalas, sin perder tiempo.</p>
+    <ul>
+      <li>Pantalla completa con botones grandes: <b>+1</b> por cada intento, <b>✓</b> encadenado y <b>⚡</b> flash.</li>
+      <li>Filtra por sector o por nivel para tener delante solo lo que estás probando.</li>
+      <li>Arriba, el tiempo de sesión, encadenados, flashes, intentos y puntos. Puedes minimizarla y seguir usando la app.</li>
+      <li>Al terminar, un resumen de la sesión que puedes compartir.</li>
+    </ul>
+  </section>
+
+  <section id="ranking">
+    <h2>Ranking</h2>
+    <ul>
+      <li><b>Apúntate con un toque</b> y un apodo. Si no te apuntas, nadie ve lo que haces.</li>
+      <li><b>Ligas por color:</b> compites con quien escala parecido a ti. Tu liga es el color más difícil del que hayas encadenado 10 bloques, y nunca se baja.</li>
+      <li><b>Puntos del mes:</b> el día 1 todo vuelve a cero. Puedes ver también el mes pasado.</li>
+      <li><b>Ir a mi puesto</b> te lleva directamente a tu fila.</li>
+    </ul>
+    <table aria-label="Puntos por nivel">
+      <tr><th>Nivel</th><td class="n">Azul 1</td><td class="n">Verde 2</td><td class="n">Naranja 3</td><td class="n">Amarillo 4</td></tr>
+      <tr><th></th><td class="n">Morado 5</td><td class="n">Rojo 6</td><td class="n">Negro 7</td><td class="n">Compe 8</td></tr>
+    </table>
+    <p class="note">El flash suma la mitad más (por ejemplo, un rojo a la primera vale 9).</p>
+  </section>
+
+  <section id="grupos">
+    <h2>Grupos</h2>
+    <ul>
+      <li><b>Crea un grupo</b> con tu gente o <b>únete con un código</b>. Para invitar, comparte el enlace por WhatsApp.</li>
+      <li><b>Ranking del grupo</b> por semana, mes o desde siempre.</li>
+      <li><b>Actividad:</b> quién ha encadenado qué, con reacciones 🔥 👏 💪.</li>
+      <li><b>Duelos:</b> reta a alguien a una semana de puntos (gana quien más sume) o a un bloque concreto (gana quien lo encadene antes).</li>
+      <li><b>Retos de grupo:</b> un objetivo para todo el grupo, con su barra de progreso.</li>
+      <li><b>Proyectos del grupo:</b> qué está probando cada uno, para ir juntos.</li>
+      <li><b>Sesión en grupo:</b> empieza una y tus amigos pueden unirse; al final, el resumen de todos.</li>
+    </ul>
+  </section>
+
+  <section id="progreso">
+    <h2>Mi progreso</h2>
+    <ul>
+      <li><b>Puntos, racha</b> (semanas seguidas encadenando algo), encadenados, flashes y tu nivel más alto.</li>
+      <li><b>Medallas:</b> primer flash, 10 y 50 encadenados, 100 puntos, un bloque recién montado, un sector completo, 6 estilos distintos, rachas de 4 y 12 semanas…</li>
+      <li><b>Nivel real:</b> tu nivel según lo que encadenas y lo duro que le parece a la gente cada bloque.</li>
+      <li><b>Tu perfil de escalador:</b> dos gráficos de araña, uno de estilos (placa, desplome, físico, técnico, estático y dinámico) y otro de agarres, para ver tus puntos fuertes y flojos.</li>
+      <li><b>Plan de la semana:</b> bloques reales de la sala para trabajar tu punto flojo.</li>
+      <li><b>Tu mes:</b> a final de mes, un resumen en pantallas para compartir en historias.</li>
+    </ul>
+  </section>
+
+  <section id="apodo">
+    <h2>Apodo, PIN y cambiar de móvil</h2>
+    <ul>
+      <li>El <b>apodo</b> es lo que ven los demás en el ranking, en tus grupos y en tus betas.</li>
+      <li>Ponle un <b>PIN</b> y podrás recuperar tu apodo, tu progreso y tus grupos en cualquier móvil (en Grupos, Ranking o Ajustes: «¿Ya tienes apodo? Recupéralo con tu PIN»). La app te lo recordará cuando lleves unos cuantos encadenados.</li>
+      <li>Para pasar lo tuyo del navegador a la app instalada, usa <b>«Instalar la app · pasar mi progreso»</b>: copias un código en un sitio y lo pegas en el otro.</li>
+    </ul>
+  </section>
+
+  <section id="ajustes">
+    <h2>Ajustes</h2>
+    <ul>
+      <li><b>Idioma:</b> español o inglés (también con el botón ES/EN de arriba).</li>
+      <li><b>Tema:</b> claro, oscuro o como el móvil.</li>
+      <li><b>Letra grande</b> para leer mejor.</li>
+      <li><b>Modo daltónico:</b> cada color de nivel y de presa lleva además su abreviatura.</li>
+    </ul>
+  </section>
+
+  <section id="mas">
+    <h2>Y además</h2>
+    <ul>
+      <li><b>Sin cobertura:</b> la app se abre con lo último que guardó. Lo que apuntes se queda en el móvil y se sube solo cuando vuelva la conexión.</li>
+      <li><b>Buzón de sugerencias:</b> ideas, bloques que te encantan, algo que no funciona… te responden en la propia app.</li>
+      <li><b>Equipadores:</b> quién monta los bloques, cuántos tiene abiertos y cómo los valora la gente.</li>
+      <li><b>Privacidad:</b> qué datos se guardan y cómo pedir que se borren, en <a href="privacidad.html">la página de privacidad</a>.</li>
+    </ul>
+  </section>
+
+  <p class="note">¿Echas algo en falta o algo no se entiende? Cuéntalo en el Buzón de sugerencias de la app.</p>
+</main>
+</body>
+</html>

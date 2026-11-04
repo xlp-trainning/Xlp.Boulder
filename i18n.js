@@ -25,7 +25,7 @@ const I18N = {
   "Rocódromo": "Gym", "Bloques": "Problems", "Mapa": "Map", "Ranking": "Ranking", "Grupos": "Groups", "Mi progreso": "My progress", "Estadísticas": "Stats", "Buzón": "Inbox",
   "Secciones": "Sections", "🧗 Empezar sesión": "🧗 Start session", "🧗 Volver a la sesión": "🧗 Back to session", "+ Nuevo bloque": "+ New problem", "Modo equipador": "Setter mode",
   "👁 Daltónico": "👁 Colour-blind", "Modo daltónico": "Colour-blind mode", "Modo daltónico activado: los colores llevan su nombre": "Colour-blind mode on: colours show their name", "Modo daltónico desactivado": "Colour-blind mode off",
-  "Xlp.Boulder · bloques equipados en Natural Patraix y Natural Benimaclet": "Xlp.Boulder · problems set at Natural Patraix and Natural Benimaclet",
+  "Xlp.Boulder · bloques equipados en Natural Climb Valencia y Natural Climb Benimaclet": "Xlp.Boulder · problems set at Natural Climb Valencia and Natural Climb Benimaclet",
   "💬 Buzón de sugerencias": "💬 Suggestion box", "📲 Instalar la app · pasar mi progreso": "📲 Install the app · move my progress", "Acceso equipador": "Setter login", "Cerrar sesión de equipador": "Log out (setter)",
   "📲 Instala Xlp.Boulder en tu móvil: icono en la pantalla de inicio y a pantalla completa.": "📲 Install Xlp.Boulder on your phone: home-screen icon and full screen.", "Cómo instalarla": "How to install", "Ahora no": "Not now",
 
@@ -224,7 +224,7 @@ const I18N = {
   "Registrar": "Log it", "Cuenta tu beta (opcional)": "Share your beta (optional)", "Ascensión registrada": "Ascent logged", "⚡ Flash registrado": "⚡ Flash logged", "Guardado": "Saved",
   "Ascensión registrada con tu beta": "Ascent logged with your beta", "Marca «Encadenado» o «⚡ Flash» (o apunta un intento) antes de registrar.": "Tap “Sent” or “⚡ Flash” (or log an attempt) before logging.",
   "Escribe tu beta para acompañar el vídeo.": "Write your beta to go with the video.",
-  "Bienvenido": "Welcome", "Todos los bloques de Natural Climb Patraix y Natural Climb Benimaclet.": "Every problem at Natural Climb Patraix and Natural Climb Benimaclet.",
+  "Bienvenido": "Welcome", "Todos los bloques de Natural Climb Valencia y Natural Climb Benimaclet.": "Every problem at Natural Climb Valencia and Natural Climb Benimaclet.",
   "Paso a paso": "Step by step", "Encadenado o flash": "Sent or flash", "Abre el bloque y márcalo con un toque.": "Open the problem and mark it with one tap.", "Cuenta tus intentos": "Count your attempts",
   "Suma uno cada vez que lo pruebes.": "Add one every time you try it.", "Modo sesión": "Session mode", "En la sala, todo en dos toques y sin abrir fichas.": "At the gym, everything in two taps without opening any problem.",
   "Con tu gente": "With your crew", "Ligas por color": "Colour leagues", "Cada mes compites con los de tu nivel.": "Every month you compete with climbers at your level.", "Grupos y duelos": "Groups and duels",
@@ -237,7 +237,7 @@ const I18N = {
   "Nada nuevo esta semana. Cuando se monten bloques, saldrán aquí.": "Nothing new this week. New problems will show up here.", "Mi progreso →": "My progress →", "Tus proyectos": "Your projects",
   "En tus grupos": "In your groups", "Grupos →": "Groups →", "Sin novedades de tus amigos en los últimos días.": "No news from your friends in the last few days.",
   "Crea un grupo con tu gente: ranking propio, duelos, retos y sesiones juntos.": "Create a group with your crew: your own ranking, duels, challenges and sessions together.", "Crear o unirme a un grupo": "Create or join a group",
-  "Bienvenida": "Welcome", "Bienvenido a Xlp.Boulder": "Welcome to Xlp.Boulder", "Todos los bloques de Natural Patraix y Natural Benimaclet: con su foto, la beta del equipador y el mapa de la sala. Sin registro.": "Every problem at Natural Patraix and Natural Benimaclet: with its photo, the setter's beta and the gym map. No sign-up.",
+  "Bienvenida": "Welcome", "Bienvenido a Xlp.Boulder": "Welcome to Xlp.Boulder", "Todos los bloques de Natural Climb Valencia y Natural Climb Benimaclet: con su foto, la beta del equipador y el mapa de la sala. Sin registro.": "Every problem at Natural Climb Valencia and Natural Climb Benimaclet: with its photo, the setter's beta and the gym map. No sign-up.",
   "Apunta lo que escalas": "Log what you climb", "Abre un bloque y marca «Encadenado» o «⚡ Flash» (a la primera).": "Open a problem and tap “Sent” or “⚡ Flash” (first go).", "Mientras lo pruebas, suma intentos con «+».": "While you're working it, add attempts with “+”.",
   "En la sala, «🧗 Empezar sesión» lo hace en dos toques.": "At the gym, “🧗 Start session” does it in two taps.", "Vota si te parece blando, justo o duro y cuenta tu beta.": "Vote whether it feels soft, fair or hard, and share your beta.",
   "Y pica a tus amigos": "And challenge your friends", "Ranking del mes por ligas de color.": "Monthly ranking by colour leagues.", "Grupos con tus amigos: duelos, retos y sesiones juntos.": "Groups with your friends: duels, challenges and sessions together.",
@@ -482,7 +482,7 @@ I18N_RX.unshift([/^(.+) bloqueado$/, m => `${m[1]} blocked`], [/^(.+) desbloquea
   [/^última actividad hace (\d+) (min|h|días)$/, m => `last active ${m[1]} ${m[2] === "días" ? "days" : m[2]} ago`], [/^última actividad ayer$/, () => "last active yesterday"], [/^última actividad sin actividad$/, () => "no activity yet"]);
 
 // Lanzamiento: que no se te pierda, opinión, glosario, ir a mi puesto y grupo de prueba
-Object.assign(I18N, { "Privacidad": "Privacy", "Que no se te pierda": "Don't lose it", "Ponte un apodo con PIN: con él recuperas tu progreso, tus grupos y tu ranking en otro móvil.": "Get a nickname with a PIN: with it you can recover your progress, groups and ranking on another phone.",
+Object.assign(I18N, { "Privacidad": "Privacy", "Guía: todo lo que puedes hacer en la app": "Guide: everything you can do in the app", "Guía de la app": "App guide", "Que no se te pierda": "Don't lose it", "Ponte un apodo con PIN: con él recuperas tu progreso, tus grupos y tu ranking en otro móvil.": "Get a nickname with a PIN: with it you can recover your progress, groups and ranking on another phone.",
   "Guardar apodo": "Save nickname", "Guardado. Apunta tu PIN en algún sitio": "Saved. Write your PIN down somewhere",
   "¿Qué tal la app después de esta semana? Cuéntanos qué te gusta y qué cambiarías": "How's the app after this week? Tell us what you like and what you'd change", "Opinar": "Give feedback",
   "Qué significa cada cosa": "What each thing means", "Volver al bloque": "Back to the problem", "¿Qué es encadenar, flash o proyecto?": "What's a send, a flash or a project?",
