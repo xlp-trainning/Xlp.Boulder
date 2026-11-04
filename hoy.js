@@ -172,7 +172,8 @@ function openSettings() {
       el("div", { class: "row" },
         el("button", { class: "btn", onclick: () => openInstall() }, ico("phone"), "Instalar · pasar mi progreso"),
         el("button", { class: "btn", onclick: () => { closeSheet(); openWelcome(); } }, "Ver la bienvenida otra vez"),
-        el("button", { class: "btn", onclick: () => openGlossary() }, ico("bulb"), "Qué significa cada cosa")))));
+        el("button", { class: "btn", onclick: () => openGlossary() }, ico("bulb"), "Qué significa cada cosa"),
+        el("a", { class: "btn", href: "privacidad.html" }, ico("lock"), "Privacidad")))));
 }
 
 applyLook();
