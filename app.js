@@ -122,7 +122,7 @@ async function loadAll() {
 }
 async function loadMine() {
   S.mine = {};
-  if (!S.session) return;
+  if (!S.session) { S.favCloud = false; return; }
   // Con el 018, los favoritos van en la misma fila (columna fav) y viajan con el apodo; sin él, solo en el móvil
   let { data, error } = await sb.from("ratings").select("block_id, stars, sent, project, flash, sent_at, feel, attempts, morpho, fav");
   S.favCloud = !error;
@@ -132,6 +132,7 @@ async function loadMine() {
 }
 // Favoritos: la primera vez se suben los que había solo en el móvil; desde entonces mandan los de Supabase
 async function syncFavs() {
+  if (!S.session) return;
   const uid = S.session.user.id, local = store.get("lb-favs", []);
   if (store.get("lb-favs-up", null) !== uid) {
     const up = local.filter(id => !S.mine[id]?.fav && S.blocks.some(b => b.id === id));
