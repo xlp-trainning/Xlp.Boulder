@@ -126,7 +126,7 @@ function openHoldEditor({ source, color }) {
     // Paso 1: marcar la zona (o elegir toda la foto). Hasta entonces no se busca nada.
     let zone = null, zonePts = [], zoneReady = false, analyzed = false, drawMode = true, drawing = false, livePts = [], skipClick = false;
     // Volúmenes estructurales: son del color del muro, así que se marcan a mano y se conservan al volver a analizar
-    let drawKind = "zone", volumes = [];
+    let drawKind = "zone", volumes = [], volHist = [];   // volHist: lo hecho en modo volumen, para «Deshacer»
     const inZone = i => !zone || zone[i] === 1;
 
     function relabel() {
@@ -232,6 +232,20 @@ function openHoldEditor({ source, color }) {
         if (!erased[i]) { erased[i] = 1; stroke.push([i, lab[i]]); }
       }
       ctx.fillStyle = "rgba(12,18,16,.72)"; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();   // se ve al momento
+    }
+    // Quitar un volumen marcado (por un toque encima o al deshacer)
+    function removeVolume(v) {
+      volumes = volumes.filter(x => x !== v);
+      const k = holds.findIndex(h => h.volume === v && !h.gone); if (k < 0) return draw();
+      for (let i = 0; i < lab.length; i++) if (lab[i] === k) lab[i] = -1;
+      holds[k].gone = true; holds[k].state = "off"; relabel(); draw();
+    }
+    // Deshacer lo último del modo volumen: un volumen añadido se quita; uno quitado vuelve
+    function undoVolume() {
+      const a = volHist.pop(); if (!a) return;
+      if (a.type === "add") { removeVolume(a.v); toast("Volumen deshecho"); }
+      else { volumes.push(a.v); const n = holds.length; addVolume(a.v); if (holds.length > n) unErase(holds.length - 1); relabel(); draw(); toast("Volumen recuperado"); }
+      drawZoneBtns();
     }
     function undoErase() {
       const s0 = strokes.pop(); if (!s0) return;
@@ -527,9 +541,8 @@ function openHoldEditor({ source, color }) {
         const there = lab[cy * W + cx];
         // Tocar un volumen ya marcado lo quita (para deshacer un toque equivocado)
         if (there >= 0 && holds[there].volume) {
-          const h = holds[there]; volumes = volumes.filter(v => v !== h.volume);
-          for (let i = 0; i < lab.length; i++) if (lab[i] === there) lab[i] = -1;
-          h.gone = true; h.state = "off"; relabel(); draw(); return toast("Volumen quitado");
+          volHist.push({ type: "del", v: holds[there].volume });
+          removeVolume(holds[there].volume); drawZoneBtns(); return toast("Volumen quitado");
         }
         if (!inZone(cy * W + cx)) { draw(); return toast("Ese punto está fuera del muro marcado"); }
         const found = autoVolume(cx, cy);
@@ -537,7 +550,7 @@ function openHoldEditor({ source, color }) {
         const v = { ...found, state: "normal" }; volumes.push(v);
         const n = holds.length; addVolume(v);
         if (holds.length === n) { volumes.pop(); draw(); return toast("Ese volumen queda fuera de la zona o encima de otras presas."); }
-        unErase(holds.length - 1); relabel(); draw(); return toast("Volumen añadido. Toca otro, o pulsa «Volumen» para terminar.");
+        unErase(holds.length - 1); relabel(); draw(); volHist.push({ type: "add", v }); drawZoneBtns(); return toast("Volumen añadido. Toca otro, o pulsa «Volumen» para terminar.");
       }
       if (drawKind === "volume" && (pts.length < 2 || bw < 30 * sc || bh < 30 * sc)) { stayVolume(); draw(); return toast("Trazo demasiado pequeño. Toca el volumen o rodéalo con el dedo."); }
       if (pts.length < 2 || bw < 30 * sc || bh < 30 * sc) {
@@ -555,7 +568,7 @@ function openHoldEditor({ source, color }) {
         const n = holds.length; addVolume(v);
         stayVolume();
         if (holds.length === n) { volumes.pop(); draw(); return toast("Ese volumen queda fuera de la zona o encima de otras presas."); }
-        unErase(holds.length - 1); relabel(); draw(); return toast("Volumen añadido. Toca otro, o pulsa «Volumen» para terminar.");
+        unErase(holds.length - 1); relabel(); draw(); volHist.push({ type: "add", v }); drawZoneBtns(); return toast("Volumen añadido. Toca otro, o pulsa «Volumen» para terminar.");
       }
       zonePts = pts;
       const oc = document.createElement("canvas"); oc.width = W; oc.height = H;
@@ -580,6 +593,7 @@ function openHoldEditor({ source, color }) {
            el("span", { class: "note", text: "Activa: pulsa para terminar" })]
         : drawMode && drawKind === "volume"
         ? [el("button", { type: "button", class: "btn small primary", "aria-pressed": "true", onclick: () => setDrawMode(false) }, ico("layers", "sm"), "Volumen"),
+           el("button", { type: "button", class: "btn small", disabled: !volHist.length, onclick: undoVolume }, ico("undo", "sm"), "Deshacer"),
            el("span", { class: "note", text: "Activo: pulsa para terminar" })]
         : drawMode
         ? [el("button", { type: "button", class: "btn small", onclick: wholePhoto }, "Analizar toda la foto"),
