@@ -91,6 +91,7 @@ create table if not exists public.ratings (
   feel       smallint check (feel between -1 and 1),         -- sensación: -1 blando, 0 justo, 1 duro
   attempts   smallint check (attempts between 1 and 999),    -- intentos
   morpho     smallint check (morpho between -1 and 1),       -- morfo: -1 mejor bajos, 0 da igual, 1 mejor altos
+  fav        boolean not null default false,                  -- en favoritos (018)
   updated_at timestamptz not null default now(),
   primary key (user_id, block_id)
 );

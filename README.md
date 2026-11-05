@@ -143,6 +143,7 @@ Hay un **máster** (el dueño de la web) y los equipadores que él quiera. Neces
 | `supabase/015-usuarios.sql` | pestaña «Usuarios» del máster: cuántos hay y qué hacen, bloquear (no escribe nada, sale del ranking y sus betas no se ven) y borrar una cuenta (ejecutar una vez, después de 014) |
 | `supabase/016-grupo-prueba.sql` | marca a quien entra con el enlace `…/Xlp.Boulder/?prueba` y lo enseña en Usuarios (ejecutar una vez, después de 015) |
 | `supabase/017-nombres-rocodromos.sql` | nombres oficiales: Natural Climb Valencia y Natural Climb Benimaclet (ejecutar una vez) |
+| `supabase/018-favoritos.sql` | los favoritos pasan del móvil a Supabase y viajan con el apodo y el PIN (ejecutar una vez) |
 | `equipadores.js` | página Equipadores, sello de cada equipador y gestión del máster |
 | `supabase/003-progreso.sql` | añade flash y fecha de encadenado a los votos (ejecutar una vez) |
 | `supabase/004-ranking.sql` | ranking por ligas: apodos y cálculo del ranking (ejecutar una vez) |

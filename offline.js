@@ -28,6 +28,7 @@ function loadSnapshot() {
 function queueMine(id, m) {
   const box = outbox();
   box[id] = { stars: m.stars || null, sent: !!m.sent, project: !!m.project, flash: !!m.flash, sent_at: m.sent_at || null, feel: m.feel ?? null, attempts: m.attempts || null, morpho: m.morpho ?? null };
+  if (S.favCloud) box[id].fav = !!m.fav;   // con el 018, también el favorito
   store.set("lb-outbox", box); store.set("lb-snap-mine", S.mine); markNet();
   clearInterval(OFF.timer); OFF.timer = setInterval(flushOutbox, 60000);
 }

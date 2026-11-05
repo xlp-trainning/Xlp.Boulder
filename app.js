@@ -123,9 +123,27 @@ async function loadAll() {
 async function loadMine() {
   S.mine = {};
   if (!S.session) return;
-  const { data } = await sb.from("ratings").select("block_id, stars, sent, project, flash, sent_at, feel, attempts, morpho");
+  // Con el 018, los favoritos van en la misma fila (columna fav) y viajan con el apodo; sin él, solo en el móvil
+  let { data, error } = await sb.from("ratings").select("block_id, stars, sent, project, flash, sent_at, feel, attempts, morpho, fav");
+  S.favCloud = !error;
+  if (error) ({ data } = await sb.from("ratings").select("block_id, stars, sent, project, flash, sent_at, feel, attempts, morpho"));
   (data || []).forEach(r => S.mine[r.block_id] = { stars: r.stars || 0, sent: r.sent, project: r.project, flash: !!r.flash, sent_at: r.sent_at || null,
-    feel: r.feel ?? null, attempts: r.attempts || null, morpho: r.morpho ?? null });
+    feel: r.feel ?? null, attempts: r.attempts || null, morpho: r.morpho ?? null, fav: !!r.fav });
+}
+// Favoritos: la primera vez se suben los que había solo en el móvil; desde entonces mandan los de Supabase
+async function syncFavs() {
+  const uid = S.session.user.id, local = store.get("lb-favs", []);
+  if (store.get("lb-favs-up", null) !== uid) {
+    const up = local.filter(id => !S.mine[id]?.fav && S.blocks.some(b => b.id === id));
+    if (up.length) {
+      const { error } = await sb.from("ratings").upsert(up.map(id => ({ user_id: uid, block_id: id, fav: true, updated_at: new Date().toISOString() })));
+      if (error) return;   // se reintenta la próxima vez
+      up.forEach(id => S.mine[id] = { ...(S.mine[id] || { stars: 0, sent: false, project: false, flash: false }), fav: true });
+    }
+    store.set("lb-favs-up", uid);
+  }
+  S.favs = Object.keys(S.mine).filter(id => S.mine[id].fav);
+  store.set("lb-favs", S.favs);
 }
 async function loadSession() {
   const { data } = await sb.auth.getSession();
@@ -153,6 +171,7 @@ async function refresh() {
   try {
     await loadSession();
     await Promise.all([loadAll(), loadMine()]);
+    if (S.favCloud) await syncFavs();   // necesita los bloques ya cargados
     await loadGroups();
     S.comments = {}; invalidateRanking(); ST.all = null;
     if (S.isSetter) await loadAllComments();
@@ -1106,9 +1125,17 @@ function saveMine(id, next) {
   }).finally(() => { store.set("lb-snap-mine", S.mine); render(); if (openId === id) openDetail(id); });
 }
 function toggleFav(id) {
-  S.favs = S.favs.includes(id) ? S.favs.filter(x => x !== id) : [...S.favs, id];
+  const on = !S.favs.includes(id);
+  S.favs = on ? [...S.favs, id] : S.favs.filter(x => x !== id);
   store.set("lb-favs", S.favs);
   render(); if (openId === id) openDetail(id);
+  if (!S.favCloud || !S.session) return;   // sin el 018, solo en el móvil
+  const m = S.mine[id] = { ...(S.mine[id] || { stars: 0, sent: false, project: false, flash: false }), fav: on };
+  sb.from("ratings").upsert({ user_id: S.session.user.id, block_id: id, fav: on, updated_at: new Date().toISOString() }).then(({ error }) => {
+    if (!error) return store.set("lb-snap-mine", S.mine);
+    if (isNetErr(error)) return queueMine(id, m);   // sin cobertura: se sube al volver
+    toast("No se pudo guardar el favorito");
+  });
 }
 async function toggleActive(b) {
   const patch = { active: !b.active, removed_date: b.active ? today() : null };
