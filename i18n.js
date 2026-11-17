@@ -506,6 +506,12 @@ I18N_RX.unshift([/^Llevas (\d+) (bloques? encadenados?)\. Todo está guardado en
 
 I18N_RX.unshift([/^(\d+) de salida · (\d+) de top\. Toca una presa para marcarla como (salida|top) \(arrastra para ajustar el tamaño del aro\)\. Toca una marca para quitarla\.$/, m => `${m[1]} start · ${m[2]} top. Tap a hold to mark it as ${m[3] === "salida" ? "start" : "top"} (drag to resize the ring). Tap a mark to remove it.`]);
 I18N_RX.unshift([/^«(.+)» ya lo usa otra persona\. Elige otro apodo\. Si es tuyo, recupéralo con tu PIN \(enlace de abajo\)\.$/, m => `Someone else already uses “${m[1]}”. Choose another nickname. If it's yours, recover it with your PIN (link below).`]);
+Object.assign(I18N, {
+  "Saltar al contenido": "Skip to content",
+  "Plano del rocódromo (desliza para moverte)": "Gym map (swipe to move around)",
+  "Buscando en todos los bloques montados": "Searching all current problems",
+  "Ese bloque ya no está en la app: puede que lo hayan borrado": "That problem is no longer in the app: it may have been removed",
+});
 // Traductor: frase entera → con números → con nombres → por trozos separados por « · »
 function tr(text) {
   if (LANG === "es" || !text) return text;

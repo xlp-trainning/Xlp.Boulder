@@ -28,6 +28,7 @@
 <script>/* tema y letra elegidos en Ajustes, antes de pintar */ try { var t = JSON.parse(localStorage.getItem("lb-theme")); if (t && t !== "auto") { document.documentElement.dataset.theme = t; document.querySelectorAll("meta[data-tc]").forEach(function (m) { m.content = t === "dark" ? "#22252C" : "#EEEDE9"; }); } if (JSON.parse(localStorage.getItem("lb-big"))) document.documentElement.classList.add("big-text"); } catch (e) {}</script>
 </head>
 <body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
 <div class="wrap">
   <header class="top">
     <div class="top-bar">

@@ -89,7 +89,7 @@ function setGym(id) {
   if (id === S.gym) return;
   S.gym = id; store.set("lb-gym", id);
   S.level = null; S.sector = null; S.colors.clear(); S.drawingSector = null; S.mapSel = null; S.loaded = false;
-  if (/^#[a-z0-9-]{2,30}$/.test(location.hash) && !location.hash.startsWith("#b-")) history.replaceState(null, "", "#" + id);
+  if (/^#[a-z0-9-]{2,30}$/.test(location.hash) && !location.hash.startsWith("#b-")) history.replaceState(history.state, "", "#" + id);
   render(); refresh();
 }
 
@@ -269,9 +269,15 @@ function card(b) {
 }
 
 /* ---------- página: bloques ---------- */
+const T = x => (typeof tr === "function" && tr(x)) || x;
+const fold = x => String(x ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 function visible() {
+  // Con el buscador lleno se busca en todos los bloques montados, sin mirar la pestaña abierta.
+  // Cada palabra tiene que aparecer en algún sitio, en cualquier orden y sin importar tildes ni mayúsculas.
+  const words = S.q ? fold(S.q).split(/\s+/).filter(Boolean) : [];
   const list = S.blocks.filter(b => {
-    const v = S.view;
+    const v = words.length ? (b.active ? "all" : "none") : S.view;
+    if (v === "none") return false;
     if ((v === "open" || v === "new") && !b.active) return false;   // «Encadenados» guarda también los ya desmontados
     // «Abiertos» son los que te quedan por encadenar; los que ya tienes, en «Encadenados»
     if (v === "open" && S.mine[b.id]?.sent) return false;
@@ -284,9 +290,9 @@ function visible() {
     if (S.setter && b.setter_id !== S.setter) return false;
     if (S.styles.size && ![...S.styles].every(s => (b.styles || []).includes(s))) return false;
     if (S.colors.size && !S.colors.has(b.hold_color)) return false;
-    if (S.q) {
-      const hay = [b.name, b.sector, b.beta, lvName(b), COLORS[b.hold_color]?.name, ...(b.styles || [])].join(" ").toLowerCase();
-      if (!hay.includes(S.q.toLowerCase())) return false;
+    if (words.length) {
+      const c = COLORS[b.hold_color]?.name, hay = fold([b.name, b.sector, b.beta, lvName(b), c, c && T(c), b.setter_id && setterById(b.setter_id)?.name, ...(b.styles || []).flatMap(x => [x, T(x)])].join(" "));
+      if (!words.every(w => hay.includes(w))) return false;
     }
     return true;
   });
@@ -349,6 +355,7 @@ function renderChips() {
   af.replaceChildren(); af.hidden = !filtering;
   if (filtering) {
     const bits = [S.level && lvName({ level: S.level }), S.sector, S.setter && setterById(S.setter)?.name, ...S.styles, ...[...S.colors].map(k => COLORS[k]?.name)].filter(Boolean);
+    if (S.q) af.append(el("span", { class: "af-bits", text: "Buscando en todos los bloques montados" }));
     if (!S.filtersOpen && bits.length) af.append(el("span", { class: "af-bits", text: bits.join(" · ") }));
     af.append(el("button", { class: "clear", onclick: () => { S.level = null; S.sector = null; S.setter = null; S.styles.clear(); S.colors.clear(); S.q = ""; $("q").value = ""; render(); } }, "Quitar filtros"));
   }
@@ -431,7 +438,7 @@ function renderMapa() {
         Object.assign(drawingSec, { shape, x, y }); S.drawingSector = null; S.mapSel = drawingSec.name; render(); toast(`Zona de ${drawingSec.name} guardada`);
       });
     }
-    kids.push(el("div", { class: "plan-scroll" }, plan));
+    kids.push(el("div", { class: "plan-scroll", tabindex: "0", role: "region", "aria-label": "Plano del rocódromo (desliza para moverte)" }, plan));
     kids.push(el("p", { class: "note", text: "Toca un sector del plano para ver sus bloques. El número es cuántos hay abiertos; en verde, los sectores con novedades. En el móvil, desliza el plano de lado." }));
   }
 
@@ -607,24 +614,60 @@ function render() {
 
 /* ---------- hoja lateral ---------- */
 let openId = null, lastFocus = null;
-function closeSheet() {
+// «Atrás» del móvil: cada hoja (ficha, formulario, ajustes…) y el modo sesión añaden un paso al historial,
+// así el botón o el gesto de atrás de Android los cierra en lugar de salir de la app
+const NAV = { popping: false, repush: false };
+function pushOverlay(kind) { if (history.state?.xlp !== kind) history.pushState({ xlp: kind }, "", location.href); }
+function popOverlay(kind) { if (history.state?.xlp === kind) { NAV.popping = true; history.back(); } }
+addEventListener("popstate", () => {
+  if (NAV.popping) { NAV.popping = false; if (NAV.repush) { NAV.repush = false; if ($("sheetRoot").firstChild) pushOverlay("sheet"); } return; }
+  const ed = document.querySelector(".ed-scrim");
+  if (ed) { ed.querySelector(".x")?.click(); return pushOverlay("sheet"); }   // con el editor de foto abierto, «atrás» lo cancela
+  if ($("sheetRoot").firstChild) return closeSheet(true);
+  if (typeof SES !== "undefined" && SES.ended) { SES.ended = null; closeSessionView(); render(); return; }   // resumen de la sesión
+  if (typeof SES !== "undefined" && SES.open) { SES.open = false; render(); }
+});
+function closeSheet(fromBack) {
+  const was = !!$("sheetRoot").firstChild;
   $("sheetRoot").replaceChildren(); openId = null;
   document.body.style.overflow = "";
-  if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  if (location.hash.startsWith("#b-")) history.replaceState(history.state, "", location.pathname + location.search);
+  if (was && fromBack !== true) popOverlay("sheet");
   lastFocus?.focus?.(); lastFocus = null;
 }
 function sheet(...kids) {
   const fresh = !$("sheetRoot").firstChild;
-  if (fresh) lastFocus = document.activeElement;
+  if (fresh) { lastFocus = document.activeElement; if (NAV.popping) NAV.repush = true; else pushOverlay("sheet"); }
   const prevScroll = $("sheetRoot").querySelector(".sheet")?.scrollTop || 0;
+  // Si el foco estaba dentro de la hoja, se busca el mismo control en la hoja nueva (el teclado no pierde el sitio)
+  const ae = document.activeElement, inOld = !fresh && $("sheetRoot").contains(ae);
+  const key = inOld ? [ae.tagName, ae.getAttribute("aria-label") || ae.textContent.trim(), ae.id] : null;
   const scrim = el("div", { class: "scrim", onclick: e => { if (e.target === scrim) closeSheet(); } },
     el("div", { class: "sheet", role: "dialog", "aria-modal": "true" }, ...kids));
   $("sheetRoot").replaceChildren(scrim);
   document.body.style.overflow = "hidden";
-  if (fresh) setTimeout(() => scrim.querySelector(".x")?.focus(), 30);
-  else scrim.querySelector(".sheet").scrollTop = prevScroll;
+  if (!fresh) scrim.querySelector(".sheet").scrollTop = prevScroll;
+  setTimeout(() => {
+    if (scrim.contains(document.activeElement)) return;
+    const same = key && [...scrim.querySelectorAll(key[0])].find(e => (key[2] && e.id === key[2]) || (e.getAttribute("aria-label") || e.textContent.trim()) === key[1]);
+    (same || scrim.querySelector(".x"))?.focus({ preventScroll: true });
+  }, 30);
 }
-document.addEventListener("keydown", e => { if (e.key === "Escape" && $("sheetRoot").firstChild) closeSheet(); });
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && $("sheetRoot").firstChild) return closeSheet();
+  // Con una hoja abierta, el tabulador da la vuelta dentro de ella (no se escapa a la página de detrás)
+  if (e.key === "Tab" && $("sheetRoot").firstChild && !document.querySelector(".ed-scrim")) {
+    const f = [...$("sheetRoot").querySelectorAll('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter(x => !x.disabled && x.offsetParent !== null);
+    if (!f.length) return;
+    const i = f.indexOf(document.activeElement);
+    if (i < 0 || (!e.shiftKey && i === f.length - 1) || (e.shiftKey && i === 0)) { e.preventDefault(); f[e.shiftKey ? f.length - 1 : 0].focus(); }
+  }
+});
+// «Saltar al contenido»: lleva el foco al principio de la pantalla abierta
+document.querySelector(".skip-link")?.addEventListener("click", e => {
+  e.preventDefault(); const pg = document.querySelector(".page:not([hidden])"); if (!pg) return;
+  pg.setAttribute("tabindex", "-1"); pg.focus();
+});
 const head = (label, big) => el("div", { class: "sheet-head" },
   big ? el("h2", { class: "sheet-title", text: label }) : el("span", { class: "label", text: label }),
   el("button", { class: "x", type: "button", "aria-label": "Cerrar", onclick: closeSheet }, ico("x")));
@@ -782,7 +825,7 @@ function firstLine(b) {
 function openDetail(id) {
   const b = S.blocks.find(x => x.id === id); if (!b) return closeSheet();
   openId = id;
-  if (location.hash !== "#b-" + id) history.replaceState(null, "", "#b-" + id);
+  if (location.hash !== "#b-" + id) history.replaceState(history.state, "", "#b-" + id);
   const st = statsFor(id);
   const mine = { stars: 0, sent: false, project: false, flash: false, sent_at: null, feel: null, attempts: null, morpho: null, ...S.mine[id] };
   const fav = S.favs.includes(id);
@@ -822,11 +865,6 @@ function openDetail(id) {
       el("div", { class: "beta" + (b.beta ? "" : " none"), text: b.beta || "El equipador no ha escrito la beta de este bloque." }),
       b.video ? el("a", { class: "link", href: b.video, target: "_blank", rel: "noopener" }, ico("play", "sm"), " Ver vídeo de la beta") : null),
     el("div", { class: "section" }, el("span", { class: "label", text: "Tu puntuación" }), rate,
-      el("div", { class: "send-pick", role: "group", "aria-label": "¿Lo has encadenado?" },
-        el("button", { class: "btn ok" + (mine.sent && !mine.flash ? " primary" : ""), "aria-pressed": mine.sent && !mine.flash ? "true" : "false",
-          onclick: () => saveMine(id, mine.sent && !mine.flash ? { ...mine, sent: false, flash: false } : { ...mine, sent: true, flash: false, attempts: mine.attempts > 1 ? mine.attempts : null }) }, ico("check"), "Encadenado"),
-        el("button", { class: "btn flash" + (mine.flash ? " primary" : ""), "aria-pressed": mine.flash ? "true" : "false",
-          onclick: () => saveMine(id, mine.flash ? { ...mine, sent: false, flash: false, attempts: null } : { ...mine, sent: true, flash: true, attempts: 1 }) }, ico("zap"), "Flash")),
       el("button", { class: "linkbtn glossary-link", onclick: () => openGlossary(id) }, "¿Qué es encadenar, flash o proyecto?"),
       mine.sent ? el("div", { class: "note", text: `${mine.flash ? "Flash" : "Encadenado"}${mine.sent_at ? " el " + fmtDate(mine.sent_at) : ""}${!mine.flash && mine.attempts > 1 ? ` al ${mine.attempts}.º intento` : ""} · +${pointsFor(b, mine.flash)} puntos` }) : null,
       attemptsBox(id, mine), feelBox(id, b, mine),
@@ -839,6 +877,12 @@ function openDetail(id) {
     friendsBox(b),
     commentsSection(b),
     S.isSetter ? el("div", { class: "section" }, el("span", { class: "label", text: "Equipador" }), adminBox) : null,
+    // Encadenado y Flash en una barra fija abajo: siempre a mano, aunque la ficha sea larga o la pantalla pequeña
+    el("div", { class: "send-bar" }, el("div", { class: "send-pick", role: "group", "aria-label": "¿Lo has encadenado?" },
+        el("button", { class: "btn ok" + (mine.sent && !mine.flash ? " primary" : ""), "aria-pressed": mine.sent && !mine.flash ? "true" : "false",
+          onclick: () => saveMine(id, mine.sent && !mine.flash ? { ...mine, sent: false, flash: false } : { ...mine, sent: true, flash: false, attempts: mine.attempts > 1 ? mine.attempts : null }) }, ico("check"), "Encadenado"),
+        el("button", { class: "btn flash" + (mine.flash ? " primary" : ""), "aria-pressed": mine.flash ? "true" : "false",
+          onclick: () => saveMine(id, mine.flash ? { ...mine, sent: false, flash: false, attempts: null } : { ...mine, sent: true, flash: true, attempts: 1 }) }, ico("zap"), "Flash"))),
   );
 }
 
@@ -900,7 +944,7 @@ function sectorPicker(input) {
   input.addEventListener("input", mark);
   mark();
   return el("div", { class: "sector-pick" }, chosen,
-    el("div", { class: "plan-scroll" }, el("div", { class: "plan" }, el("img", { src: photoUrl(S.mapPath), alt: "Plano de la sala", ...mapDims() }), svg, pins.map(([, p]) => p))));
+    el("div", { class: "plan-scroll", tabindex: "0", role: "region", "aria-label": "Plano del rocódromo (desliza para moverte)" }, el("div", { class: "plan" }, el("img", { src: photoUrl(S.mapPath), alt: "Plano de la sala", ...mapDims() }), svg, pins.map(([, p]) => p))));
 }
 
 // Por qué no se ha guardado un bloque, dicho claro (con el código para poder buscarlo)
@@ -1196,6 +1240,7 @@ if (sb) refresh().then(async () => {
     const r = await sb.from("blocks").select("gym_id").eq("id", m[1]).maybeSingle();
     if (r.data && r.data.gym_id !== S.gym) { S.gym = r.data.gym_id; store.set("lb-gym", S.gym); await refresh(); }
   }
+  if (!S.blocks.some(b => b.id === m[1])) { history.replaceState(null, "", location.pathname + location.search); return toast("Ese bloque ya no está en la app: puede que lo hayan borrado"); }
   openDetail(m[1]);
 });
 });

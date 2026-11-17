@@ -199,11 +199,12 @@ Barra de pestañas de texto (`.mainnav`): Hoy, Bloques, Mapa, Ranking, Grupos, E
 
 | Ancho | Cambio |
 |---|---|
-| ≤ 380px | Botones del editor más estrechos |
+| ≤ 380px | Botones del editor más estrechos; logo más pequeño para que el botón de idioma no lo tape; en la sesión, la cinta del nivel va encima del nombre |
 | ≤ 560px | Se oculta la frase de la cabecera |
 | ≤ 767px | «Empezar sesión» solo en Hoy; listas a una columna |
 | ≥ 768px | Listas a dos columnas |
 | Alto bajo | La bienvenida reduce su parte central y deja hacer scroll |
+| Alto ≤ 740px (móvil) | Sin la etiqueta del rocódromo; tira de niveles más baja, para que el primer bloque se vea sin bajar; sesión compacta (botones de 48px al lado del nombre, sin la leyenda), para ver 3–4 bloques a la vez |
 
 ### Touch Targets
 
@@ -213,7 +214,15 @@ Barra de pestañas de texto (`.mainnav`): Hoy, Bloques, Mapa, Ranking, Grupos, E
 
 - Filtros: buscador más «Filtros · n», y el resto en un panel que se abre. Con el panel cerrado, una línea dice qué se filtra.
 - El aviso de instalar la app solo sale en Hoy.
-- Las pestañas y las etiquetas se desplazan de lado dentro de su fila; la página nunca.
+- Las pestañas y las etiquetas se desplazan de lado dentro de su fila; la página nunca. En las hojas (Ajustes) los selectores bajan de línea.
+- Encadenado y Flash van en una barra fija al pie de la ficha (`.send-bar`): se ven sin bajar.
+- Con letra grande, las cifras de la sesión van en dos columnas.
+
+### Teclado y botón Atrás
+
+- «Saltar al contenido» (`.skip-link`), invisible hasta que recibe el foco.
+- Con una hoja abierta, el tabulador da la vuelta dentro de ella; Escape la cierra y devuelve el foco.
+- El botón Atrás del móvil cierra la hoja o el modo sesión en vez de salir de la app (`pushOverlay` / `popOverlay` en `app.js`).
 
 ### Image Behavior
 

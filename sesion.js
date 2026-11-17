@@ -73,6 +73,7 @@ function closeSessionView() { $("sessionRoot").replaceChildren(); clearInterval(
 
 function renderSession(s) {
   const root = $("sessionRoot");
+  pushOverlay("session");   // «atrás» minimiza la sesión
   const keepScroll = root.querySelector(".ses-list")?.scrollTop || 0;
   const r = sesSummary(s);
   const open = S.blocks.filter(b => b.active);
@@ -97,7 +98,7 @@ function renderSession(s) {
     el("div", { class: "ses-head" },
       el("div", {}, el("span", { class: "label", text: s.group ? `Sesión en grupo · ${s.group.name}` : `Sesión · ${gymShort(currentGym()?.name || "")}` }), el("div", { class: "ses-clock", text: fmtMins(r.mins) })),
       el("div", { class: "row" },
-        el("button", { class: "btn", onclick: () => { SES.open = false; render(); } }, "Minimizar"),
+        el("button", { class: "btn", onclick: () => { SES.open = false; popOverlay("session"); render(); } }, "Minimizar"),
         el("button", { class: "btn primary", onclick: endSession }, "Terminar"))),
     el("div", { class: "ses-kpis" },
       [[r.sends.length, "encadenados"], [r.flashes, "flash"], [r.tries, "intentos"], ["+" + r.points, "puntos"]].map(([n, t]) =>
@@ -119,7 +120,7 @@ function endSession() {
   const s = sesActive(); if (!s) return;
   const r = sesSummary(s);
   sesSet(null); SES.open = false; clearInterval(SES.timer); SES.timer = 0;
-  if (!r.sends.length && !r.tries && !s.group) { closeSessionView(); render(); return toast("Sesión terminada"); }
+  if (!r.sends.length && !r.tries && !s.group) { closeSessionView(); popOverlay("session"); render(); return toast("Sesión terminada"); }
   SES.ended = r;
   const gbox = s.group ? el("div", { class: "section ses-group" }, el("p", { class: "note", text: "Cargando la sesión del grupo…" })) : null;
   if (gbox) groupSessionEnd(s.group, gbox);
@@ -136,7 +137,7 @@ function endSession() {
     gbox,
     el("div", { class: "actions" },
       el("button", { class: "btn primary", onclick: () => storySession(r) }, ico("camera"), "Compartir sesión"),
-      el("button", { class: "btn", onclick: () => { SES.ended = null; closeSessionView(); render(); } }, "Cerrar"))));
+      el("button", { class: "btn ses-close", onclick: () => { SES.ended = null; closeSessionView(); popOverlay("session"); render(); } }, "Cerrar"))));
   render();
 }
 
