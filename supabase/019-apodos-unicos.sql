@@ -5,11 +5,20 @@
 -- Si ya hubiera dos apodos así, el índice no se crea y se avisa con un NOTICE: cambia uno y vuelve a ejecutarlo.
 -- Ejecútalo una vez en Supabase → SQL Editor. Se puede repetir sin problema.
 
--- Clave de comparación de un apodo
+-- Caracteres invisibles (espacios de ancho cero, marcas de dirección, guion blando…), generados con chr()
+-- para no depender de cómo cada versión de Postgres lee los rangos \u dentro de las expresiones regulares
+create or replace function public.invisible_chars()
+returns text language sql immutable parallel safe set search_path = '' as $$
+  select string_agg(chr(c), '' order by c) from (
+    select 173 as c union all select generate_series(8203, 8207) union all select generate_series(8232, 8239)
+    union all select generate_series(8288, 8303) union all select 65279) t;
+$$;
+
+-- Clave de comparación de un apodo: sin invisibles, sin espacios, sin tildes y en minúsculas
 create or replace function public.nick_key(p text)
 returns text language sql immutable parallel safe set search_path = '' as $$
   select lower(translate(
-    regexp_replace(coalesce(p, ''), '[\s​-‏ - ⁠-⁯﻿­]', '', 'g'),
+    regexp_replace(translate(coalesce(p, ''), public.invisible_chars(), ''), '\s', '', 'g'),
     'ÁÉÍÓÚÀÈÌÒÙÄËÏÖÜÂÊÎÔÛÑÇáéíóúàèìòùäëïöüâêîôûñç',
     'AEIOUAEIOUAEIOUAEIOUNCaeiouaeiouaeiouaeiounc'));
 $$;
@@ -18,14 +27,15 @@ $$;
 create or replace function public.clean_nick()
 returns trigger language plpgsql set search_path = '' as $$
 begin
-  new.nick := btrim(regexp_replace(regexp_replace(new.nick, '[​-‏ - ⁠-⁯﻿­]', '', 'g'), '\s+', ' ', 'g'));
+  new.nick := btrim(regexp_replace(translate(new.nick, public.invisible_chars(), ''), '\s+', ' ', 'g'));
   return new;
 end $$;
 drop trigger if exists clean_nick on public.climbers;
 create trigger clean_nick before insert or update of nick on public.climbers for each row execute function public.clean_nick();
 
 -- Los que ya existen, limpios
-update public.climbers set nick = nick where nick ~ '[​-‏ - ⁠-⁯﻿­]|\s\s|^\s|\s$';
+update public.climbers set nick = nick
+  where nick is distinct from btrim(regexp_replace(translate(nick, public.invisible_chars(), ''), '\s+', ' ', 'g'));
 
 -- Índice único por la clave (si no hay ya duplicados que lo impidan)
 do $$
