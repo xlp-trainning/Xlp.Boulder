@@ -11,7 +11,7 @@
 - Web estática (HTML, CSS y JS sin compilar) en GitHub Pages: https://xlp-trainning.github.io/Xlp.Boulder/
 - Datos en Supabase (proyecto `przbceryckqmmvocyele`); esquema en `supabase/schema.sql`.
 - Dos rocódromos: Natural Climb Valencia y Natural Climb Benimaclet. Planos en `mapas/`.
-- `editor.js`: editor de la foto del bloque (zona a analizar, presas por color, volúmenes, salida y top).
+- `editor.js`: editor de la foto del bloque. Solo se marcan a mano las presas de salida y de top; la foto no se toca. El usuario pidió quitar la búsqueda automática de presas (zona, color, volúmenes, lápiz, goma): no la vuelvas a poner.
 
 ## Sistema visual
 - **`DESIGN.md`** (en la raíz) describe este sistema en el formato DESIGN.md: colores, tipografía, espacios, formas, componentes, qué hacer y qué no, y el comportamiento por anchos. Léelo antes de tocar la interfaz y actualízalo cuando cambies un token o un componente.

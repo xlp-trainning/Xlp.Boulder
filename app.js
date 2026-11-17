@@ -956,7 +956,7 @@ function openForm(b) {
       src ? el("img", { class: "photo", src, alt: "Vista previa de la foto" }) : null,
       el("div", { class: "actions" },
         el("button", { type: "button", class: "btn", onclick: () => fileIn.click() }, ico("camera"), src ? "Cambiar foto" : "Añadir foto"),
-        d.raw ? el("button", { type: "button", class: "btn", onclick: editPhoto }, ico("pencil"), "Resaltar presas") : null,
+        d.raw ? el("button", { type: "button", class: "btn", onclick: editPhoto }, ico("pencil"), "Marcar salida y top") : null,
         src ? el("button", { type: "button", class: "btn danger", onclick: () => { d.file = null; d.raw = null; d.photo = ""; fileIn.value = ""; drawPhoto(); } }, "Quitar foto") : null)].filter(Boolean));
   };
   drawPhoto();

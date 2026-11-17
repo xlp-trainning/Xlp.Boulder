@@ -57,7 +57,7 @@
 - **Buzón de sugerencias** («💬 Buzón de sugerencias», al pie de todas las páginas): cualquiera escribe al equipador sin registrarse (idea, bloques, algo falla u otro), con su nombre si quiere. **Sin respuesta ni confirmación de lectura**: quien escribe no ve sus mensajes ni sabe si se han leído. Como mucho 5 mensajes por persona y hora.
 - **El equipador** entra con email y contraseña ("Acceso equipador", al pie de la página) y puede:
   - crear, editar, desmontar o borrar bloques, con foto;
-  - **resaltar presas** en la foto, en tres pasos: 1) marcas la zona a analizar rodeando el muro con el dedo (o arrastrando en diagonal para un rectángulo, o «Analizar toda la foto»); 2) eliges el color de las presas y la web deja en color solo esas, oscureciendo el resto; 3) tocas las presas para marcar la **salida** y el **top**, añadir las que falten o quitar las que sobren. Los **volúmenes estructurales** (madera, negro o gris, del color del muro) se marcan rodeándolos con «◇ Volumen» y funcionan como una presa más;
+  - **marcar la salida y el top** en la foto: la foto se queda tal cual; eliges «Salida» o «Top» y tocas la presa (arrastrando, el aro se ajusta a su tamaño). Tocar una marca la quita, y hay «Deshacer». (La búsqueda automática de presas por color se quitó en noviembre de 2026.)
   - gestionar el plano y los sectores (renombrarlos, añadirlos y dibujar su zona en el plano);
   - borrar comentarios;
   - leer el **buzón** en su pestaña «Buzón» (con el número de mensajes nuevos), archivar o borrar mensajes, sin que nadie lo sepa;
@@ -129,7 +129,7 @@ Hay un **máster** (el dueño de la web) y los equipadores que él quiera. Neces
 | `apodo.js` | apodo con PIN: crearlo, recuperarlo en otro móvil y PIN puesto por el equipador |
 | `hoy.js` | pantalla «Hoy», bienvenida y Ajustes (tema, letra, idioma, daltónico) |
 | `wrapped.js` | «Tu mes»: el resumen del mes tipo Wrapped |
-| `editor.js` | editor de la foto del bloque: resaltar presas por color, salida y top |
+| `editor.js` | editor de la foto del bloque: marcar a mano las presas de salida y de top |
 | `config.js` | dirección y clave pública de Supabase |
 | `supabase/schema.sql` | tablas y reglas de acceso |
 | `manifest.webmanifest`, `icon*` | instalación en la pantalla de inicio, con el logo de Xlp.Boulder |
