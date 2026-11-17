@@ -44,13 +44,13 @@ async function loadRanking() {
 }
 
 async function joinRanking(nick) {
-  nick = nick.trim().replace(/\s+/g, " ");
+  nick = cleanNick(nick);
   if (nick.length < 2 || nick.length > 20) return toast("El apodo tiene que tener entre 2 y 20 letras");
   if (!(await ensureVoter())) return;
   store.set("lb-nick", nick);
   const q = RK.nick || G.me ? sb.from("climbers").update({ nick, in_ranking: true }).eq("user_id", S.session.user.id) : sb.from("climbers").insert({ nick });
   const { error } = await q;
-  if (error) return toast(error.code === "23505" ? "Ese apodo ya lo usa otra persona" : "No se pudo guardar");
+  if (error) return toast(error.code === "23505" ? "Ese apodo ya lo usa otra persona. Elige otro." : "No se pudo guardar");
   toast(RK.me ? "Apodo cambiado" : "¡Ya estás en el ranking!");
   G.me = { nick, in_ranking: true }; RK.me = RK.nick = nick;   // el recuadro de apuntarse se va ya, sin esperar a recargar
   RK.editing = false; invalidateRanking(); renderRanking();

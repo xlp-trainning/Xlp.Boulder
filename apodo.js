@@ -7,7 +7,8 @@ const APODO = { pin: null };   // ¿tu apodo tiene PIN? (null = sin apodo o sin 
 const validPin = p => /^[0-9]{4,8}$/.test(p);
 const pinInput = (attrs = {}) => el("input", { type: "password", inputmode: "numeric", pattern: "[0-9]*", maxlength: "8", autocomplete: "off",
   placeholder: "PIN (4 a 8 cifras)", "aria-label": "PIN del apodo", ...attrs });
-const cleanNick = s => (s || "").trim().replace(/\s+/g, " ");
+// Sin caracteres invisibles (que permitirían un apodo idéntico a la vista a otro) y con los espacios normales
+const cleanNick = s => (s || "").replace(/[\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\u00AD]/g, "").trim().replace(/\s+/g, " ");
 
 async function loadPinState() {
   APODO.pin = null;
@@ -26,7 +27,8 @@ function nickForm({ inRanking = false, submitText = "Guardar", mode = "new", onD
     const btn = el("button", { class: "btn primary", type: "submit" }, m === "new" ? submitText : "Recuperar");
     const busy = on => { btn.disabled = on; };
     box.replaceChildren(...[
-      m === "recover" ? el("p", { class: "note", text: msg || "Recupera tu apodo en este móvil: escribe el apodo y su PIN. Vuelven tus grupos, tu ranking y tu progreso." }) : null,
+      m === "recover" ? el("p", { class: "note", text: msg || "Recupera tu apodo en este móvil: escribe el apodo y su PIN. Vuelven tus grupos, tu ranking y tu progreso." })
+        : msg ? el("p", { class: "err", role: "alert", text: msg }) : null,
       el("form", { class: "nick-grid", onsubmit: async e => {
         e.preventDefault();
         const n = cleanNick(nick.value), p = pin.value.trim();
@@ -49,7 +51,8 @@ async function createNick(nick, pin, inRanking, draw, onDone) {
   if (!(await ensureVoter())) return;
   const { error } = await sb.from("climbers").insert({ nick, in_ranking: inRanking });
   if (error) {
-    if (error.code === "23505") return draw("recover", nick, `«${nick}» ya existe. Si es tuyo, escribe su PIN para recuperarlo en este móvil.`);
+    // Apodo ya cogido (también si solo cambian mayúsculas, tildes o espacios): hay que elegir otro
+    if (error.code === "23505") return draw("new", nick, `«${nick}» ya lo usa otra persona. Elige otro apodo. Si es tuyo, recupéralo con tu PIN (enlace de abajo).`);
     return toast("No se pudo guardar el apodo");
   }
   const r = await sb.rpc("set_pin", { p_pin: pin });
