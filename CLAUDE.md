@@ -68,6 +68,13 @@ Plano y moderno: superficies lisas, radios cortos y color a bloques; el color fu
 - Para revisar: `node .claude/skills/taste-skill/scripts/lint.mjs <archivos>` y `node .claude/skills/taste-skill/scripts/inspect.mjs index.html --app`. Requiere Node 22 y Chromium.
 - `assets.mjs` busca imágenes en archivos públicos y necesita red. No lo uses sin que el usuario lo pida.
 
+## Skill de diseño · Hallmark
+- Instalada en `.claude/skills/hallmark/` (de [Nutlope/hallmark](https://github.com/Nutlope/hallmark), licencia MIT, commit 04977e1). Se invoca con `/hallmark`: `/hallmark audit <archivo>` solo informa; `/hallmark <encargo>` sirve para páginas nuevas sueltas (por ejemplo, una página de presentación).
+- **Solo cuando el usuario la nombra.** No rediseña la app por su cuenta: en las pantallas manda `DESIGN.md` y la sección «Sistema visual» de arriba.
+- Choques conocidos que son decisiones de marca y se mantienen: mayúsculas espaciadas en el muro y la marca, Big Shoulders en mayúsculas, los textos unidos con « · », la cinta girada y los emojis de las reacciones de grupos.
+- No instales su hook (`scripts/install-hook.mjs`), que revisaría cada edición con reglas que chocan con las de la app. `scripts/imagegen.mjs` usa una API de pago (Together AI) y `theme.mjs` descarga fotos de Wikimedia: no los uses sin que el usuario lo pida.
+- Su revisor en navegador (`scripts/sloplint.mjs --render`) necesita Node 18+ y Chromium.
+
 ## Skill de revisión · web-design-guidelines
 - Está instalada en `.claude/skills/web-design-guidelines/`. Viene de `vercel-labs/agent-skills` y tiene licencia MIT. Revisa accesibilidad, formularios, animación, tipografía, móvil, tema oscuro e idioma, y da los problemas en formato `archivo:línea`.
 - Las reglas están copiadas y fijas en `guidelines.md` (commit 434b7f9). No se descargan de internet. Para actualizarlas, primero se lee el texto nuevo.
