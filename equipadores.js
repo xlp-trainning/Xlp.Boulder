@@ -58,7 +58,7 @@ function setterList() {
       return el("button", { class: "rk-row setter-row", onclick: () => { EQ.sel = s.user_id; renderEquipadores(); window.scrollTo({ top: 0 }); } },
         el("span", { class: "rk-pos" }, setterBadge(s, true)),
         el("span", { class: "rk-who" }, el("strong", { text: s.name + (s.user_id === S.session?.user.id ? " (tú)" : "") }),
-          el("span", { class: "note" }, `${x.open.length} ${x.open.length === 1 ? "abierto" : "abiertos"} · ${x.total} en total`, x.avg ? ` · ${x.avg.toFixed(1)} ★` : "")),
+          parts("note", `${x.open.length} ${x.open.length === 1 ? "abierto" : "abiertos"}`, `${x.total} en total`, x.avg ? `${x.avg.toFixed(1)} ★` : "")),
         el("span", { class: "setter-mix" }, lvMix(x.counts)),
         el("span", { class: "rk-pts" }, el("strong", { text: total ? Math.round(x.open.length / total * 100) + "%" : "—" }), el("span", { class: "note", text: "de la sala" })));
     })),
@@ -80,7 +80,7 @@ function setterPage(s) {
       kpi(x.open.length, "abiertos", lvMix(x.counts)),
       kpi(x.avg ? x.avg.toFixed(1) : "—", "puntuación media", el("span", { class: "note", text: `${x.votes} ${x.votes === 1 ? "voto" : "votos"}` })),
       kpi(x.sends, "encadenados", el("span", { class: "note", text: x.sends ? `${Math.round(x.flashes / x.sends * 100)} % al flash` : "" })),
-      kpi(feelN ? `${pct(x.hard)}%` : "—", "dice «duro»", el("span", { class: "note", text: feelN ? `${pct(x.soft)} % blando · ${pct(x.fair)} % justo` : "Sin votos de sensación" }))),
+      kpi(feelN ? `${pct(x.hard)}%` : "—", "dice «duro»", el("span", { class: "note", text: feelN ? `${pct(x.soft)} % blando, ${pct(x.fair)} % justo` : "Sin votos de sensación" }))),
     x.best || x.most || x.styles.length ? el("section", { class: "section" }, el("span", { class: "label", text: "Lo destacado" }),
       x.best ? el("p", { class: "first-line" }, el("span", { class: "first-sticker" }, ico("star", "sm"), "El mejor valorado"), blockLinkTo(x.best), el("span", { class: "note", text: ` · ${statsFor(x.best.id).avg.toFixed(1)} ★` })) : null,
       x.most ? el("p", { class: "first-line" }, el("span", { class: "first-sticker" }, ico("mountain", "sm"), "El más encadenado"), blockLinkTo(x.most), el("span", { class: "note", text: ` · ${statsFor(x.most.id).sends} encadenados` })) : null,

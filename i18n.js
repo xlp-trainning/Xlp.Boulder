@@ -331,7 +331,7 @@ const I18N_RX = [
   [/^Sesión en grupo · (.+)$/, m => `Group session · ${m[1]}`],
   [/^Sesión · (.+)$/, m => `Session · ${m[1]}`],
   [/^Tarjeta para historias: (.+)$/, m => `Story card: ${m[1]}`],
-  [/^Tu plan de la semana · (.+)$/, m => `Your plan this week · ${tw(m[1])}`],
+  [/^Tu plan de la semana[:·] ?(.+)$/, m => `Your plan this week: ${tw(m[1].trim())}`],
   [/^Tres bloques de (.+) cerca de tu nivel para mejorar tu punto débil\. (\d+) de (\d+) hechos( 🎉)?\. Cada lunes, plan nuevo\.$/, m => `Three ${tw(m[1])} problems near your level to work on your weak spot. ${m[2]} of ${m[3]} done${m[4] || ""}. New plan every Monday.`],
   [/^Como un (\S+) (alto|bajo|medio)\. Sale de .*$/, m => `Like a ${{ alto: "high", bajo: "low", medio: "mid" }[m[2]]} ${tw(m[1])}. It comes from your 10 best sends in the last 90 days: the colour, how hard each problem is according to climbers, and how many attempts it took you.`],
   [/^Perfil por estilos: (.+)$/, m => `Style profile: ${m[1].split(", ").map(x => x.replace(/^(\D+) (\d+)$/, (_, a, b) => `${tw(a)} ${b}`)).join(", ")}`],
@@ -512,6 +512,20 @@ Object.assign(I18N, {
   "Buscando en todos los bloques montados": "Searching all current problems",
   "Ese bloque ya no está en la app: puede que lo hayan borrado": "That problem is no longer in the app: it may have been removed",
 });
+// Textos sin « · » (rediseño): las mismas frases, con comas, paréntesis o puntos
+Object.assign(I18N, {
+  "De fácil a difícil. Toca un nivel para filtrar": "Easy to hard. Tap a grade to filter",
+  "Xlp.Boulder: bloques equipados en Natural Climb Valencia y Natural Climb Benimaclet": "Xlp.Boulder: problems set at Natural Climb Valencia and Natural Climb Benimaclet",
+  "Instalar la app y pasar mi progreso": "Install the app and move my progress", "Instalar y pasar mi progreso": "Install and move my progress",
+  "Idioma / Language": "Language / Idioma", "(con PIN)": "(with PIN)", "(sin PIN)": "(no PIN)", "Cambiar apodo": "Change nickname",
+});
+for (const [k, v] of [["Novedades ({n})", "New ({n})"], ["Filtros ({n})", "Filters ({n})"], ["{n} de {n} ({n} votos)", "{n} of {n} ({n} votes)"], ["{n} de {n} ({n} voto)", "{n} of {n} ({n} vote)"],
+  ["Este mes: {n} puntos, puesto {n} de {n}", "This month: {n} points, position {n} of {n}"], ["{n} nuevos", "{n} new"], ["{n} abiertos", "{n} open"], ["{n} abierto", "{n} open"],
+  ["{n} en total", "{n} in total"], ["{n} al flash", "{n} flashed"], ["{n} flash", "{n} flash"], ["{n} % blando", "{n}% soft"], ["{n} % justo", "{n}% fair"],
+  ["{n} % duro ({n} votos)", "{n}% hard ({n} votes)"], ["{n} % duro ({n} voto)", "{n}% hard ({n} vote)"], ["{n} % blando, {n} % justo", "{n}% soft, {n}% fair"],
+  ["{n} personas lo han encadenado", "{n} people have sent it"], ["{n} persona lo ha encadenado", "{n} person has sent it"]]) I18N_N[k] ??= v;
+for (const [k, v] of [["Medallas: {n} de {n}", "Badges: {n} of {n}"], ["Por nivel: {n} de {n} abiertos", "By grade: {n} of {n} open"], ["Grupos ({n})", "Groups ({n})"]]) I18N_N[k] ??= v;
+I18N_RX.unshift([/^Sesión en grupo: (.+)$/, m => `Group session: ${m[1]}`], [/^Sesión en (.+)$/, m => `Session at ${m[1]}`]);
 // Traductor: frase entera → con números → con nombres → por trozos separados por « · »
 function tr(text) {
   if (LANG === "es" || !text) return text;

@@ -37,7 +37,10 @@ Plano y moderno: superficies lisas, radios cortos y color a bloques; el color fu
 - **Composición**:
   - Hoy: la portada en el muro con la rejilla de tuercas, el saludo en grande, tu marcador y «Empezar sesión»; debajo, listas. (Se probó una portada con el bloque destacado y el panel, y el usuario prefirió esta.)
   - Bloques: encima de la lista solo van las barras de nivel, las pestañas y una fila con el buscador y «Filtros» (orden, estilo, equipador y presa en un panel que se abre). La lista empieza en la primera pantalla del móvil. En las filas, los estilos y el equipador van como texto, sin recuadro.
-  - Títulos de sección en frase normal y negrita (`.today-head`), nunca en mayúsculas pequeñas. Las mayúsculas espaciadas quedan para el muro y la marca.
+  - Títulos de sección en frase normal y negrita (`.today-head`), nunca en mayúsculas pequeñas.
+  - Sin mayúsculas espaciadas en etiquetas, marcadores, tablas ni insignias (tampoco en el muro): Figtree en frase normal. Las mayúsculas solo en la condensada (logotipo, títulos grandes, cinta del nivel).
+  - Sin datos unidos con « · »: comas (`parts()` en `app.js`), paréntesis o dos puntos. Solo se mantiene dentro de los nombres reales de sectores («Sala 1 · 1»). Si cambias una frase, añade su traducción en `i18n.js`.
+  - Selectores (`.tabs`) como texto sobre una línea con la tira de cinta en la opción elegida; nada de bandeja con pastilla blanca.
   - Bloques y demás listas: filas densas separadas por una línea (`.grid` con `gap: 1px` sobre `--line`, dos columnas desde 768 px), nunca tarjetas iguales.
   - Momentos a pantalla completa: sesión, celebración (`cheer()` en `progreso.js`), Tu mes y bienvenida.
 - **Iconos**: `ico(nombre, clase)` de `icons.js` (trazo de 2 px, estilo Lucide). En el HTML fijo, `<span data-ico="nombre">`. En los lienzos de historias, `drawIco()`.
@@ -71,7 +74,9 @@ Plano y moderno: superficies lisas, radios cortos y color a bloques; el color fu
 ## Skill de diseño · Hallmark
 - Instalada en `.claude/skills/hallmark/` (de [Nutlope/hallmark](https://github.com/Nutlope/hallmark), licencia MIT, commit 04977e1). Se invoca con `/hallmark`: `/hallmark audit <archivo>` solo informa; `/hallmark <encargo>` sirve para páginas nuevas sueltas (por ejemplo, una página de presentación).
 - **Solo cuando el usuario la nombra.** No rediseña la app por su cuenta: en las pantallas manda `DESIGN.md` y la sección «Sistema visual» de arriba.
-- Choques conocidos que son decisiones de marca y se mantienen: mayúsculas espaciadas en el muro y la marca, Big Shoulders en mayúsculas, los textos unidos con « · », la cinta girada y los emojis de las reacciones de grupos.
+- En noviembre de 2026 el usuario pidió una revisión completa con ella («que no parezca IA»): se hizo un *restyle* que mantuvo la composición y quitó las mayúsculas espaciadas, los « · », las bandejas de los selectores y los colores sueltos. El sello de Hallmark está al principio de `styles.css`.
+- Choques que se mantienen como decisiones de marca: Big Shoulders en mayúsculas (logotipo, títulos y cinta), la cinta girada, la portada de Hoy tal como está y los emojis de las reacciones de grupos.
+- Para revisar la app: `node .claude/skills/hallmark/scripts/sloplint.mjs styles.css index.html --genre editorial --scope app` (debe dar 0 FAIL).
 - No instales su hook (`scripts/install-hook.mjs`), que revisaría cada edición con reglas que chocan con las de la app. `scripts/imagegen.mjs` usa una API de pago (Together AI) y `theme.mjs` descarga fotos de Wikimedia: no los uses sin que el usuario lo pida.
 - Su revisor en navegador (`scripts/sloplint.mjs --render`) necesita Node 18+ y Chromium.
 

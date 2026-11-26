@@ -151,10 +151,10 @@ function renderProgreso() {
       recs.length ? el("div", { class: "grid" }, recs.map(r => el("div", { class: "rec" }, el("span", { class: "rec-why", text: r.why }), card(r.b))))
         : el("p", { class: "note", text: open.length ? "¡Lo tienes todo encadenado! Vuelve cuando haya bloques nuevos." : "Cuando haya bloques abiertos, aquí te propondremos tres para ti." })),
 
-    el("section", { class: "section" }, el("span", { class: "label", text: `Medallas · ${earned.length} de ${MEDALS.length}` }),
+    el("section", { class: "section" }, el("span", { class: "label", text: `Medallas: ${earned.length} de ${MEDALS.length}` }),
       el("div", { class: "medals" }, earned.map(m => medal(m, true)), pending.map(m => medal(m, false)))),
 
-    el("section", { class: "section" }, el("span", { class: "label", text: `Por nivel · ${sentOpen.length} de ${open.length} abiertos` }),
+    el("section", { class: "section" }, el("span", { class: "label", text: `Por nivel: ${sentOpen.length} de ${open.length} abiertos` }),
       el("div", { class: "levels" }, LEVELS.map(l => {
         const tot = open.filter(b => b.level === l.k).length;
         const got = sentOpen.filter(b => b.level === l.k).length;

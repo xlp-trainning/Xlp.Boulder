@@ -88,7 +88,7 @@ function renderSession(s) {
       el("span", { class: "ses-top" },
         el("span", { class: "ses-tape", style: `background:${l.solid ? "#F4F4F2" : l.bg};color:${l.solid ? "#1C1C1E" : l.fg}`, text: SHORT[b.level] }),
         el("span", { class: "ses-name" }, el("strong", { text: title(b) }),
-          el("span", { class: "note" }, m.sent ? ico(m.flash ? "zap" : "check", "sm") : null, [b.sector, state].filter(Boolean).join(" · ")))),
+          el("span", { class: "note" }, m.sent ? ico(m.flash ? "zap" : "check", "sm") : null, parts("", b.sector, state)))),
       el("span", { class: "ses-btns" },
         el("button", { class: "btn", disabled: !!m.sent, "aria-label": `Un intento más en ${title(b)}`, onclick: () => sesPlus(b) }, "+1"),
         el("button", { class: "btn ok" + (m.sent && !m.flash ? " primary" : ""), "aria-pressed": m.sent && !m.flash ? "true" : "false", "aria-label": m.sent ? `Deshacer encadenado de ${title(b)}` : `Encadenado ${title(b)}`, onclick: () => sesSend(b) }, ico("check")),
@@ -96,7 +96,7 @@ function renderSession(s) {
   };
   root.replaceChildren(el("div", { class: "session is-wall", role: "dialog", "aria-modal": "true", "aria-label": "Sesión de escalada" },
     el("div", { class: "ses-head" },
-      el("div", {}, el("span", { class: "label", text: s.group ? `Sesión en grupo · ${s.group.name}` : `Sesión · ${gymShort(currentGym()?.name || "")}` }), el("div", { class: "ses-clock", text: fmtMins(r.mins) })),
+      el("div", {}, el("span", { class: "label", text: s.group ? `Sesión en grupo: ${s.group.name}` : `Sesión en ${gymShort(currentGym()?.name || "")}` }), el("div", { class: "ses-clock", text: fmtMins(r.mins) })),
       el("div", { class: "row" },
         el("button", { class: "btn", onclick: () => { SES.open = false; popOverlay("session"); render(); } }, "Minimizar"),
         el("button", { class: "btn primary", onclick: endSession }, "Terminar"))),

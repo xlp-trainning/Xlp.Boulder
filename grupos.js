@@ -79,7 +79,7 @@ function markGroups() {
   const tab = document.querySelector('[data-page="grupos"]');
   if (!tab) return;
   const n = G.news + G.active.filter(s => !s.am_in).length;
-  tab.textContent = n ? `Grupos · ${n}` : "Grupos";
+  tab.textContent = n ? `Grupos (${n})` : "Grupos";
   tab.classList.toggle("has-new", n > 0);
 }
 
@@ -185,7 +185,7 @@ async function groupSessionEnd(gs, box) {
   const rows = data || [];
   if (!rows.length) return;
   const tot = rows.reduce((a, r) => ({ sends: a.sends + r.sends, flashes: a.flashes + r.flashes, points: a.points + r.points }), { sends: 0, flashes: 0, points: 0 });
-  box.replaceChildren(el("span", { class: "label", text: `Sesión en grupo · ${gs.name}` }),
+  box.replaceChildren(el("span", { class: "label", text: `Sesión en grupo: ${gs.name}` }),
     el("p", { class: "ses-group-tot", text: `Entre ${rows.length}: ${tot.sends} ${tot.sends === 1 ? "bloque" : "bloques"} · ${tot.flashes} flash · +${tot.points} puntos` }),
     el("ol", { class: "rk-list" }, rows.map((r, i) => el("li", { class: "rk-row" + (r.is_me ? " me" : "") },
       rkPos(i),

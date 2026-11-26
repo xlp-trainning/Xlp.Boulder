@@ -89,7 +89,8 @@ Modo daltónico: cada nivel lleva además su abreviatura escrita en la cinta. El
 ### Principles
 
 - Los títulos de sección van en frase normal y negrita, en tinta (`.today-head`). Nunca en mayúsculas pequeñas espaciadas.
-- Las mayúsculas espaciadas quedan para el muro (marcadores) y la marca (nombre del rocódromo).
+- **Sin mayúsculas espaciadas.** Las etiquetas, los pies de los marcadores, las cabeceras de tabla y las insignias van en Figtree, en frase normal, a 12–13px y sin espaciado («semanas de racha», «puntos», «Nuevo»). Las mayúsculas solo salen en la condensada: el logotipo, los títulos grandes y la cinta del nivel.
+- **Sin datos encadenados con « · ».** Varios datos seguidos van separados por comas (`parts()` en `app.js`: cada dato en su trozo y la coma la pone el CSS), entre paréntesis («3.0 de 5 (2 votos)», «Novedades (5)») o con dos puntos («Medallas: 3 de 12»). El « · » solo queda dentro de los nombres reales de los sectores («Sala 1 · 1»).
 - Los campos de texto van a 16px para que iOS no haga zoom.
 - Textos con «…» de verdad, nunca «...».
 
@@ -141,11 +142,13 @@ Solo se gira lo que es «cinta pegada». Todo lo demás va recto.
 
 - `.btn`: superficie con borde `--line-2`, 44px de alto como mínimo. `.btn.primary`: relleno `--accent` con texto `--accent-ink`. `.btn.small`: 36px, en avisos y barras de herramientas (editor), nunca como acción principal.
 - `.linkbtn`: texto subrayado para acciones secundarias.
+- `.x` (cerrar): círculo liso en `--surface-2`, sin borde.
+- Deshabilitado: tres señales a la vez (fondo `--surface-2`, texto `--muted` y cursor), nunca solo opacidad.
 - Al pulsar, `scale(.97)`. Foco: contorno de 3px en `--accent`, o en `--tape` sobre el muro.
 
 ### Cards & Containers
 
-- **Fila de bloque** (`.card`): cinta del nivel a la izquierda, nombre a 17px, una línea de meta (sector · fecha · equipador con su inicial), estilos como texto («Placa · Técnico»), estrellas y estado (Flash, Encadenado, Proyecto), y la miniatura de la foto si la hay (84px). Sin recuadros dentro.
+- **Fila de bloque** (`.card`): cinta del nivel a la izquierda, nombre a 17px, una línea de meta (sector, presa, fecha y equipador con su inicial), estilos como texto separados por comas («Placa, Técnico»), estrellas y estado (Flash, Encadenado, Proyecto), y la miniatura de la foto si la hay (84px). Sin recuadros dentro.
 - **Etiquetas de estilo en la ficha** (`.tag`): pastilla plana en `--surface-2`, en frase normal.
 - **Portada de Hoy** (`.today-hero`): un trozo de muro con la rejilla de tuercas, la etiqueta del rocódromo en cinta, el saludo en grande en condensada, el marcador (racha, puntos, encadenados) y «Empezar sesión» en girasol. El usuario prefirió esta versión a la del bloque destacado con el panel.
 - **Hoja** (`.sheet`): ficha y formularios, a pantalla completa en el móvil, con `overscroll-behavior: contain`.
@@ -161,6 +164,8 @@ Barra de pestañas de texto (`.mainnav`): Hoy, Bloques, Mapa, Ranking, Grupos, E
 ### Pills, Tags, and Chips
 
 - `.chip`: filtros (estilo, agarre, equipador, presa), dentro del panel «Filtros». Pulsado: relleno `--ink`.
+- **Selectores** (`.tabs`: vistas de Bloques, tema, letra, mes…): sin bandeja ni pastilla blanca flotante. Opciones de texto sobre una línea; la elegida va en tinta con la misma tira de cinta amarilla que la navegación.
+- **Rocódromo** (`.gympick`): dos pastillas con borde; la elegida, rellena de `--ink`. El nombre del rocódromo ya no se repite debajo del logo.
 - `.new-badge`: «Nuevo» en cinta amarilla con muesca.
 - Etiqueta de equipador: su inicial en un cuadradito `--accent` y su nombre en texto.
 
@@ -188,7 +193,9 @@ Barra de pestañas de texto (`.mainnav`): Hoy, Bloques, Mapa, Ranking, Grupos, E
 
 - Gris o blanco puros, texturas o grano.
 - Tarjetas iguales en rejilla, o iconos dentro de cuadrados de color.
-- Títulos en mayúsculas pequeñas espaciadas fuera del muro.
+- Etiquetas en mayúsculas pequeñas espaciadas, en ningún sitio (tampoco en el muro).
+- Datos unidos con « · ».
+- Bandejas con pastilla blanca para elegir opción; franjas de color en un solo lado de un recuadro.
 - Degradados, brillos, fondos desenfocados o manchas de color.
 - Emojis como iconos.
 - Copiar el sistema visual de otra marca o app: este documento es el de Xlp.Boulder.
@@ -212,7 +219,7 @@ Barra de pestañas de texto (`.mainnav`): Hoy, Bloques, Mapa, Ranking, Grupos, E
 
 ### Collapsing Strategy
 
-- Filtros: buscador más «Filtros · n», y el resto en un panel que se abre. Con el panel cerrado, una línea dice qué se filtra.
+- Filtros: buscador más «Filtros (n)», y el resto en un panel que se abre. Con el panel cerrado, una línea dice qué se filtra.
 - El aviso de instalar la app solo sale en Hoy.
 - Las pestañas y las etiquetas se desplazan de lado dentro de su fila; la página nunca. En las hojas (Ajustes) los selectores bajan de línea.
 - Encadenado y Flash van en una barra fija al pie de la ficha (`.send-bar`): se ven sin bajar.

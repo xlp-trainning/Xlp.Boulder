@@ -110,7 +110,7 @@ function renderRanking() {
         el("span", { text: `${lg.have} de ${PROMOTE} ${PLURAL[lg.next.k]} para subir a la liga ` }), leagueBadge(lg.next)),
       el("span", { class: "medal-bar lg-bar" }, el("span", { style: `width:${lg.have / PROMOTE * 100}%;background:${lg.next.solid ? "#8A8F8C" : lg.next.bg}` }))]
       : el("div", { class: "lg-next", text: "Estás en la liga más alta. ¡A por el primer puesto!" }),
-    me ? el("div", { class: "note", text: `Este mes: ${me.points} puntos · puesto ${RK.rows.filter(r => r.league === me.league).indexOf(me) + 1} de ${RK.rows.filter(r => r.league === me.league).length}` }) : null);
+    me ? el("div", { class: "note", text: `Este mes: ${me.points} puntos, puesto ${RK.rows.filter(r => r.league === me.league).indexOf(me) + 1} de ${RK.rows.filter(r => r.league === me.league).length}` }) : null);
 
   // Apuntarse con un apodo
   let joinBox = null;
@@ -132,8 +132,8 @@ function renderRanking() {
         RK.editing ? el("button", { class: "btn", type: "button", onclick: () => { RK.editing = false; renderRanking(); } }, "Cancelar") : null),
       el("p", { class: "note", text: "Solo se verá tu apodo, tu liga y tus puntos del mes. Sin email ni contraseña." }));
   } else if (RK.me) {
-    joinBox = el("div", { class: "note join-me" }, `Participas como `, el("strong", { text: RK.me }), " · ",
-      el("button", { class: "linkbtn", onclick: () => { RK.editing = true; renderRanking(); } }, "Cambiar apodo"), " · ",
+    joinBox = el("div", { class: "note join-me" }, el("span", {}, `Participas como `, el("strong", { text: RK.me })),
+      el("button", { class: "linkbtn", onclick: () => { RK.editing = true; renderRanking(); } }, "Cambiar apodo"),
       el("button", { class: "linkbtn", onclick: leaveRanking }, "Salir del ranking"));
   }
   const nudge = pinNudge();
@@ -165,7 +165,7 @@ function renderRanking() {
         : rows.length ? el("ol", { class: "rk-list" }, rows.map((r, i) => el("li", { class: "rk-row" + (r.is_me ? " me" : "") },
             rkPos(i),
             el("span", { class: "rk-who" }, el("strong", { text: r.nick + (r.is_me ? " (tú)" : "") }),
-              el("span", { class: "note", text: `${r.sends} ${r.sends === 1 ? "bloque" : "bloques"}` + (r.flashes ? ` · ${r.flashes} flash` : "") })),
+              parts("note", `${r.sends} ${r.sends === 1 ? "bloque" : "bloques"}`, r.flashes ? `${r.flashes} flash` : "")),
             el("span", { class: "rk-pts" }, el("strong", { text: String(r.points) }), el("span", { class: "note", text: "puntos" })),
             S.isSetter && !r.is_me ? el("button", { class: "linkbtn rk-kick", "aria-label": `Quitar a ${r.nick}`, onclick: () => kickClimber(r) }, "Quitar") : null)))
         : el("p", { class: "note", text: RK.month === "cur" ? `Nadie ha puntuado todavía en la liga ${view.name} este mes. ¡Estrénala!` : `Nadie puntuó en la liga ${view.name} ese mes.` })),

@@ -42,9 +42,9 @@ function renderHoy() {
         el("button", { class: "btn primary", onclick: () => startSession() }, ico("play"), ses ? "Volver a la sesión" : "Empezar sesión"),
         el("button", { class: "btn", onclick: () => setPage("mapa") }, ico("map"), "Mapa de la sala"))),
     alerts.length ? el("div", { class: "today-alerts" }, alerts) : null,
-    el("section", { class: "section" }, todayHead(fresh.length ? `Novedades · ${fresh.length}` : "Novedades", fresh.length > 4 ? "Ver todas" : null, () => { S.view = "new"; store.set("lb-view", "new"); setPage("bloques"); }),
+    el("section", { class: "section" }, todayHead(fresh.length ? `Novedades (${fresh.length})` : "Novedades", fresh.length > 4 ? "Ver todas" : null, () => { S.view = "new"; store.set("lb-view", "new"); setPage("bloques"); }),
       fresh.length ? el("div", { class: "grid" }, fresh.slice(0, 4).map(card)) : el("p", { class: "note", text: "Nada nuevo esta semana. Cuando se monten bloques, saldrán aquí." })),
-    plan ? el("section", { class: "section" }, todayHead(`Tu plan de la semana · ${plan.axis.toLowerCase()}`, "Mi progreso", () => setPage("progreso")), el("div", { class: "grid" }, plan.blocks.map(card)))
+    plan ? el("section", { class: "section" }, todayHead(`Tu plan de la semana: ${plan.axis.toLowerCase()}`, "Mi progreso", () => setPage("progreso")), el("div", { class: "grid" }, plan.blocks.map(card)))
       : recs.length ? el("section", { class: "section" }, todayHead("Tu siguiente reto"), el("div", { class: "grid" }, recs.map(r => el("div", { class: "rec" }, el("span", { class: "rec-why", text: r.why }), card(r.b))))) : null,
     projects.length ? el("section", { class: "section" }, todayHead("Tus proyectos"), el("div", { class: "grid" }, projects.map(card))) : null,
     G.groups.length ? el("section", { class: "section" }, todayHead("En tus grupos", "Grupos", () => setPage("grupos")),
@@ -154,7 +154,7 @@ function openSettings() {
   const cb = document.body.classList.contains("cb");
   openId = null;
   sheet(head("Ajustes", true), el("div", { class: "settings" },
-    el("div", { class: "field" }, el("span", { class: "label", text: "Idioma · Language" }),
+    el("div", { class: "field" }, el("span", { class: "label", text: "Idioma / Language" }),
       el("div", { class: "tabs", role: "group", "aria-label": "Idioma", translate: "no" }, [["es", "Español"], ["en", "English"]].map(([k, t]) =>
         el("button", { "aria-pressed": LANG === k ? "true" : "false", onclick: () => { if (k === LANG) return; try { localStorage.setItem("lb-lang", JSON.stringify(k)); } catch (e) {} location.reload(); } }, t)))),
     tabs("Tema", store.get("lb-theme", "auto"), [["auto", "Como el móvil"], ["light", [ico("sun", "sm"), "Claro"]], ["dark", [ico("moon", "sm"), "Oscuro"]]], k => { store.set("lb-theme", k); applyLook(); }),
@@ -165,12 +165,12 @@ function openSettings() {
         el("button", { id: "cbBtn", "aria-pressed": cb ? "true" : "false", onclick: () => { setColorBlind(true); render(); openSettings(); } }, "Sí")),
       el("p", { class: "note", text: "Cada color de nivel y de presa lleva su abreviatura (Az, Ve, Na, Am…)." })),
     el("div", { class: "field" }, el("span", { class: "label", text: "Tu apodo" }),
-      G.me ? el("div", { class: "row" }, el("span", {}, el("strong", { text: G.me.nick }), el("span", { class: "note", text: APODO.pin ? " · con PIN" : " · sin PIN" })),
+      G.me ? el("div", { class: "row" }, el("span", {}, el("strong", { text: G.me.nick }), el("span", { class: "note", text: APODO.pin ? " (con PIN)" : " (sin PIN)" })),
           el("button", { class: "btn small", onclick: openPinSheet }, ico("lock", "sm"), APODO.pin ? "Cambiar PIN" : "Poner PIN"))
         : el("div", { class: "row" }, el("span", { class: "note", text: "Aún no tienes apodo en este móvil." }), el("button", { class: "btn small", onclick: openRecoverSheet }, "Recuperar mi apodo"))),
     el("div", { class: "field" }, el("span", { class: "label", text: "La app" }),
       el("div", { class: "row" },
-        el("button", { class: "btn", onclick: () => openInstall() }, ico("phone"), "Instalar · pasar mi progreso"),
+        el("button", { class: "btn", onclick: () => openInstall() }, ico("phone"), "Instalar y pasar mi progreso"),
         el("button", { class: "btn", onclick: () => { closeSheet(); openWelcome(); } }, "Ver la bienvenida otra vez"),
         el("button", { class: "btn", onclick: () => openGlossary() }, ico("bulb"), "Qué significa cada cosa"),
         el("a", { class: "btn", href: "privacidad.html" }, ico("lock"), "Privacidad"),

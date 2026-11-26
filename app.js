@@ -58,6 +58,8 @@ const S = {
   setter: null, isMaster: false, drawingSector: null, mapSel: null, loaded: false, error: null,
 };
 const $ = id => document.getElementById(id);
+// Varios datos seguidos: cada uno en su trozo (se traduce solo) y las comas las pone el CSS (.parts)
+const parts = (cls, ...xs) => el("span", { class: (cls ? cls + " " : "") + "parts" }, xs.filter(Boolean).map(t => el("span", { text: t })));
 const el = (tag, attrs = {}, ...kids) => {
   const n = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -239,7 +241,7 @@ const levelDot = k => colorDot(k, LV[k].bg, LV[k].solid);
 function setColorBlind(on) { document.body.classList.toggle("cb", on); store.set("lb-cb", on); const b = $("cbBtn"); if (b) b.setAttribute("aria-pressed", on ? "true" : "false"); }
 const holdMeta = b => COLORS[b.hold_color] ? el("span", { class: "hold" }, colorDot(b.hold_color, COLORS[b.hold_color].hex), "Presa " + COLORS[b.hold_color].name.toLowerCase()) : null;
 const starsLine = (st, long) => el("div", { class: "stars-line" },
-  st.n ? [el("span", { class: "s", text: starStr(st.avg) }), el("span", { text: long ? `${st.avg.toFixed(1)} de 5 · ${st.n} ${st.n === 1 ? "voto" : "votos"}` : `${st.avg.toFixed(1)} · ${st.n}` })]
+  st.n ? [el("span", { class: "s", text: starStr(st.avg) }), el("span", { text: long ? `${st.avg.toFixed(1)} de 5 (${st.n} ${st.n === 1 ? "voto" : "votos"})` : `${st.avg.toFixed(1)} (${st.n})` })]
        : el("span", { text: long ? "Sin puntuar todavía" : "Sin puntuar" }));
 const emptyBox = (h, p, btn, error) => el("div", { class: "empty" + (error ? " is-error" : ""), role: error ? "alert" : null }, el("h2", { text: h }), p ? el("p", { text: p }) : null, btn || null);
 // Esqueleto de la lista mientras llegan los bloques
@@ -327,7 +329,7 @@ function renderChips() {
   const newCount = S.blocks.filter(isNew).length;
   document.querySelectorAll("[data-view]").forEach(b => {
     b.setAttribute("aria-pressed", S.view === b.dataset.view ? "true" : "false");
-    if (b.dataset.view === "new") b.textContent = newCount ? `Novedades · ${newCount}` : "Novedades";
+    if (b.dataset.view === "new") b.textContent = newCount ? `Novedades (${newCount})` : "Novedades";
   });
   const sc = $("styleChips"); sc.replaceChildren();
   const styleChip = s => el("button", { class: "chip", "aria-pressed": S.styles.has(s) ? "true" : "false", onclick: () => { S.styles.has(s) ? S.styles.delete(s) : S.styles.add(s); render(); } }, s);
@@ -347,7 +349,7 @@ function renderChips() {
   cc.hidden = !cc.firstChild;
   // Botón «Filtros · n» y, con el panel cerrado, lo que está filtrando en una línea
   const n = S.styles.size + S.colors.size + (S.setter ? 1 : 0) + (S.sector ? 1 : 0) + (S.sort && S.sort !== "new" ? 1 : 0);
-  $("filterLbl").textContent = n ? `Filtros · ${n}` : "Filtros";
+  $("filterLbl").textContent = n ? `Filtros (${n})` : "Filtros";
   $("filterBtn").classList.toggle("on", !!n);
   $("filterBtn").setAttribute("aria-expanded", S.filtersOpen ? "true" : "false");
   $("filterPanel").hidden = !S.filtersOpen;
@@ -356,7 +358,7 @@ function renderChips() {
   if (filtering) {
     const bits = [S.level && lvName({ level: S.level }), S.sector, S.setter && setterById(S.setter)?.name, ...S.styles, ...[...S.colors].map(k => COLORS[k]?.name)].filter(Boolean);
     if (S.q) af.append(el("span", { class: "af-bits", text: "Buscando en todos los bloques montados" }));
-    if (!S.filtersOpen && bits.length) af.append(el("span", { class: "af-bits", text: bits.join(" · ") }));
+    if (!S.filtersOpen && bits.length) af.append(parts("af-bits", ...bits));
     af.append(el("button", { class: "clear", onclick: () => { S.level = null; S.sector = null; S.setter = null; S.styles.clear(); S.colors.clear(); S.q = ""; $("q").value = ""; render(); } }, "Quitar filtros"));
   }
 }
@@ -448,7 +450,7 @@ function renderMapa() {
     kids.push(el("section", { class: "section sector-panel" },
       el("div", { class: "sector-panel-head" },
         el("div", {}, el("span", { class: "label", text: "Sector" }), el("h2", { class: "sector-title", text: S.mapSel }),
-          el("span", { class: "note", text: `${list.length} ${list.length === 1 ? "bloque abierto" : "bloques abiertos"}` + (newBy[S.mapSel] ? ` · ${newBy[S.mapSel]} nuevos` : "") }),
+          parts("note", `${list.length} ${list.length === 1 ? "bloque abierto" : "bloques abiertos"}`, newBy[S.mapSel] ? `${newBy[S.mapSel]} nuevos` : ""),
           (age => age ? el("div", { class: "sector-age", "aria-label": `Abierto desde el ${fmtDate(age.since)}: ${ageText(age.days)}` },
             el("b", { text: age.days <= 0 ? "0" : String(age.days) }),
             el("span", {}, el("strong", { text: age.days === 1 ? "día abierto" : "días abierto" }), el("span", { class: "note", text: `desde el ${fmtDate(age.since)}` })))
@@ -464,7 +466,7 @@ function renderMapa() {
     kids.push(el("div", { class: "section" }, el("span", { class: "label", text: "Sectores" }),
       el("div", { class: "sector-grid" }, names.map(n => el("button", { class: "sector-btn" + (n === S.mapSel ? " sel" : ""), onclick: () => selectSector(n, true) },
         el("span", { class: "sector-name", text: n }),
-        el("span", { class: "note", text: `${openBy[n] || 0} abiertos` + (newBy[n] ? ` · ${newBy[n]} nuevos` : "") + (sectorAge(n) ? ` · ${ageText(sectorAge(n).days)}` : "") }))))));
+        parts("note", `${openBy[n] || 0} abiertos`, newBy[n] ? `${newBy[n]} nuevos` : "", sectorAge(n) ? ageText(sectorAge(n).days) : ""))))));
   } else if (!S.isSetter) kids.push(emptyBox("Sin sectores todavía", "Cuando el equipador apunte los sectores de la sala, aparecerán aquí."));
 
   if (S.isMaster) kids.push(mapEditor());
@@ -788,7 +790,7 @@ function feelSummary(st) {
   return el("div", { class: "feel-sum" },
     el("span", { class: "feel-bar", "aria-hidden": "true" },
       st.soft ? el("span", { class: "soft", style: `flex:${st.soft}` }) : null, st.fair ? el("span", { class: "fair", style: `flex:${st.fair}` }) : null, st.hard ? el("span", { class: "hard", style: `flex:${st.hard}` }) : null),
-    el("span", { class: "note", text: `${pct(st.soft)} % blando · ${pct(st.fair)} % justo · ${pct(st.hard)} % duro (${total} ${total === 1 ? "voto" : "votos"})` }));
+    parts("note", `${pct(st.soft)} % blando`, `${pct(st.fair)} % justo`, `${pct(st.hard)} % duro (${total} ${total === 1 ? "voto" : "votos"})`));
 }
 function feelBox(id, b, mine) {
   const tried = mine.sent || mine.project || mine.attempts;
@@ -859,7 +861,7 @@ function openDetail(id) {
         (b.styles || []).length ? el("div", { class: "styles" }, b.styles.map(s => el("span", { class: "tag", text: s }))) : null,
         starsLine(st, true),
         firstLine(b),
-        el("div", { class: "note", text: `${st.sends} ${st.sends === 1 ? "persona lo ha encadenado" : "personas lo han encadenado"}` + (st.flashes ? ` · ${st.flashes} al flash` : "") + (st.projects ? ` · ${st.projects} lo ${st.projects === 1 ? "está" : "están"} probando` : "") + (st.attempts ? ` · de media en ${st.attempts.toLocaleString("es-ES")} intentos` : "") }))),
+        el("div", { class: "note" }, parts("", `${st.sends} ${st.sends === 1 ? "persona lo ha encadenado" : "personas lo han encadenado"}`, st.flashes ? `${st.flashes} al flash` : "", st.projects ? `${st.projects} lo ${st.projects === 1 ? "está" : "están"} probando` : "", st.attempts ? `de media en ${st.attempts.toLocaleString("es-ES")} intentos` : "")))),
     diffBox(b),
     el("div", { class: "section" }, el("span", { class: "label", text: "Beta del equipador" }),
       el("div", { class: "beta" + (b.beta ? "" : " none"), text: b.beta || "El equipador no ha escrito la beta de este bloque." }),
